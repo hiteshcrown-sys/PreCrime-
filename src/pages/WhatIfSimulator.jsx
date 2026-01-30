@@ -4,20 +4,24 @@ import { FlaskConical, Shield, Lightbulb, Lock, Users, ArrowRight, RotateCcw, Pl
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { predictScenario } from "@/utils/crimeModelService";
+import { predictScenario, CITY_BASE_RATES } from "@/utils/crimeModelService";
 import crimeModelService from "@/utils/crimeModelService";
 
 // Dashboard cities (same as used in IndiaMap2D component)
 const DASHBOARD_CITIES = [
-  'Delhi', 'Mumbai', 'Bangalore', 'Chennai', 'Kolkata', 
+  'Delhi', 'Mumbai', 'Bangalore', 'Chennai', 'Kolkata',
   'Hyderabad', 'Pune', 'Ahmedabad', 'Jaipur', 'Lucknow'
 ];
 
 // Create zones from dashboard cities only
 const createZonesFromCities = () => {
+  console.log('Creating zones...');
+  console.log('DASHBOARD_CITIES:', DASHBOARD_CITIES);
+  console.log('CITY_BASE_RATES:', CITY_BASE_RATES);
   try {
     return DASHBOARD_CITIES.map((city, index) => {
-      const baseRate = crimeModelService?.CITY_BASE_RATES?.[city] || 100; // fallback
+      const baseRate = crimeModelService.CITY_BASE_RATES[city] || 100; // fallback
+      console.log(`City ${city}: baseRate = ${baseRate}`);
       return {
         id: index + 1,
         name: city,
@@ -67,10 +71,10 @@ const HeatmapGrid = ({ prediction, label }) => {
             initial={{ opacity: 0 }}
             animate={{
               opacity: 1,
-              backgroundColor: cellRisk >= 70 ? `rgba(239, 68, 68, ${cellRisk/100})` :
-                              cellRisk >= 50 ? `rgba(249, 115, 22, ${cellRisk/100})` :
-                              cellRisk >= 30 ? `rgba(234, 179, 8, ${cellRisk/100})` :
-                              `rgba(34, 197, 94, ${cellRisk/100})`
+              backgroundColor: cellRisk >= 70 ? `rgba(239, 68, 68, ${cellRisk / 100})` :
+                cellRisk >= 50 ? `rgba(249, 115, 22, ${cellRisk / 100})` :
+                  cellRisk >= 30 ? `rgba(234, 179, 8, ${cellRisk / 100})` :
+                    `rgba(34, 197, 94, ${cellRisk / 100})`
             }}
             transition={{ delay: i * 0.01 }}
           />
@@ -81,19 +85,23 @@ const HeatmapGrid = ({ prediction, label }) => {
         <span className="text-xs text-slate-500">Predicted Crimes</span>
       </div>
       <div className="mt-2 text-xs text-slate-400">
-        Risk Level: <span className={`font-medium ${
-          prediction.riskLevel === 'CRITICAL' ? 'text-red-400' :
-          prediction.riskLevel === 'HIGH' ? 'text-orange-400' :
-          prediction.riskLevel === 'MEDIUM' ? 'text-yellow-400' :
-          prediction.riskLevel === 'LOW' ? 'text-blue-400' : 'text-green-400'
-        }`}>{prediction.riskLevel}</span>
+        Risk Level: <span className={`font-medium ${prediction.riskLevel === 'CRITICAL' ? 'text-red-400' :
+            prediction.riskLevel === 'HIGH' ? 'text-orange-400' :
+              prediction.riskLevel === 'MEDIUM' ? 'text-yellow-400' :
+                prediction.riskLevel === 'LOW' ? 'text-blue-400' : 'text-green-400'
+          }`}>{prediction.riskLevel}</span>
       </div>
     </div>
   );
 };
 
 export default function WhatIfSimulator() {
+  console.log('WhatIfSimulator rendering...');
+  console.log('zones:', zones);
+  console.log('zones[0]:', zones[0]);
+
   const [selectedZone, setSelectedZone] = useState(zones[0] || { name: 'Delhi', baseRisk: 543, riskLevel: 'CRITICAL' });
+  console.log('selectedZone:', selectedZone);
   const [interventionValues, setInterventionValues] = useState({
     patrols: 0,
     lighting: 0,
@@ -109,7 +117,7 @@ export default function WhatIfSimulator() {
   useEffect(() => {
     try {
       const basePred = predictScenario(selectedZone.name, new Date().getHours(), {}, 'gradientBoosting');
-      
+
       // Check if it's an error response
       if (basePred && basePred.error) {
         console.error('Prediction error:', basePred.error);
@@ -170,9 +178,8 @@ export default function WhatIfSimulator() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+    <div className="space-y-6 p-6">
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-lg bg-yellow-500/20">
             <FlaskConical className="w-6 h-6 text-yellow-400" />
@@ -182,9 +189,9 @@ export default function WhatIfSimulator() {
             <p className="text-slate-400 text-sm">Test crime prevention strategies</p>
           </div>
         </div>
-        
-        <Select 
-          value={selectedZone.name} 
+
+        <Select
+          value={selectedZone.name}
           onValueChange={(v) => {
             setSelectedZone(zones.find(z => z.name === v));
             setShowResults(false);
@@ -210,7 +217,7 @@ export default function WhatIfSimulator() {
             <h3 className="font-semibold text-white">Prevention Strategies</h3>
             <p className="text-xs text-slate-500 mt-0.5">Select and adjust intervention measures</p>
           </div>
-          
+
           <div className="p-6 space-y-6">
             {interventions.map((int) => (
               <div key={int.id} className="space-y-3">
@@ -282,7 +289,7 @@ export default function WhatIfSimulator() {
             <h3 className="font-semibold text-white">Impact Analysis</h3>
             <p className="text-xs text-slate-500 mt-0.5">{selectedZone.name} - Before vs After Strategy</p>
           </div>
-          
+
           <div className="p-6">
             <div className="grid grid-cols-2 gap-4 mb-6">
               <HeatmapGrid prediction={basePrediction} label="Current State" />

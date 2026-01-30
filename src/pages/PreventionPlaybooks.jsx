@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 
 import { mlService } from "@/api/mlService";
 import { Loader2 } from "lucide-react";
+import { CITY_BASE_RATES } from "@/utils/crimeModelService";
 
 const priorityColors = {
   high: "bg-red-500/20 text-red-400 border-red-500/30",
@@ -14,13 +15,7 @@ const priorityColors = {
   low: "bg-green-500/20 text-green-400 border-green-500/30"
 };
 
-const cities = [
-  'Delhi', 'Mumbai', 'Bangalore', 'Hyderabad', 'Chennai', 'Kolkata', 'Pune',
-  'Ahmedabad', 'Jaipur', 'Lucknow', 'Indore', 'Kanpur', 'Thane', 'Bhopal',
-  'Visakhapatnam', 'Pimpri-Chinchwad', 'Patna', 'Vadodara', 'Ghaziabad',
-  'Ludhiana', 'Agra', 'Nagpur', 'Indira Nagar', 'Srinagar', 'Meerut',
-  'Ranchi', 'Bhubaneswar', 'Aligarh', 'Rajkot'
-];
+const cities = Object.keys(CITY_BASE_RATES);
 
 
 const roleIcons = {

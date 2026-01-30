@@ -44,7 +44,7 @@ const MODEL_PARAMETERS = {
 };
 
 // City base crime rates (from historical data)
-const CITY_BASE_RATES = {
+export const CITY_BASE_RATES = {
   'Delhi': 542.82,
   'Mumbai': 487.45,
   'Bangalore': 412.34,
@@ -126,7 +126,7 @@ export const predictCrimeRate = (city, hour, model = 'gradientBoosting') => {
 
   const baseRate = CITY_BASE_RATES[city];
   const hourFactor = HOUR_ADJUSTMENT_FACTORS[hour % 24] || 1.0;
-  
+
   // Apply model-specific adjustment
   const modelParams = MODEL_PARAMETERS[model];
   let modelAdjustment = 1.0;
@@ -143,7 +143,7 @@ export const predictCrimeRate = (city, hour, model = 'gradientBoosting') => {
 
   // Determine risk level first
   const riskLevelValue = classifyRiskLevel(predictedRate);
-  
+
   // Calculate threat level (1-10 scale) based on risk level
   let threatLevel = 5; // Default
   if (riskLevelValue === 'CRITICAL') {
@@ -157,10 +157,10 @@ export const predictCrimeRate = (city, hour, model = 'gradientBoosting') => {
   } else {
     threatLevel = 1;
   }
-  
+
   // Calculate risk score (0-1 scale)
   const riskScore = Math.min(1, predictedRate / 600);
-  
+
   // Calculate confidence as decimal (0-1)
   const confidenceValue = modelParams.accuracy;
 
@@ -287,7 +287,7 @@ export const predictCityRankings = (hour, model = 'gradientBoosting') => {
  */
 export const batchPredictCrimeRates = (cities, hours, model = 'gradientBoosting') => {
   const predictions = [];
-  
+
   cities.forEach(city => {
     hours.forEach(hour => {
       const prediction = predictCrimeRate(city, hour, model);
@@ -366,7 +366,7 @@ export const getSafestHours = (city) => {
 export const getCrimeDomainDistribution = (hour) => {
   // Adjust distribution based on hour
   const hourFactor = HOUR_ADJUSTMENT_FACTORS[hour % 24] || 1.0;
-  
+
   return Object.entries(CRIME_DOMAIN_DISTRIBUTION).reduce((acc, [domain, data]) => {
     acc[domain] = {
       percentage: data.percentage,
@@ -384,7 +384,7 @@ export const getCrimeDomainDistribution = (hour) => {
  */
 export const exportModelData = (options = {}) => {
   const { cities = Object.keys(CITY_BASE_RATES), format = 'json' } = options;
-  
+
   const data = {
     exportDate: new Date().toISOString(),
     modelInfo: {

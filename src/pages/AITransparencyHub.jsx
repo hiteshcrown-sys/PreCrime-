@@ -1,9 +1,9 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Brain, Info, Scale, CheckCircle, AlertCircle, Eye, Clock, TrendingUp } from "lucide-react";
+import { Brain, Info, Scale, CheckCircle, AlertCircle, Eye, Clock } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { predict, getModelInfo, classifyRiskLevel } from "@/utils/crimeModelService";
+import { predictCrimeRate, getModelInfo, classifyRiskLevel } from "@/utils/crimeModelService";
 
 // Cities trained on the ML model
 const TRAINED_CITIES = [
@@ -64,7 +64,7 @@ export default function AITransparencyHub() {
   // Get ML predictions for selected zone
   const mlPrediction = useMemo(() => {
     try {
-      const prediction = predict(selectedZone.name, new Date().getHours(), selectedModel);
+      const prediction = predictCrimeRate(selectedZone.name, new Date().getHours(), selectedModel);
       return {
         rate: Math.round(prediction.adjustedRate),
         confidence: 99.98,

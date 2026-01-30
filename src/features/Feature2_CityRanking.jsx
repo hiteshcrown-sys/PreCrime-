@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TrendingDown, TrendingUp, MapPin } from 'lucide-react';
-import useCrimeModel from '@/hooks/useCrimeModel';
+import { useCrimeModel } from '@/hooks/useCrimeModel';
 
 /**
  * Feature 2: City Ranking by Crime Rate

@@ -1,11 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { Shield, AlertTriangle, MapPin, Activity, TrendingUp } from "lucide-react";
-import { Slider } from "@/components/ui/slider";
+import { Shield, AlertTriangle, MapPin, Activity } from "lucide-react";
 import KPICard from "@/components/dashboard/KPICard";
 
 import CrimePredictionModel from "@/components/dashboard/CrimePredictionModel";
-import useCrimeModel from "@/hooks/useCrimeModel";
+import { useCrimeModel } from "@/hooks/useCrimeModel";
 import L from 'leaflet';
 
 // City coordinates mapping (latitude, longitude)
