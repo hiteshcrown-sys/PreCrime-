@@ -1,78 +1,72 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Radio, MapPin, AlertTriangle, Activity, RefreshCw, Zap } from "lucide-react";
+import { Radio, MapPin, AlertTriangle, Activity, RefreshCw, Zap, Shield, Navigation } from "lucide-react";
 import RiskBadge from "@/components/ui/RiskBadge";
-
-const eventTypes = [
-  "Suspicious Activity Reported",
-  "Vehicle Theft Alert",
-  "Assault Pattern Detected",
-  "Break-in Cluster Forming",
-  "Vandalism Report",
-  "Robbery Alert",
-  "Drug Activity Spike",
-  "Pickpocket Warning"
-];
-
-const zones = ["Downtown Core", "Financial Hub", "Industrial District", "Harbor Area", "Old Town", "Shopping District"];
-
-const generateEvent = (id) => ({
-  id,
-  type: eventTypes[Math.floor(Math.random() * eventTypes.length)],
-  zone: zones[Math.floor(Math.random() * zones.length)],
-  risk: Math.floor(Math.random() * 50) + 40,
-  confidence: Math.floor(Math.random() * 20) + 75,
-  timestamp: new Date()
-});
+import { useCity } from "@/contexts/CityContext";
+import PatrolTrackerMap from "@/components/live/PatrolTrackerMap";
+import { livePatrolService } from "@/services/livePatrolService";
+import { crimeDataService } from "@/api/crimeDataService";
 
 export default function LiveCrimePulse() {
+  const { selectedCity } = useCity();
   const [events, setEvents] = useState([]);
   const [isRecalculating, setIsRecalculating] = useState(false);
-  const [zoneRisks, setZoneRisks] = useState({
-    "Downtown Core": 87,
-    "Financial Hub": 79,
-    "Industrial District": 72,
-    "Harbor Area": 65,
-    "Old Town": 58,
-    "Shopping District": 52
-  });
+  const [showRoutes, setShowRoutes] = useState(true);
+  const [patrolStats, setPatrolStats] = useState({ active: 5, responding: 0, idle: 5 });
 
   useEffect(() => {
-    // Initial events
-    setEvents([
-      generateEvent(1),
-      generateEvent(2),
-      generateEvent(3)
-    ]);
-
-    // Add new events periodically
-    const eventInterval = setInterval(() => {
-      setEvents(prev => {
-        const newEvent = generateEvent(Date.now());
-        return [newEvent, ...prev.slice(0, 9)];
-      });
-    }, 5000);
-
-    // Simulate model recalculation
-    const recalcInterval = setInterval(() => {
-      setIsRecalculating(true);
-      setTimeout(() => {
-        setZoneRisks(prev => {
-          const updated = { ...prev };
-          Object.keys(updated).forEach(zone => {
-            updated[zone] = Math.max(20, Math.min(95, updated[zone] + (Math.random() - 0.5) * 10));
-          });
-          return updated;
-        });
-        setIsRecalculating(false);
-      }, 2000);
-    }, 15000);
-
-    return () => {
-      clearInterval(eventInterval);
-      clearInterval(recalcInterval);
+    // Connect to real-time events from crimeDataService
+    const handleUpdate = (detail) => {
+      if (detail.type === 'alert' || detail.type === 'hotspots') {
+        const newEvent = {
+          id: Date.now(),
+          type: detail.message || "Risk Threshold Exceeded",
+          zone: detail.city || selectedCity,
+          risk: detail.riskRate || 75,
+          confidence: detail.confidence || 88,
+          timestamp: new Date()
+        };
+        setEvents(prev => [newEvent, ...prev.slice(0, 9)]);
+      }
     };
-  }, []);
+
+    window.addEventListener('crimeDataUpdate', (e) => handleUpdate(e.detail));
+
+    // Initial fetch of hotspots to generate initial events if feed is empty
+    const initFeed = async () => {
+      try {
+        const hotspotData = await crimeDataService.getHotspots(selectedCity);
+        const hotspots = Array.isArray(hotspotData) ? hotspotData : (hotspotData?.hotspots || []);
+
+        const initialEvents = hotspots.slice(0, 5).map((h, i) => ({
+          id: `init-${i}`,
+          type: `Higher density predicted in ${h.name}`,
+          zone: h.name,
+          risk: (h.riskLevel === 'CRITICAL' || h.priority === 'CRITICAL') ? 85 :
+            (h.riskLevel === 'HIGH' || h.priority === 'HIGH') ? 75 : 55,
+          confidence: 90 + Math.floor(Math.random() * 5),
+          timestamp: new Date()
+        }));
+        setEvents(initialEvents);
+      } catch (err) {
+        console.error("Feed init failed:", err);
+      }
+    };
+
+    initFeed();
+
+    return () => window.removeEventListener('crimeDataUpdate', handleUpdate);
+  }, [selectedCity]);
+
+  // Handle status updates from the map component
+  const handleStatusChange = (counts) => {
+    setPatrolStats({
+      active: Object.values(counts).reduce((a, b) => a + b, 0),
+      responding: counts['Responding'] || 0,
+      enRoute: counts['En Route'] || 0,
+      idle: counts['Idle'] || 0
+    });
+  };
 
   const getRiskLevel = (risk) => {
     if (risk >= 80) return "critical";
@@ -87,8 +81,8 @@ export default function LiveCrimePulse() {
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="relative">
-            <div className="p-2 rounded-lg bg-red-500/20">
-              <Radio className="w-6 h-6 text-red-400" />
+            <div className="p-2 rounded-lg bg-red-500/20 text-red-500">
+              <Shield className="w-6 h-6" />
             </div>
             <motion.span
               className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"
@@ -97,166 +91,102 @@ export default function LiveCrimePulse() {
             />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-white">Live Crime Pulse</h1>
-            <p className="text-slate-400 text-sm">Real-time intelligence feed</p>
+            <h1 className="text-2xl font-bold text-white">Patrol Tracker & Operational Pulse</h1>
+            <p className="text-slate-400 text-sm">Real-time command & control for {selectedCity}</p>
           </div>
         </div>
-        
-        {/* Status indicator */}
+
         <div className="flex items-center gap-4">
-          {isRecalculating ? (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-yellow-500/10 border border-yellow-500/30"
+          <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-800/50 border border-slate-700">
+            <span className="text-xs text-slate-400 uppercase tracking-widest">Route Prediction</span>
+            <button
+              onClick={() => setShowRoutes(!showRoutes)}
+              className={`w-10 h-5 rounded-full relative transition-colors ${showRoutes ? 'bg-cyan-500' : 'bg-slate-700'}`}
             >
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-              >
-                <RefreshCw className="w-4 h-4 text-yellow-400" />
-              </motion.div>
-              <span className="text-sm text-yellow-400">Model Recalculating...</span>
-            </motion.div>
-          ) : (
-            <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-500/10 border border-green-500/30">
-              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-sm text-green-400">Live Feed Active</span>
-            </div>
-          )}
+              <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${showRoutes ? 'left-6' : 'left-1'}`} />
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-500/10 border border-green-500/30 font-medium">
+            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+            <span className="text-sm text-green-400 uppercase tracking-tighter">Live Sensor Feed</span>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        {/* Live Map with animated zones */}
-        <div className="xl:col-span-2">
-          <div className="rounded-2xl bg-slate-900/50 border border-slate-800 overflow-hidden h-[500px]">
-            <div className="p-4 border-b border-slate-800 flex items-center justify-between">
-              <h3 className="font-semibold text-white">Animated Risk Map</h3>
-              <div className="flex items-center gap-2 text-xs text-slate-400">
-                <Activity className="w-4 h-4" />
-                <span>Updates every 5 seconds</span>
-              </div>
-            </div>
-            
-            <div className="relative h-[calc(100%-60px)] p-4">
-              {/* Grid background */}
-              <div className="absolute inset-4 opacity-20">
-                <svg width="100%" height="100%">
-                  <defs>
-                    <pattern id="pulse-grid" width="50" height="50" patternUnits="userSpaceOnUse">
-                      <path d="M 50 0 L 0 0 0 50" fill="none" stroke="rgb(100, 116, 139)" strokeWidth="0.5"/>
-                    </pattern>
-                  </defs>
-                  <rect width="100%" height="100%" fill="url(#pulse-grid)" />
-                </svg>
-              </div>
-
-              {/* Zone markers */}
-              {Object.entries(zoneRisks).map(([zone, risk], index) => {
-                const positions = [
-                  { x: 45, y: 35 }, { x: 55, y: 45 }, { x: 25, y: 55 },
-                  { x: 70, y: 65 }, { x: 50, y: 50 }, { x: 40, y: 70 }
-                ];
-                const pos = positions[index];
-                const riskLevel = getRiskLevel(risk);
-                const colors = {
-                  critical: { bg: "rgba(239, 68, 68, 0.5)", border: "#ef4444" },
-                  high: { bg: "rgba(249, 115, 22, 0.4)", border: "#f97316" },
-                  medium: { bg: "rgba(234, 179, 8, 0.3)", border: "#eab308" },
-                  low: { bg: "rgba(34, 197, 94, 0.3)", border: "#22c55e" }
-                };
-
-                return (
-                  <motion.div
-                    key={zone}
-                    className="absolute"
-                    style={{ left: `${pos.x}%`, top: `${pos.y}%`, transform: "translate(-50%, -50%)" }}
-                    animate={isRecalculating ? { scale: [1, 1.1, 1] } : {}}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <motion.div
-                      className="relative"
-                      animate={{ scale: [1, 1.05, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    >
-                      <div
-                        className="absolute inset-0 rounded-full blur-xl"
-                        style={{
-                          width: 60,
-                          height: 60,
-                          background: colors[riskLevel].bg,
-                          transform: "translate(-50%, -50%)",
-                          left: "50%",
-                          top: "50%"
-                        }}
-                      />
-                      <div
-                        className="relative w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-sm border-2"
-                        style={{
-                          background: colors[riskLevel].bg,
-                          borderColor: colors[riskLevel].border
-                        }}
-                      >
-                        {Math.round(risk)}
-                      </div>
-                    </motion.div>
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 whitespace-nowrap">
-                      <span className="text-xs text-slate-400">{zone}</span>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+        {/* Real-time Patrol Map */}
+        <div className="xl:col-span-3">
+          <div className="h-[600px] relative">
+            <PatrolTrackerMap
+              city={selectedCity}
+              showRoutes={showRoutes}
+              onStatusChange={handleStatusChange}
+            />
           </div>
         </div>
 
-        {/* Real-time Activity Feed */}
-        <div className="xl:col-span-1">
-          <div className="rounded-2xl bg-slate-900/50 border border-slate-800 overflow-hidden h-[500px] flex flex-col">
-            <div className="p-4 border-b border-slate-800 flex items-center justify-between">
-              <h3 className="font-semibold text-white">Activity Feed</h3>
-              <div className="flex items-center gap-1 text-xs">
-                <Zap className="w-3 h-3 text-yellow-400" />
-                <span className="text-yellow-400">{events.length} events</span>
+        {/* Operational Analytics & Feed */}
+        <div className="xl:col-span-1 space-y-6">
+          {/* Patrol Stats Card */}
+          <div className="rounded-2xl bg-slate-900/50 border border-slate-800 p-5 space-y-4 shadow-xl backdrop-blur-sm">
+            <div className="flex items-center gap-2 text-cyan-400 mb-2">
+              <Navigation className="w-4 h-4" />
+              <h3 className="font-bold text-sm uppercase tracking-wider">Unit Readiness</h3>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-3 bg-slate-800/50 rounded-xl border border-slate-700/50">
+                <p className="text-[10px] text-slate-500 uppercase">Responding</p>
+                <p className="text-xl font-bold text-red-400">{patrolStats.responding}</p>
+              </div>
+              <div className="p-3 bg-slate-800/50 rounded-xl border border-slate-700/50">
+                <p className="text-[10px] text-slate-500 uppercase">En Route</p>
+                <p className="text-xl font-bold text-cyan-400">{patrolStats.enRoute || 0}</p>
+              </div>
+              <div className="p-3 bg-slate-800/50 rounded-xl border border-slate-700/50">
+                <p className="text-[10px] text-slate-500 uppercase">Standby</p>
+                <p className="text-xl font-bold text-slate-400">{patrolStats.idle}</p>
+              </div>
+              <div className="p-3 bg-slate-800/50 rounded-xl border border-slate-700/50">
+                <p className="text-[10px] text-slate-500 uppercase">Total Units</p>
+                <p className="text-xl font-bold text-white">{patrolStats.active}</p>
               </div>
             </div>
-            
-            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+          </div>
+
+          {/* Real-time Activity Feed */}
+          <div className="rounded-2xl bg-slate-900/50 border border-slate-800 overflow-hidden h-[340px] flex flex-col shadow-xl">
+            <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-800/30">
+              <h3 className="font-bold text-sm text-white uppercase tracking-wider">Intelligence Stream</h3>
+              <Zap className="w-4 h-4 text-yellow-500 animate-pulse" />
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
               <AnimatePresence mode="popLayout">
                 {events.map((event) => (
                   <motion.div
                     key={event.id}
                     layout
-                    initial={{ opacity: 0, x: -50, scale: 0.8 }}
-                    animate={{ opacity: 1, x: 0, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    transition={{ type: "spring", damping: 15 }}
-                    className="p-3 rounded-xl bg-slate-800/50 border border-slate-700"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    className="p-3 rounded-xl bg-slate-800/50 border border-slate-700 group hover:border-cyan-500/30 transition-all"
                   >
                     <div className="flex items-start gap-3">
-                      <div className={`p-1.5 rounded-lg ${
-                        event.risk >= 70 ? "bg-red-500/20" : 
-                        event.risk >= 50 ? "bg-orange-500/20" : "bg-yellow-500/20"
-                      }`}>
-                        <AlertTriangle className={`w-3 h-3 ${
-                          event.risk >= 70 ? "text-red-400" : 
-                          event.risk >= 50 ? "text-orange-400" : "text-yellow-400"
-                        }`} />
+                      <div className={`p-2 rounded-lg ${event.risk >= 80 ? "bg-red-500/20 text-red-500" : "bg-cyan-500/20 text-cyan-500"
+                        }`}>
+                        <AlertTriangle className="w-3 h-3" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-white text-sm truncate">{event.type}</p>
-                        <div className="flex items-center gap-2 mt-1 text-xs text-slate-400">
-                          <MapPin className="w-3 h-3" />
-                          <span className="truncate">{event.zone}</span>
-                        </div>
-                        <div className="flex items-center gap-2 mt-2">
-                          <RiskBadge level={getRiskLevel(event.risk)} size="sm" />
-                          <span className="text-xs text-cyan-400">{event.confidence}% conf</span>
-                        </div>
+                        <p className="font-bold text-white text-[11px] truncate leading-tight uppercase tracking-tight">{event.type}</p>
+                        <p className="text-[10px] text-slate-500 mt-1 flex items-center gap-1">
+                          <MapPin className="w-2 h-2" />
+                          {event.zone}
+                        </p>
                       </div>
-                      <span className="text-[10px] text-slate-500 whitespace-nowrap">
-                        {event.timestamp.toLocaleTimeString()}
+                      <span className="text-[9px] text-slate-600 font-mono">
+                        {new Date(event.timestamp).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
                   </motion.div>
