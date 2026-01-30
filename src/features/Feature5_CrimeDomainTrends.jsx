@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Pie, LineChart, TrendingUp } from 'lucide-react';
+import { PieChart, TrendingUp } from 'lucide-react';
 
 /**
  * Feature 5: Crime Domain Trends Analysis

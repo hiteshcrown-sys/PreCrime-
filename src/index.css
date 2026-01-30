@@ -86,3 +86,5 @@
     @apply bg-background text-foreground;
   }
 }
+/* Leaflet Map Styles */
+@import 'leaflet/dist/leaflet.css';

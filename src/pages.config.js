@@ -50,14 +50,18 @@
 import AITransparencyHub from './pages/AITransparencyHub';
 import CommandCenter from './pages/CommandCenter';
 import CrimeDNA from './pages/CrimeDNA';
+import CrimeIntelligence from './pages/CrimeIntelligence';
 import ExplainableAI from './pages/ExplainableAI';
 import FairnessDashboard from './pages/FairnessDashboard';
 import FullAnalytics from './pages/FullAnalytics';
+import HotspotIntelligence from './pages/HotspotIntelligence';
 import InterventionTracker from './pages/InterventionTracker';
 import LiveCrimePulse from './pages/LiveCrimePulse';
 import MainDashboard from './pages/MainDashboard';
+import ModelPerformance from './pages/ModelPerformance';
 import Nowcasting from './pages/Nowcasting';
 import PreventionPlaybooks from './pages/PreventionPlaybooks';
+import TemporalAnalytics from './pages/TemporalAnalytics';
 import WhatIfSimulator from './pages/WhatIfSimulator';
 import __Layout from './Layout.jsx';
 
@@ -66,14 +70,18 @@ export const PAGES = {
     "AITransparencyHub": AITransparencyHub,
     "CommandCenter": CommandCenter,
     "CrimeDNA": CrimeDNA,
+    "CrimeIntelligence": CrimeIntelligence,
     "ExplainableAI": ExplainableAI,
     "FairnessDashboard": FairnessDashboard,
     "FullAnalytics": FullAnalytics,
+    "HotspotIntelligence": HotspotIntelligence,
     "InterventionTracker": InterventionTracker,
     "LiveCrimePulse": LiveCrimePulse,
     "MainDashboard": MainDashboard,
+    "ModelPerformance": ModelPerformance,
     "Nowcasting": Nowcasting,
     "PreventionPlaybooks": PreventionPlaybooks,
+    "TemporalAnalytics": TemporalAnalytics,
     "WhatIfSimulator": WhatIfSimulator,
 }
 
