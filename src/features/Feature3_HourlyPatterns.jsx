@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Clock, BarChart3, PieChart, TrendingUp } from 'lucide-react';
-import useCrimeModel from '@/hooks/useCrimeModel';
+import { useCrimeModel } from '@/hooks/useCrimeModel';
 
 /**
  * Feature 3: Hourly Crime Patterns

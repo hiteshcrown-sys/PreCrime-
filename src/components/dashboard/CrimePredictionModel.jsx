@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { AlertTriangle, MapPin, Clock, TrendingUp, Zap } from 'lucide-react';
-import useCrimeModel from '@/hooks/useCrimeModel';
+import { useCrimeModel } from '@/hooks/useCrimeModel';
 
 /**
  * CrimePredictionModel
@@ -10,7 +10,7 @@ import useCrimeModel from '@/hooks/useCrimeModel';
  */
 
 export default function CrimePredictionModel({ onPredictionHourChange, onPredictionChange }) {
-  const { predict, classifyRiskLevel, selectedModel } = useCrimeModel();
+  const { predict } = useCrimeModel();
   const [selectedCity, setSelectedCity] = useState('Delhi');
   const [selectedHour, setSelectedHour] = useState(new Date().getHours());
   const [prediction, setPrediction] = useState(null);

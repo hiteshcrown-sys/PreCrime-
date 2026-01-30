@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Activity, TrendingUp, AlertCircle, BarChart3 } from 'lucide-react';
-import useCrimeModel from '@/hooks/useCrimeModel';
+import { useCrimeModel } from '@/hooks/useCrimeModel';
 
 /**
  * Feature 1: Crime Rate Prediction
