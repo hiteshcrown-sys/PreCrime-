@@ -21,7 +21,6 @@ const navItems = [
   { name: "Main Dashboard", icon: LayoutDashboard, page: "MainDashboard" },
   { name: "Crime DNA™", icon: Fingerprint, page: "CrimeDNA" },
   { name: "Prevention Playbooks™", icon: BookOpen, page: "PreventionPlaybooks" },
-  { name: "AI Transparency Hub", icon: Brain, page: "AITransparencyHub" },
   { name: "Scenario Simulator", icon: FlaskConical, page: "WhatIfSimulator" },
   { name: "Full Analytics", icon: Activity, page: "FullAnalytics" },
   { name: "Live Crime Pulse", icon: Radio, page: "LiveCrimePulse" }

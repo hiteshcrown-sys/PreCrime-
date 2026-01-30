@@ -47,7 +47,6 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
-import AITransparencyHub from './pages/AITransparencyHub';
 import CrimeDNA from './pages/CrimeDNA';
 import CrimeIntelligence from './pages/CrimeIntelligence';
 import ExplainableAI from './pages/ExplainableAI';
@@ -66,7 +65,6 @@ import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
-    "AITransparencyHub": AITransparencyHub,
     "CrimeDNA": CrimeDNA,
     "CrimeIntelligence": CrimeIntelligence,
     "ExplainableAI": ExplainableAI,
