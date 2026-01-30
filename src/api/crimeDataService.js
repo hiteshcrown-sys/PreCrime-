@@ -10,8 +10,11 @@
  */
 
 // API Configuration
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-const WS_URL = process.env.REACT_APP_WS_URL || 'ws://localhost:5000/ws';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:5000/ws';
+
+import { classifyRiskLevel } from '../utils/crimeModelService';
+import crimeModelService from '../utils/crimeModelService';
 
 // Cache configuration
 const CACHE_DURATION = {
@@ -185,7 +188,7 @@ export const crimeDataService = {
       wsConnection.onmessage = (event) => {
         const data = JSON.parse(event.data);
         onDataUpdate(data);
-        
+
         // Dispatch event for components to listen to
         window.dispatchEvent(new CustomEvent('crimeDataUpdate', { detail: data }));
       };
@@ -246,14 +249,32 @@ export const crimeDataService = {
  */
 
 function getMockPrediction(city, hour, domain) {
+  // Get base rate for the city
+  const baseRate = crimeModelService.CITY_BASE_RATES[city] || 100;
+  
+  // Apply hour adjustment factor
+  const hourFactor = crimeModelService.HOUR_ADJUSTMENT_FACTORS[hour] || 1.0;
+  
+  // Add real-time variation (±15% fluctuation based on current time)
+  const now = new Date();
+  const timeSeed = now.getMinutes() + now.getSeconds(); // Changes every minute
+  const realTimeVariation = 0.85 + (Math.sin(timeSeed * 0.1) * 0.15); // Smooth variation
+  
+  // Add random noise (±5%)
+  const randomNoise = 0.95 + Math.random() * 0.1;
+  
+  // Calculate adjusted rate
+  const adjustedRate = baseRate * hourFactor * realTimeVariation * randomNoise;
+  
   return {
     city,
     hour,
     domain,
-    baseCrimeRate: 250 + Math.random() * 100,
-    adjustedRate: 260 + Math.random() * 120,
-    confidence: 99.98,
-    timestamp: new Date().toISOString()
+    baseCrimeRate: baseRate,
+    adjustedRate: Math.round(adjustedRate * 100) / 100, // Round to 2 decimal places
+    confidence: 92 + Math.random() * 6, // 92-98% confidence
+    timestamp: new Date().toISOString(),
+    riskLevel: classifyRiskLevel(adjustedRate)
   };
 }
 
@@ -262,8 +283,16 @@ function getMockCityRankings() {
     cities: [
       { rank: 1, name: 'Delhi', crimeRate: 542.82, riskLevel: 'CRITICAL' },
       { rank: 2, name: 'Mumbai', crimeRate: 487.45, riskLevel: 'CRITICAL' },
-      { rank: 3, name: 'Bangalore', crimeRate: 412.34, riskLevel: 'HIGH' },
-      // Add more cities...
+      { rank: 3, name: 'Bangalore', crimeRate: 412.34, riskLevel: 'CRITICAL' },
+      { rank: 4, name: 'Hyderabad', crimeRate: 398.56, riskLevel: 'CRITICAL' },
+      { rank: 5, name: 'Chennai', crimeRate: 367.89, riskLevel: 'CRITICAL' },
+      { rank: 6, name: 'Kolkata', crimeRate: 345.23, riskLevel: 'CRITICAL' },
+      { rank: 7, name: 'Pune', crimeRate: 298.45, riskLevel: 'HIGH' },
+      { rank: 8, name: 'Ahmedabad', crimeRate: 287.12, riskLevel: 'HIGH' },
+      { rank: 9, name: 'Jaipur', crimeRate: 276.34, riskLevel: 'HIGH' },
+      { rank: 10, name: 'Lucknow', crimeRate: 265.78, riskLevel: 'HIGH' },
+      { rank: 11, name: 'Indore', crimeRate: 198.56, riskLevel: 'MEDIUM' },
+      { rank: 12, name: 'Meerut', crimeRate: 49.23, riskLevel: 'VERY_LOW' }
     ],
     lastUpdated: new Date().toISOString()
   };
@@ -304,24 +333,88 @@ function getMockDomainTrends() {
 function getMockRiskClassification() {
   return {
     levels: [
-      { level: 'CRITICAL', count: 3, cities: ['Delhi', 'Mumbai', 'Bangalore'] },
-      { level: 'HIGH', count: 4, cities: [] },
-      { level: 'MEDIUM', count: 6, cities: [] },
-      { level: 'LOW', count: 8, cities: [] },
-      { level: 'VERY_LOW', count: 8, cities: [] }
+      { 
+        level: 'CRITICAL', 
+        count: 3, 
+        cities: ['Delhi', 'Mumbai', 'Bangalore'],
+        recommendations: [
+          'Deploy maximum police presence in high-risk zones',
+          'Implement 24/7 armed patrols',
+          'Set up temporary checkpoints',
+          'Increase surveillance camera monitoring',
+          'Coordinate with local authorities for emergency response'
+        ]
+      },
+      { 
+        level: 'HIGH', 
+        count: 4, 
+        cities: [],
+        recommendations: [
+          'Increase police patrols during peak hours',
+          'Enhance street lighting in vulnerable areas',
+          'Deploy additional security personnel',
+          'Monitor CCTV feeds continuously',
+          'Conduct community safety awareness programs'
+        ]
+      },
+      { 
+        level: 'MEDIUM', 
+        count: 6, 
+        cities: [],
+        recommendations: [
+          'Maintain regular police presence',
+          'Conduct routine security checks',
+          'Improve community policing initiatives',
+          'Monitor crime trends regularly',
+          'Enhance public safety infrastructure'
+        ]
+      },
+      { 
+        level: 'LOW', 
+        count: 8, 
+        cities: [],
+        recommendations: [
+          'Continue standard policing procedures',
+          'Focus on preventive measures',
+          'Maintain community relations',
+          'Regular safety inspections'
+        ]
+      },
+      { 
+        level: 'VERY_LOW', 
+        count: 8, 
+        cities: [],
+        recommendations: [
+          'Maintain minimal security presence',
+          'Focus on general public safety',
+          'Conduct occasional safety audits'
+        ]
+      }
     ],
     lastUpdated: new Date().toISOString()
   };
 }
 
 function getMockHotspots(city) {
+  const hotspotRecommendations = [
+    'Increase foot patrols in this area',
+    'Install additional CCTV cameras',
+    'Enhance street lighting',
+    'Set up community watch programs',
+    'Deploy mobile police units',
+    'Conduct regular security sweeps',
+    'Improve emergency response times',
+    'Coordinate with local businesses for security'
+  ];
+  
   const hotspots = Array.from({ length: 10 }, (_, i) => ({
     id: i + 1,
     city: city || 'Delhi',
     name: `Hotspot ${i + 1}`,
     coordinates: [28.5 + Math.random() * 0.5, 77 + Math.random() * 0.5],
     density: 50 + Math.random() * 50,
-    priority: Math.random() > 0.7 ? 'CRITICAL' : 'HIGH'
+    priority: Math.random() > 0.7 ? 'CRITICAL' : 'HIGH',
+    recommendations: hotspotRecommendations.slice(0, 2 + Math.floor(Math.random() * 3)) // 2-4 random recommendations
   }));
   return { hotspots, lastUpdated: new Date().toISOString() };
 }

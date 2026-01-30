@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import { FlaskConical, Shield, Lightbulb, Lock, Users, ArrowRight, RotateCcw, Play } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const zones = [

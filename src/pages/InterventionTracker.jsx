@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Target, CheckCircle, XCircle, Clock, TrendingUp, AlertTriangle, Shield, BarChart3 } from "lucide-react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import KPICard from "@/components/dashboard/KPICard";
 
 const interventions = [

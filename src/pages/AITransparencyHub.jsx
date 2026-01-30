@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Brain, Info, Scale, CheckCircle, AlertCircle, Eye, Clock, Shield, Target, BarChart3 } from "lucide-react";
+import { Brain, Info, Scale, CheckCircle, AlertCircle, Eye, Clock } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 

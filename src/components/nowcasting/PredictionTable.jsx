@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 import { MapPin, AlertCircle, CheckCircle, Clock } from "lucide-react";
-import RiskBadge from "@/components/ui/RiskBadge";
 
 const predictions = [
   { zone: "Downtown Core", risk: 87, confidence: 94, status: "alert", trend: "rising", incidents: 12 },

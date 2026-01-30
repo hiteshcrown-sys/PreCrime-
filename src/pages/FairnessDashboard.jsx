@@ -1,7 +1,5 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
-import { Scale, AlertCircle, CheckCircle, Clock, BarChart3, Shield, Eye } from "lucide-react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Scale, AlertCircle, CheckCircle, Clock, Eye } from "lucide-react";
 
 const biasMetrics = [
   { name: "Geographic Distribution", value: 92, status: "good", description: "Risk alerts evenly distributed across demographics" },

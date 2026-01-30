@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { BarChart3, TrendingUp, Download, AlertTriangle } from 'lucide-react';
+import { BarChart3, TrendingUp, Download } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import Feature8_ModelEvaluation from '@/features/Feature8_ModelEvaluation';
 import Feature9_DashboardExport from '@/features/Feature9_DashboardExport';

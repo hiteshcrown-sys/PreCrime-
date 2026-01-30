@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Radio, MapPin, Clock, AlertTriangle, Activity, RefreshCw, Zap } from "lucide-react";
+import { Radio, MapPin, AlertTriangle, Activity, RefreshCw, Zap } from "lucide-react";
 import RiskBadge from "@/components/ui/RiskBadge";
 
 const eventTypes = [

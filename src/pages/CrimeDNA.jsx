@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Fingerprint, Clock, MapPin, TrendingUp, Target, Zap } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PatternCluster from "@/components/crimedna/PatternCluster";
 import PatternTimeline from "@/components/crimedna/PatternTimeline";
 import RiskBadge from "@/components/ui/RiskBadge";

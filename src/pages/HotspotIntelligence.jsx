@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Eye, Search, AlertTriangle } from 'lucide-react';
+import { MapPin, Eye, AlertTriangle } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import RealTimeMap from '@/components/dashboard/RealTimeMap';
 import Feature7_HotspotDetection from '@/features/Feature7_HotspotDetection';

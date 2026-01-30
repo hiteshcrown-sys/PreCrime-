@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Brain, Info, TrendingUp, AlertTriangle, Lightbulb, BarChart3, CheckCircle } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
+import { Brain, Info, AlertTriangle, CheckCircle } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const zones = [
