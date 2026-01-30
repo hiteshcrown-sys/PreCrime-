@@ -14,8 +14,12 @@ import {
   Menu,
   X,
   Shield,
-  Bell
+  Bell,
+  MapPin
 } from "lucide-react";
+import { useCity } from "./contexts/CityContext";
+import { CITY_BASE_RATES } from "./utils/crimeModelService";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const navItems = [
   { name: "Main Dashboard", icon: LayoutDashboard, page: "MainDashboard" },
@@ -29,6 +33,8 @@ const navItems = [
 export default function Layout({ children, currentPageName }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { selectedCity, setSelectedCity } = useCity();
+  const cities = Object.keys(CITY_BASE_RATES);
 
   return (
     <div className="min-h-screen bg-[#0a0f1a] text-white">
@@ -76,7 +82,7 @@ export default function Layout({ children, currentPageName }) {
         <div className="h-16 flex items-center gap-3 px-5 border-b border-slate-800">
           <div className="relative">
             <Shield className="w-8 h-8 text-cyan-400" />
-            <motion.div 
+            <motion.div
               className="absolute inset-0 rounded-full bg-cyan-400/20"
               animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0, 0.5] }}
               transition={{ duration: 2, repeat: Infinity }}
@@ -133,17 +139,28 @@ export default function Layout({ children, currentPageName }) {
       )}>
         {/* Top bar */}
         <div className="hidden lg:flex h-16 items-center justify-between px-6 bg-[#0d1320]/80 backdrop-blur-sm border-b border-slate-800 sticky top-0 z-30">
-          <div>
-            <h2 className="font-semibold text-lg">{navItems.find(n => n.page === currentPageName)?.name || "Dashboard"}</h2>
-            <p className="text-xs text-slate-500">Real-time predictive analytics</p>
-          </div>
-          
           <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-cyan-500/5 border border-cyan-500/20">
+              <MapPin className="w-4 h-4 text-cyan-400" />
+              <Select value={selectedCity} onValueChange={setSelectedCity}>
+                <SelectTrigger className="w-[180px] h-8 bg-transparent border-none text-white focus:ring-0 p-0">
+                  <SelectValue placeholder="Select City" />
+                </SelectTrigger>
+                <SelectContent className="bg-[#0d1320] border-slate-700 text-white">
+                  {cities.map(city => (
+                    <SelectItem key={city} value={city}>{city}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="h-8 w-px bg-slate-800 mx-2" />
+
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-500/10 border border-green-500/30">
               <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
               <span className="text-xs font-medium text-green-400">System Online</span>
             </div>
-            
+
             <button className="relative p-2 rounded-lg hover:bg-slate-800 transition-colors">
               <Bell className="w-5 h-5 text-slate-400" />
               <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500" />

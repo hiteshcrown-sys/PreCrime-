@@ -8,6 +8,7 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import { ChatBotProvider } from '@/contexts/ChatBotContext';
+import { CityProvider } from '@/contexts/CityContext';
 import ChatBot from '@/components/AIAssistant/ChatBot';
 
 const { Pages, Layout, mainPage } = pagesConfig;
@@ -70,16 +71,18 @@ function App() {
 
   return (
     <AuthProvider>
-      <ChatBotProvider>
-        <QueryClientProvider client={queryClientInstance}>
-          <Router>
-            <NavigationTracker />
-            <AuthenticatedApp />
-            <ChatBot />
-          </Router>
-          <Toaster />
-        </QueryClientProvider>
-      </ChatBotProvider>
+      <CityProvider>
+        <ChatBotProvider>
+          <QueryClientProvider client={queryClientInstance}>
+            <Router>
+              <NavigationTracker />
+              <AuthenticatedApp />
+              <ChatBot />
+            </Router>
+            <Toaster />
+          </QueryClientProvider>
+        </ChatBotProvider>
+      </CityProvider>
     </AuthProvider>
   )
 }
