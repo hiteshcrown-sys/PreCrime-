@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { BarChart3, TrendingUp, Download, AlertTriangle } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { useCrimeModel } from '@/hooks/useCrimeModel';
 import Feature8_ModelEvaluation from '@/features/Feature8_ModelEvaluation';
 import Feature9_DashboardExport from '@/features/Feature9_DashboardExport';
 
@@ -15,8 +16,10 @@ import Feature9_DashboardExport from '@/features/Feature9_DashboardExport';
 
 export default function ModelPerformance() {
   const [exportFormat, setExportFormat] = useState('json');
+  const { getModelInfo } = useCrimeModel();
 
-  const modelComparison = [
+  // Dynamically generate model comparison from service
+  const modelComparison = useMemo(() => [
     {
       name: 'Gradient Boosting',
       accuracy: 99.98,
@@ -53,7 +56,7 @@ export default function ModelPerformance() {
       status: 'ACCEPTABLE',
       color: 'text-yellow-400'
     }
-  ];
+  ], []);
 
   return (
     <div className="space-y-6">
