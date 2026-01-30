@@ -23,7 +23,9 @@ const navItems = [
   { name: "Prevention Playbooks™", icon: BookOpen, page: "PreventionPlaybooks" },
   { name: "Scenario Simulator", icon: FlaskConical, page: "WhatIfSimulator" },
   { name: "Full Analytics", icon: Activity, page: "FullAnalytics" },
-  { name: "Live Crime Pulse", icon: Radio, page: "LiveCrimePulse" }
+  { name: "Live Crime Pulse", icon: Radio, page: "LiveCrimePulse" },
+  { name: "IoT Network", icon: Activity, page: "IoTNetwork" },     // New!
+  { name: "Alerts", icon: Bell, page: "IoTAlerts" }  
 ];
 
 export default function Layout({ children, currentPageName }) {

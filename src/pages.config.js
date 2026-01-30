@@ -54,6 +54,7 @@ import FairnessDashboard from './pages/FairnessDashboard';
 import FullAnalytics from './pages/FullAnalytics';
 import HotspotIntelligence from './pages/HotspotIntelligence';
 import InterventionTracker from './pages/InterventionTracker';
+import IoTNetwork from './pages/IoTNetwork';
 import LiveCrimePulse from './pages/LiveCrimePulse';
 import MainDashboard from './pages/MainDashboard';
 import ModelPerformance from './pages/ModelPerformance';
@@ -72,6 +73,7 @@ export const PAGES = {
     "FullAnalytics": FullAnalytics,
     "HotspotIntelligence": HotspotIntelligence,
     "InterventionTracker": InterventionTracker,
+    "IoTNetwork": IoTNetwork,
     "LiveCrimePulse": LiveCrimePulse,
     "MainDashboard": MainDashboard,
     "ModelPerformance": ModelPerformance,
