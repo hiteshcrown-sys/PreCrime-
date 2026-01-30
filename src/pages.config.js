@@ -48,7 +48,6 @@
  * The mainPage value must match a key in the PAGES object exactly.
  */
 import AITransparencyHub from './pages/AITransparencyHub';
-import CommandCenter from './pages/CommandCenter';
 import CrimeDNA from './pages/CrimeDNA';
 import CrimeIntelligence from './pages/CrimeIntelligence';
 import ExplainableAI from './pages/ExplainableAI';
@@ -68,7 +67,6 @@ import __Layout from './Layout.jsx';
 
 export const PAGES = {
     "AITransparencyHub": AITransparencyHub,
-    "CommandCenter": CommandCenter,
     "CrimeDNA": CrimeDNA,
     "CrimeIntelligence": CrimeIntelligence,
     "ExplainableAI": ExplainableAI,
@@ -86,7 +84,7 @@ export const PAGES = {
 }
 
 export const pagesConfig = {
-    mainPage: "CommandCenter",
+    mainPage: "MainDashboard",
     Pages: PAGES,
     Layout: __Layout,
 };

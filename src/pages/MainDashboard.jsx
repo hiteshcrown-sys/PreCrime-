@@ -9,6 +9,7 @@ import VoiceCommand from "@/components/dashboard/VoiceCommand";
 import CoverageSidebar from "@/components/patrol/CoverageSidebar";
 import DispatchAlert from "@/components/patrol/DispatchAlert";
 import PatrolCommand from "@/components/patrol/PatrolCommand";
+import CrimePredictionModel from "@/components/dashboard/CrimePredictionModel";
 
 export default function MainDashboard() {
   const [timeOfDay, setTimeOfDay] = useState(20);
@@ -134,6 +135,9 @@ export default function MainDashboard() {
           trendValue="+1.8% improvement"
         />
       </div>
+
+      {/* AI Crime Prediction Model */}
+      <CrimePredictionModel />
 
       {/* Main Map Section with Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>

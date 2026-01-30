@@ -1,186 +1,229 @@
-import React, { useState } from 'react';
-import { MapPin, TrendingDown, TrendingUp, Award } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { TrendingDown, TrendingUp, MapPin } from 'lucide-react';
+import useCrimeModel from '@/hooks/useCrimeModel';
 
 /**
- * Feature 2: City Ranking & Hotspots
+ * Feature 2: City Ranking by Crime Rate
+ * Ranks all 29 Indian cities by predicted crime rate using ML models
  * 
- * Data:
- * - 29 Indian cities ranked by crime rate
- * - Crime rate range: 33.28 (Rajkot - Safest) to 542.82 (Delhi - Most Dangerous)
- * - 159 hotspots identified using K-means clustering
+ * Integration:
+ * - Real-time predictions for all cities
+ * - Sortable by crime rate, risk level
+ * - Hour-based ranking updates
  */
 
 const Feature2_CityRanking = () => {
-  const [sortBy, setSortBy] = useState('dangerous'); // 'dangerous' or 'safe'
-  const [selectedCity, setSelectedCity] = useState(null);
+  const [selectedHour, setSelectedHour] = useState(12);
+  const [sortBy, setSortBy] = useState('rate'); // 'rate' or 'risk'
+  const [modelType, setModelType] = useState('gradientBoosting');
 
-  const cityData = [
-    { rank: 1, city: 'Delhi', crimes: 542.82, risk: 'CRITICAL', hotspots: 24, topHour: '07:00' },
-    { rank: 2, city: 'Mumbai', crimes: 437.96, risk: 'HIGH', hotspots: 18, topHour: '03:00' },
-    { rank: 3, city: 'Bangalore', crimes: 360.52, risk: 'HIGH', hotspots: 12, topHour: '09:00' },
-    { rank: 4, city: 'Hyderabad', crimes: 285.40, risk: 'HIGH', hotspots: 8, topHour: '14:00' },
-    { rank: 5, city: 'Kolkata', crimes: 195.30, risk: 'MEDIUM', hotspots: 6, topHour: '19:00' },
-    { rank: 6, city: 'Pune', crimes: 178.45, risk: 'MEDIUM', hotspots: 5, topHour: '11:00' },
-    { rank: 7, city: 'Ahmedabad', crimes: 168.20, risk: 'MEDIUM', hotspots: 4, topHour: '22:00' },
-    { rank: 8, city: 'Jaipur', crimes: 145.60, risk: 'MEDIUM', hotspots: 3, topHour: '18:00' },
-    { rank: 9, city: 'Lucknow', crimes: 128.35, risk: 'MEDIUM', hotspots: 3, topHour: '20:00' },
-    { rank: 10, city: 'Chandigarh', crimes: 95.70, risk: 'LOW', hotspots: 2, topHour: '16:00' },
-    { rank: 11, city: 'Surat', crimes: 87.50, risk: 'LOW', hotspots: 2, topHour: '13:00' },
-    { rank: 12, city: 'Chennai', crimes: 82.30, risk: 'LOW', hotspots: 2, topHour: '01:00' },
-    { rank: 13, city: 'Indore', crimes: 76.45, risk: 'LOW', hotspots: 1, topHour: '15:00' },
-    { rank: 14, city: 'Thane', crimes: 72.60, risk: 'LOW', hotspots: 1, topHour: '17:00' },
-    { rank: 15, city: 'Bhopal', crimes: 68.90, risk: 'LOW', hotspots: 1, topHour: '12:00' },
-    { rank: 16, city: 'Visakhapatnam', crimes: 64.20, risk: 'LOW', hotspots: 1, topHour: '19:00' },
-    { rank: 17, city: 'Pimpri-Chinchwad', crimes: 59.80, risk: 'LOW', hotspots: 1, topHour: '14:00' },
-    { rank: 18, city: 'Patna', crimes: 55.40, risk: 'LOW', hotspots: 1, topHour: '21:00' },
-    { rank: 19, city: 'Vadodara', crimes: 51.20, risk: 'VERY_LOW', hotspots: 0, topHour: '10:00' },
-    { rank: 20, city: 'Ghaziabad', crimes: 48.65, risk: 'VERY_LOW', hotspots: 0, topHour: '09:00' },
-    { rank: 21, city: 'Ludhiana', crimes: 45.30, risk: 'VERY_LOW', hotspots: 0, topHour: '16:00' },
-    { rank: 22, city: 'Agra', crimes: 42.10, risk: 'VERY_LOW', hotspots: 0, topHour: '11:00' },
-    { rank: 23, city: 'Nashik', crimes: 39.85, risk: 'VERY_LOW', hotspots: 0, topHour: '08:00' },
-    { rank: 24, city: 'Faridabad', crimes: 37.50, risk: 'VERY_LOW', hotspots: 0, topHour: '15:00' },
-    { rank: 25, city: 'Meerut', crimes: 35.75, risk: 'VERY_LOW', hotspots: 0, topHour: '12:00' },
-    { rank: 26, city: 'Kalyan-Dombivali', crimes: 34.50, risk: 'VERY_LOW', hotspots: 0, topHour: '07:00' },
-    { rank: 27, city: 'Vasai-Virar', crimes: 34.08, risk: 'VERY_LOW', hotspots: 0, topHour: '06:00' },
-    { rank: 28, city: 'Varanasi', crimes: 33.65, risk: 'VERY_LOW', hotspots: 0, topHour: '04:00' },
-    { rank: 29, city: 'Rajkot', crimes: 33.28, risk: 'VERY_LOW', hotspots: 0, topHour: '13:00' },
-  ];
+  // Use crime model hook
+  const {
+    getCityRankings,
+    selectedModel,
+    setSelectedModel,
+    loading,
+    error
+  } = useCrimeModel();
 
-  const getRiskColor = (risk) => {
-    switch(risk) {
-      case 'CRITICAL': return 'text-red-600 bg-red-50';
-      case 'HIGH': return 'text-orange-600 bg-orange-50';
-      case 'MEDIUM': return 'text-yellow-600 bg-yellow-50';
-      case 'LOW': return 'text-blue-600 bg-blue-50';
-      case 'VERY_LOW': return 'text-green-600 bg-green-50';
-      default: return 'text-gray-600 bg-gray-50';
-    }
+  // Update model when type changes
+  useEffect(() => {
+    setSelectedModel(modelType);
+  }, [modelType, setSelectedModel]);
+
+  // Get city rankings for selected hour
+  const rankings = getCityRankings(selectedHour);
+
+  // Sort rankings
+  const sortedRankings = rankings
+    ? [...rankings].sort((a, b) => {
+        if (sortBy === 'rate') {
+          return b.predictedRate - a.predictedRate;
+        }
+        // Sort by risk level order
+        const riskOrder = { 'CRITICAL': 5, 'HIGH': 4, 'MEDIUM': 3, 'LOW': 2, 'VERY_LOW': 1 };
+        return riskOrder[b.riskLevel] - riskOrder[a.riskLevel];
+      })
+    : [];
+
+  const getRiskColor = (riskLevel) => {
+    const colors = {
+      'CRITICAL': 'text-red-400 bg-red-500/10',
+      'HIGH': 'text-orange-400 bg-orange-500/10',
+      'MEDIUM': 'text-yellow-400 bg-yellow-500/10',
+      'LOW': 'text-blue-400 bg-blue-500/10',
+      'VERY_LOW': 'text-green-400 bg-green-500/10'
+    };
+    return colors[riskLevel] || 'text-gray-400';
   };
 
-  const getRiskBadgeColor = (risk) => {
-    switch(risk) {
-      case 'CRITICAL': return 'bg-red-600 text-white';
-      case 'HIGH': return 'bg-orange-500 text-white';
-      case 'MEDIUM': return 'bg-yellow-500 text-white';
-      case 'LOW': return 'bg-blue-500 text-white';
-      case 'VERY_LOW': return 'bg-green-500 text-white';
-      default: return 'bg-gray-500 text-white';
-    }
+  const getRiskBorderColor = (riskLevel) => {
+    const colors = {
+      'CRITICAL': 'border-red-500/30',
+      'HIGH': 'border-orange-500/30',
+      'MEDIUM': 'border-yellow-500/30',
+      'LOW': 'border-blue-500/30',
+      'VERY_LOW': 'border-green-500/30'
+    };
+    return colors[riskLevel] || 'border-slate-500/30';
   };
 
-  const displayedCities = sortBy === 'dangerous' 
-    ? cityData 
-    : [...cityData].reverse();
+  // Statistics
+  const stats = rankings ? {
+    critical: rankings.filter(r => r.riskLevel === 'CRITICAL').length,
+    high: rankings.filter(r => r.riskLevel === 'HIGH').length,
+    medium: rankings.filter(r => r.riskLevel === 'MEDIUM').length,
+    low: rankings.filter(r => r.riskLevel === 'LOW').length,
+    veryLow: rankings.filter(r => r.riskLevel === 'VERY_LOW').length,
+    avgRate: (rankings.reduce((sum, r) => sum + r.predictedRate, 0) / rankings.length).toFixed(2)
+  } : null;
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-6 bg-gradient-to-br from-pink-50 to-red-50 rounded-xl shadow-lg">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="mb-6">
-        <h2 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
-          <MapPin className="text-red-600" size={32} />
-          🏙️ Feature 2: City Ranking & Crime Hotspots
-        </h2>
-        <p className="text-gray-600 mt-2">All 29 Indian cities ranked by crime rate | 159 hotspots identified</p>
+      <div className="flex items-center gap-3 mb-6">
+        <div className="p-2 rounded-lg bg-cyan-500/20">
+          <TrendingDown className="w-5 h-5 text-cyan-400" />
+        </div>
+        <div>
+          <h2 className="text-xl font-bold text-white">City Crime Rate Ranking</h2>
+          <p className="text-xs text-slate-400">Real-time rankings for all 29 Indian cities</p>
+        </div>
       </div>
 
-      {/* Controls */}
-      <div className="mb-6 flex gap-4">
-        <button
-          onClick={() => setSortBy('dangerous')}
-          className={`px-4 py-2 rounded-lg font-semibold flex items-center gap-2 ${
-            sortBy === 'dangerous'
-              ? 'bg-red-600 text-white'
-              : 'bg-white text-gray-700 border-2 border-red-600'
-          }`}
+      {/* Model & Controls */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Model Selector */}
+        <select
+          value={modelType}
+          onChange={(e) => setModelType(e.target.value)}
+          className="px-3 py-2 bg-slate-800 border border-slate-700 text-white rounded-lg text-sm"
         >
-          <TrendingUp size={18} />
-          Most Dangerous First
-        </button>
-        <button
-          onClick={() => setSortBy('safe')}
-          className={`px-4 py-2 rounded-lg font-semibold flex items-center gap-2 ${
-            sortBy === 'safe'
-              ? 'bg-green-600 text-white'
-              : 'bg-white text-gray-700 border-2 border-green-600'
-          }`}
+          <option value="gradientBoosting">Gradient Boosting</option>
+          <option value="randomForest">Random Forest</option>
+          <option value="lassoRegression">Lasso Regression</option>
+        </select>
+
+        {/* Hour Selector */}
+        <div className="flex items-center gap-2">
+          <label className="text-sm text-slate-400">Hour:</label>
+          <input
+            type="range"
+            min="0"
+            max="23"
+            value={selectedHour}
+            onChange={(e) => setSelectedHour(parseInt(e.target.value))}
+            className="flex-1 h-2 bg-slate-700 rounded-lg accent-cyan-500"
+          />
+          <span className="text-sm text-white font-semibold min-w-fit">{String(selectedHour).padStart(2, '0')}:00</span>
+        </div>
+
+        {/* Sort By */}
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+          className="px-3 py-2 bg-slate-800 border border-slate-700 text-white rounded-lg text-sm"
         >
-          <TrendingDown size={18} />
-          Safest First
-        </button>
+          <option value="rate">Sort by Crime Rate</option>
+          <option value="risk">Sort by Risk Level</option>
+        </select>
       </div>
 
-      {/* Statistics Summary */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white p-4 rounded-lg shadow">
-          <p className="text-xs text-gray-600">Total Cities</p>
-          <p className="text-3xl font-bold text-gray-800">29</p>
+      {/* Statistics */}
+      {stats && (
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30">
+            <p className="text-xs text-slate-400">Critical</p>
+            <p className="text-2xl font-bold text-red-400">{stats.critical}</p>
+          </div>
+          <div className="p-3 rounded-lg bg-orange-500/10 border border-orange-500/30">
+            <p className="text-xs text-slate-400">High</p>
+            <p className="text-2xl font-bold text-orange-400">{stats.high}</p>
+          </div>
+          <div className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
+            <p className="text-xs text-slate-400">Medium</p>
+            <p className="text-2xl font-bold text-yellow-400">{stats.medium}</p>
+          </div>
+          <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/30">
+            <p className="text-xs text-slate-400">Low</p>
+            <p className="text-2xl font-bold text-blue-400">{stats.low}</p>
+          </div>
+          <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/30">
+            <p className="text-xs text-slate-400">Very Low</p>
+            <p className="text-2xl font-bold text-green-400">{stats.veryLow}</p>
+          </div>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow">
-          <p className="text-xs text-gray-600">Total Hotspots</p>
-          <p className="text-3xl font-bold text-red-600">159</p>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow">
-          <p className="text-xs text-gray-600">Crime Rate Range</p>
-          <p className="text-lg font-bold text-gray-800">33.28 - 542.82</p>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow">
-          <p className="text-xs text-gray-600">Avg per City</p>
-          <p className="text-2xl font-bold text-gray-800">5.5</p>
-        </div>
-      </div>
+      )}
 
-      {/* Table */}
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-gradient-to-r from-red-600 to-orange-600 text-white">
-            <tr>
-              <th className="px-4 py-3 text-left text-sm font-semibold">Rank</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold">City Name</th>
-              <th className="px-4 py-3 text-right text-sm font-semibold">Crime Rate</th>
-              <th className="px-4 py-3 text-center text-sm font-semibold">Risk Level</th>
-              <th className="px-4 py-3 text-right text-sm font-semibold">Hotspots</th>
-              <th className="px-4 py-3 text-center text-sm font-semibold">Peak Hour</th>
-            </tr>
-          </thead>
-          <tbody>
-            {displayedCities.map((item, idx) => (
-              <tr
-                key={item.city}
-                className={`border-b hover:bg-gray-50 cursor-pointer transition ${
-                  idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'
-                } ${selectedCity === item.city ? 'bg-yellow-100' : ''}`}
-                onClick={() => setSelectedCity(selectedCity === item.city ? null : item.city)}
-              >
-                <td className="px-4 py-3">
-                  <span className="font-bold text-lg text-gray-800">#{item.rank}</span>
-                </td>
-                <td className="px-4 py-3 font-semibold text-gray-800">{item.city}</td>
-                <td className="px-4 py-3 text-right font-bold text-gray-800">{item.crimes}</td>
-                <td className="px-4 py-3 text-center">
-                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${getRiskBadgeColor(item.risk)}`}>
-                    {item.risk}
-                  </span>
-                </td>
-                <td className="px-4 py-3 text-right">
-                  <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full font-bold">
-                    {item.hotspots}
-                  </span>
-                </td>
-                <td className="px-4 py-3 text-center text-sm font-semibold text-gray-700">{item.topHour}</td>
+      {/* Loading State */}
+      {loading && (
+        <div className="text-center py-8">
+          <div className="inline-block w-8 h-8 border-4 border-slate-600 border-t-cyan-500 rounded-full animate-spin"></div>
+          <p className="text-slate-400 mt-3">Loading city rankings...</p>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+          {error}
+        </div>
+      )}
+
+      {/* Rankings Table */}
+      {sortedRankings && sortedRankings.length > 0 && (
+        <div className="rounded-xl border border-slate-700 overflow-hidden">
+          <table className="w-full">
+            <thead className="bg-slate-800/50 border-b border-slate-700">
+              <tr>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400">#</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400">City</th>
+                <th className="px-4 py-3 text-right text-xs font-semibold text-slate-400">Crime Rate</th>
+                <th className="px-4 py-3 text-center text-xs font-semibold text-slate-400">Risk Level</th>
+                <th className="px-4 py-3 text-right text-xs font-semibold text-slate-400">Trend</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="divide-y divide-slate-700/50">
+              {sortedRankings.map((city, idx) => (
+                <tr key={city.city} className={`hover:bg-slate-700/20 transition-colors border-b border-slate-700/30 ${getRiskBorderColor(city.riskLevel)}`}>
+                  <td className="px-4 py-3 text-sm text-slate-400">{idx + 1}</td>
+                  <td className="px-4 py-3 text-sm font-semibold text-white flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-cyan-400" />
+                    {city.city}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-right text-white font-semibold">
+                    {city.predictedRate.toFixed(2)}
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${getRiskColor(city.riskLevel)}`}>
+                      {city.riskLevel}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    {city.hourFactor > 1.1 ? (
+                      <TrendingUp className="w-4 h-4 text-red-400 inline-block" />
+                    ) : city.hourFactor < 0.9 ? (
+                      <TrendingDown className="w-4 h-4 text-green-400 inline-block" />
+                    ) : (
+                      <span className="text-yellow-400 text-xs">→</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
-      {/* Legend */}
-      <div className="mt-6 p-4 bg-blue-100 border-l-4 border-blue-600 rounded">
-        <p className="text-sm text-blue-800">
-          <strong>Note:</strong> Crime rates are calculated from 40,160 historical records.
-          Hotspots are identified locations with peak crime concentration using K-means clustering (k=3).
-          Peak hour indicates the time slot with highest crime activity in each city.
-        </p>
-      </div>
+      {/* Average Rate Info */}
+      {stats && (
+        <div className="p-4 rounded-lg bg-slate-800/30 border border-slate-700">
+          <p className="text-sm text-slate-400">
+            Average crime rate across all cities at <span className="font-semibold text-white">{String(selectedHour).padStart(2, '0')}:00</span>: 
+            <span className="font-bold text-cyan-400 ml-2">{stats.avgRate}</span>
+          </p>
+        </div>
+      )}
     </div>
   );
 };

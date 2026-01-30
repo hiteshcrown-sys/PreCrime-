@@ -180,7 +180,7 @@ export default function ModelPerformance() {
           <div className="flex gap-3">
             <div className="text-cyan-400 font-bold min-w-fit">•</div>
             <p className="text-slate-300">
-              All models show strong recall (>84%), ensuring most crimes are detected and not missed in predictions.
+              All models show strong recall ({'>'}'84%), ensuring most crimes are detected and not missed in predictions.
             </p>
           </div>
         </div>
