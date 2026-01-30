@@ -1,24 +1,11 @@
 import { motion } from "framer-motion";
 
-const patterns = [
-  { id: "DNA-001", x: 30, y: 35, size: 50, type: "Assault", similarity: 94, color: "#ef4444" },
-  { id: "DNA-002", x: 55, y: 25, size: 42, type: "Vehicle Theft", similarity: 87, color: "#f97316" },
-  { id: "DNA-003", x: 70, y: 50, size: 38, type: "Break-in", similarity: 82, color: "#eab308" },
-  { id: "DNA-004", x: 25, y: 65, size: 35, type: "Vandalism", similarity: 76, color: "#22c55e" },
-  { id: "DNA-005", x: 60, y: 70, size: 45, type: "Drug Activity", similarity: 91, color: "#8b5cf6" },
-  { id: "DNA-006", x: 45, y: 50, size: 55, type: "Robbery", similarity: 96, color: "#ef4444" },
-  { id: "DNA-007", x: 80, y: 30, size: 30, type: "Fraud", similarity: 68, color: "#06b6d4" }
-];
-
-const connections = [
-  { from: "DNA-001", to: "DNA-006", strength: 0.8 },
-  { from: "DNA-002", to: "DNA-003", strength: 0.6 },
-  { from: "DNA-003", to: "DNA-004", strength: 0.5 },
-  { from: "DNA-005", to: "DNA-006", strength: 0.7 },
-  { from: "DNA-001", to: "DNA-005", strength: 0.4 }
-];
-
-export default function PatternCluster({ onPatternSelect, selectedPattern }) {
+export default function PatternCluster({ 
+  patterns = [], 
+  connections = [],
+  onPatternSelect, 
+  selectedPattern 
+}) {
   const getPatternPos = (id) => {
     const p = patterns.find(p => p.id === id);
     return p ? { x: p.x, y: p.y } : { x: 0, y: 0 };
