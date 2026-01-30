@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useMemo, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import patternClusteringService from "@/utils/patternClusteringService";
 
 export default function PatternTimeline({ patternId }) {
