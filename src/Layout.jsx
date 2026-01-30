@@ -146,7 +146,7 @@ export default function Layout({ children, currentPageName }) {
                 <SelectTrigger className="w-[180px] h-8 bg-transparent border-none text-white focus:ring-0 p-0">
                   <SelectValue placeholder="Select City" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#0d1320] border-slate-700 text-white">
+                <SelectContent className="bg-[#0d1320] border-slate-700 text-white z-[9999]">
                   {cities.map(city => (
                     <SelectItem key={city} value={city}>{city}</SelectItem>
                   ))}

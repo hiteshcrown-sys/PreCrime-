@@ -35,12 +35,15 @@ export default function LiveCrimePulse() {
     // Initial fetch of hotspots to generate initial events if feed is empty
     const initFeed = async () => {
       try {
-        const hotspots = await crimeDataService.getHotspots(selectedCity);
+        const hotspotData = await crimeDataService.getHotspots(selectedCity);
+        const hotspots = Array.isArray(hotspotData) ? hotspotData : (hotspotData?.hotspots || []);
+
         const initialEvents = hotspots.slice(0, 5).map((h, i) => ({
           id: `init-${i}`,
           type: `Higher density predicted in ${h.name}`,
           zone: h.name,
-          risk: h.riskLevel === 'CRITICAL' ? 85 : h.riskLevel === 'HIGH' ? 75 : 55,
+          risk: (h.riskLevel === 'CRITICAL' || h.priority === 'CRITICAL') ? 85 :
+            (h.riskLevel === 'HIGH' || h.priority === 'HIGH') ? 75 : 55,
           confidence: 90 + Math.floor(Math.random() * 5),
           timestamp: new Date()
         }));
@@ -55,19 +58,15 @@ export default function LiveCrimePulse() {
     return () => window.removeEventListener('crimeDataUpdate', handleUpdate);
   }, [selectedCity]);
 
-  // Update stats based on simulation
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const patrols = livePatrolService.getCityPatrols(selectedCity);
-      setPatrolStats({
-        active: patrols.length,
-        responding: patrols.filter(p => p.status === 'Responding').length,
-        enRoute: patrols.filter(p => p.status === 'En Route').length,
-        idle: patrols.filter(p => p.status === 'Idle').length
-      });
-    }, 4000);
-    return () => clearInterval(interval);
-  }, [selectedCity]);
+  // Handle status updates from the map component
+  const handleStatusChange = (counts) => {
+    setPatrolStats({
+      active: Object.values(counts).reduce((a, b) => a + b, 0),
+      responding: counts['Responding'] || 0,
+      enRoute: counts['En Route'] || 0,
+      idle: counts['Idle'] || 0
+    });
+  };
 
   const getRiskLevel = (risk) => {
     if (risk >= 80) return "critical";
@@ -119,7 +118,11 @@ export default function LiveCrimePulse() {
         {/* Real-time Patrol Map */}
         <div className="xl:col-span-3">
           <div className="h-[600px] relative">
-            <PatrolTrackerMap city={selectedCity} showRoutes={showRoutes} />
+            <PatrolTrackerMap
+              city={selectedCity}
+              showRoutes={showRoutes}
+              onStatusChange={handleStatusChange}
+            />
           </div>
         </div>
 

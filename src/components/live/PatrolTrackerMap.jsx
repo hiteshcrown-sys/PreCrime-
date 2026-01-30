@@ -15,16 +15,21 @@ L.Icon.Default.mergeOptions({
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-// Custom Patrol Icon
+// Custom Police Car Icon
 const createPatrolIcon = (status) => {
-    const color = status === 'Responding' ? '#ef4444' : status === 'En Route' ? '#06b6d4' : '#94a3b8';
+    const color = status === 'Responding' ? '#ef4444' : status === 'En Route' ? '#06b6d4' : '#000000';
+    const strokeColor = '#000000';
     return L.divIcon({
-        html: `<div style="background-color: ${color}; width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; display: flex; items-center; justify-content: center; box-shadow: 0 0 10px rgba(0,0,0,0.5);">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        html: `<div style="transform: rotate(0deg); transition: transform 0.5s;">
+            <svg viewBox="0 0 24 24" width="36" height="36" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5 11L3 13V19C3 19.5523 3.44772 20 4 20H5C5.55228 20 6 19.5523 6 19V18H18V19C18 19.5523 18.4477 20 19 20H20C20.5523 20 21 19.5523 21 19V13L19 11M5 11L7 5H17L19 11M5 11H19M8 15H8.01M16 15H16.01" stroke="${strokeColor}" stroke-width="2" fill="rgba(255,255,255,0.4)" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="9" y="3" width="6" height="2" rx="1" fill="${status === 'Responding' ? '#ef4444' : (status === 'En Route' ? '#06b6d4' : '#000000')}" stroke="${strokeColor}" stroke-width="0.5" class="${status === 'Responding' ? 'animate-pulse' : ''}"/>
+            </svg>
+            <div style="position: absolute; top: -5px; right: -5px; width: 10px; height: 10px; border-radius: 50%; background-color: ${color}; border: 2px solid white;"></div>
            </div>`,
         className: '',
-        iconSize: [30, 30],
-        iconAnchor: [15, 15]
+        iconSize: [36, 36],
+        iconAnchor: [18, 18]
     });
 };
 
@@ -32,12 +37,12 @@ const createPatrolIcon = (status) => {
 function ChangeView({ center }) {
     const map = useMap();
     useEffect(() => {
-        map.setView(center, 12, { animate: true });
+        map.flyTo(center, 13, { duration: 1.5 });
     }, [center, map]);
     return null;
 }
 
-export default function PatrolTrackerMap({ city, showRoutes = true }) {
+export default function PatrolTrackerMap({ city, showRoutes = true, onStatusChange }) {
     const [hotspots, setHotspots] = useState([]);
     const [patrols, setPatrols] = useState([]);
     const [mapCenter, setMapCenter] = useState([28.6139, 77.2090]); // Delhi default
@@ -49,14 +54,26 @@ export default function PatrolTrackerMap({ city, showRoutes = true }) {
             try {
                 setLoading(true);
                 const hotspotData = await crimeDataService.getHotspots(city);
-                setHotspots(hotspotData);
+                const hotspotsArray = Array.isArray(hotspotData) ? hotspotData : (hotspotData?.hotspots || []);
+                setHotspots(hotspotsArray);
 
-                if (hotspotData.length > 0) {
-                    setMapCenter([hotspotData[0].lat, hotspotData[0].lng]);
+                if (hotspotsArray.length > 0) {
+                    const first = hotspotsArray[0];
+                    setMapCenter([first.lat || first.coordinates?.[0], first.lng || first.coordinates?.[1]]);
                 }
 
-                const initialPatrols = livePatrolService.getCityPatrols(city, hotspotData);
+                const initialPatrols = livePatrolService.getCityPatrols(city, hotspotsArray);
                 setPatrols(initialPatrols);
+
+                // Initial status report
+                if (onStatusChange) {
+                    const counts = initialPatrols.reduce((acc, p) => {
+                        acc[p.status] = (acc[p.status] || 0) + 1;
+                        return acc;
+                    }, {});
+                    onStatusChange(counts);
+                }
+
                 setLoading(false);
             } catch (error) {
                 console.error("Failed to load map data:", error);
@@ -73,11 +90,19 @@ export default function PatrolTrackerMap({ city, showRoutes = true }) {
             if (hotspots.length > 0) {
                 const updated = livePatrolService.updatePatrols(city, hotspots);
                 setPatrols([...updated]);
+
+                if (onStatusChange) {
+                    const counts = updated.reduce((acc, p) => {
+                        acc[p.status] = (acc[p.status] || 0) + 1;
+                        return acc;
+                    }, {});
+                    onStatusChange(counts);
+                }
             }
         }, 4000); // Update every 4 seconds
 
         return () => clearInterval(interval);
-    }, [city, hotspots]);
+    }, [city, hotspots, onStatusChange]);
 
     const getRiskColor = (level) => {
         switch (level) {
@@ -85,7 +110,7 @@ export default function PatrolTrackerMap({ city, showRoutes = true }) {
             case 'HIGH': return '#f97316';
             case 'MEDIUM': return '#eab308';
             case 'LOW': return '#22c55e';
-            default: return '#94a3b8';
+            default: return '#3b82f6';
         }
     };
 
@@ -94,7 +119,7 @@ export default function PatrolTrackerMap({ city, showRoutes = true }) {
             <div className="w-full h-full flex items-center justify-center bg-slate-900/50 rounded-2xl border border-slate-800">
                 <div className="flex flex-col items-center gap-4">
                     <div className="w-12 h-12 border-4 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin" />
-                    <p className="text-slate-400 font-medium">Initializing Patrol Network for {city}...</p>
+                    <p className="text-slate-400 font-medium">Calibrating Satellite Matrix for {city}...</p>
                 </div>
             </div>
         );
@@ -104,39 +129,63 @@ export default function PatrolTrackerMap({ city, showRoutes = true }) {
         <div className="relative w-full h-full rounded-2xl overflow-hidden border border-slate-800 shadow-2xl">
             <MapContainer
                 center={mapCenter}
-                zoom={12}
+                zoom={13}
                 scrollWheelZoom={true}
-                style={{ height: '100%', width: '100%', background: '#0a0f1a' }}
+                style={{ height: '100%', width: '100%', background: '#f8fafc' }}
             >
                 <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-                    url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
 
                 <ChangeView center={mapCenter} />
 
                 {/* Render Hotspots */}
-                {hotspots.map((hotspot) => (
-                    <Circle
-                        key={hotspot.id}
-                        center={[hotspot.lat, hotspot.lng]}
-                        radius={800} // fixed radius for visualization
-                        pathOptions={{
-                            fillColor: getRiskColor(hotspot.riskLevel),
-                            fillOpacity: 0.2,
-                            color: getRiskColor(hotspot.riskLevel),
-                            weight: 2,
-                            className: hotspot.riskLevel === 'CRITICAL' ? 'animate-pulse' : ''
-                        }}
-                    >
-                        <Popup className="custom-popup">
-                            <div className="p-2">
-                                <h4 className="font-bold text-slate-900">{hotspot.name}</h4>
-                                <p className="text-sm text-slate-700">Risk: <span className="font-semibold" style={{ color: getRiskColor(hotspot.riskLevel) }}>{hotspot.riskLevel}</span></p>
-                                <div className="mt-2 text-xs text-slate-500 italic">ML Confidence: 94%</div>
-                            </div>
-                        </Popup>
-                    </Circle>
+                {Array.isArray(hotspots) && hotspots.map((hotspot) => (
+                    <React.Fragment key={hotspot.id}>
+                        <Circle
+                            center={[hotspot.lat || hotspot.coordinates?.[0], hotspot.lng || hotspot.coordinates?.[1]]}
+                            radius={800}
+                            pathOptions={{
+                                fillColor: getRiskColor(hotspot.riskLevel || hotspot.priority),
+                                fillOpacity: 0.15,
+                                color: getRiskColor(hotspot.riskLevel || hotspot.priority),
+                                weight: 1,
+                                dashArray: '5, 5'
+                            }}
+                        />
+                        {/* Core marker for the spot */}
+                        <Marker
+                            position={[hotspot.lat || hotspot.coordinates?.[0], hotspot.lng || hotspot.coordinates?.[1]]}
+                            icon={L.divIcon({
+                                html: `<div class="relative">
+                        <div class="absolute -inset-2 rounded-full border-2 border-dashed animate-spin" style="border-color: ${getRiskColor(hotspot.riskLevel || hotspot.priority)}; opacity: 0.5;"></div>
+                        <div class="w-4 h-4 rounded-full shadow-lg" style="background-color: ${getRiskColor(hotspot.riskLevel || hotspot.priority)}; border: 2px solid white;"></div>
+                        ${(hotspot.riskLevel === 'CRITICAL' || hotspot.priority === 'CRITICAL') ? `<div class="absolute -inset-4 rounded-full bg-red-500/20 animate-ping"></div>` : ''}
+                       </div>`,
+                                className: '',
+                                iconSize: [20, 20],
+                                iconAnchor: [10, 10]
+                            })}
+                        >
+                            <Popup className="custom-popup">
+                                <div className="p-3 bg-white">
+                                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Target Zone</div>
+                                    <h4 className="font-bold text-slate-900 border-b border-slate-100 pb-2 mb-2">{hotspot.name}</h4>
+                                    <div className="space-y-1">
+                                        <div className="flex justify-between text-xs">
+                                            <span className="text-slate-500">Risk Level</span>
+                                            <span className="font-bold" style={{ color: getRiskColor(hotspot.riskLevel || hotspot.priority) }}>{hotspot.riskLevel || hotspot.priority}</span>
+                                        </div>
+                                        <div className="flex justify-between text-xs">
+                                            <span className="text-slate-500">Detection Conf.</span>
+                                            <span className="text-slate-900 font-medium">94.2%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </Popup>
+                        </Marker>
+                    </React.Fragment>
                 ))}
 
                 {/* Render Patrol Units */}
@@ -147,17 +196,23 @@ export default function PatrolTrackerMap({ city, showRoutes = true }) {
                             icon={createPatrolIcon(patrol.status)}
                         >
                             <Popup>
-                                <div className="min-w-[150px]">
-                                    <div className="flex justify-between items-center mb-2">
-                                        <span className="font-bold text-slate-900">{patrol.name}</span>
-                                        <span className={`text-[10px] px-2 py-0.5 rounded-full text-white ${patrol.status === 'Responding' ? 'bg-red-500' :
-                                                patrol.status === 'En Route' ? 'bg-cyan-500' : 'bg-slate-500'
+                                <div className="min-w-[160px] p-1">
+                                    <div className="flex justify-between items-center mb-3">
+                                        <span className="font-bold text-slate-900 text-sm">{patrol.name}</span>
+                                        <span className={`text-[9px] px-2 py-0.5 rounded-full text-white font-bold tracking-tighter ${patrol.status === 'Responding' ? 'bg-red-500' :
+                                            patrol.status === 'En Route' ? 'bg-cyan-500' : 'bg-slate-500'
                                             }`}>
                                             {patrol.status}
                                         </span>
                                     </div>
-                                    <div className="text-xs text-slate-600">
-                                        Target: {patrol.targetHotspot?.name || 'Monitoring'}
+                                    <div className="space-y-2">
+                                        <div className="flex items-center gap-2 text-[10px] text-slate-600">
+                                            <Navigation className="w-3 h-3 text-cyan-500" />
+                                            <span>{patrol.status === 'Idle' ? 'Area Patrol' : `To: ${patrol.targetHotspot?.name}`}</span>
+                                        </div>
+                                        <div className="w-full bg-slate-100 h-1 rounded-full overflow-hidden">
+                                            <div className={`h-full bg-cyan-500 ${patrol.status !== 'Idle' ? 'animate-pulse' : ''}`} style={{ width: patrol.status === 'Responding' ? '90%' : '40%' }}></div>
+                                        </div>
                                     </div>
                                 </div>
                             </Popup>
@@ -168,13 +223,14 @@ export default function PatrolTrackerMap({ city, showRoutes = true }) {
                             <Polyline
                                 positions={[
                                     [patrol.lat, patrol.lng],
-                                    [patrol.targetHotspot.lat, patrol.targetHotspot.lng]
+                                    [patrol.targetHotspot.lat || patrol.targetHotspot.coordinates?.[0], patrol.targetHotspot.lng || patrol.targetHotspot.coordinates?.[1]]
                                 ]}
                                 pathOptions={{
                                     color: patrol.status === 'Responding' ? '#ef4444' : '#06b6d4',
-                                    weight: 2,
-                                    dashArray: '5, 10',
-                                    opacity: 0.6
+                                    weight: 3,
+                                    dashArray: '10, 10',
+                                    opacity: 0.5,
+                                    className: 'animate-dash'
                                 }}
                             />
                         )}
@@ -184,20 +240,20 @@ export default function PatrolTrackerMap({ city, showRoutes = true }) {
 
             {/* Map Overlay HUD */}
             <div className="absolute top-4 right-4 z-[1000] flex flex-col gap-2">
-                <div className="bg-slate-900/90 border border-slate-700 p-3 rounded-xl backdrop-blur-md shadow-lg">
-                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Network Legend</h4>
-                    <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]" />
-                            <span className="text-[10px] text-white">Critical Risk Zone</span>
+                <div className="bg-white/95 border border-slate-200 p-4 rounded-2xl shadow-2xl backdrop-blur-md">
+                    <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-100 pb-2">Unit Telemetry</h4>
+                    <div className="space-y-3">
+                        <div className="flex items-center gap-3">
+                            <div className="p-1 px-2 rounded-md bg-red-100 text-red-600 font-bold text-[10px]">SOS</div>
+                            <span className="text-[11px] text-slate-700 font-medium">Responding (Critical)</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 rounded-full bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.5)]" />
-                            <span className="text-[10px] text-white">Patrol En Route</span>
+                        <div className="flex items-center gap-3">
+                            <div className="p-1 px-2 rounded-md bg-cyan-100 text-cyan-600 font-bold text-[10px]">NAV</div>
+                            <span className="text-[11px] text-slate-700 font-medium">Intercepting Pattern</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 border-2 border-dashed border-cyan-500/50" />
-                            <span className="text-[10px] text-white">Predictive Route</span>
+                        <div className="flex items-center gap-3">
+                            <div className="p-1 px-2 rounded-md bg-slate-100 text-slate-600 font-bold text-[10px]">IDL</div>
+                            <span className="text-[11px] text-slate-700 font-medium">Standard Surveillance</span>
                         </div>
                     </div>
                 </div>

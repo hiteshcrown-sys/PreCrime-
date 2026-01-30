@@ -59,6 +59,7 @@ export const CITY_BASE_RATES = {
   'Kanpur': 187.34,
   'Thane': 176.45,
   'Bhopal': 165.23,
+  'Surat': 158.42,
   'Visakhapatnam': 154.67,
   'Pimpri-Chinchwad': 143.45,
   'Patna': 132.78,
