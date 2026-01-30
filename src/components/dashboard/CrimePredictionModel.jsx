@@ -9,7 +9,7 @@ import useCrimeModel from '@/hooks/useCrimeModel';
  * Users can select city and hour to get real-time predictions
  */
 
-export default function CrimePredictionModel() {
+export default function CrimePredictionModel({ onPredictionHourChange, onPredictionChange }) {
   const { predict, classifyRiskLevel, selectedModel } = useCrimeModel();
   const [selectedCity, setSelectedCity] = useState('Delhi');
   const [selectedHour, setSelectedHour] = useState(new Date().getHours());
@@ -59,13 +59,20 @@ export default function CrimePredictionModel() {
         const crimes = specificCrimes[crimeType] || ['Unknown Crime'];
         const specificCrime = crimes[Math.floor(Math.random() * crimes.length)];
         
-        setPrediction({
+        const fullPrediction = {
           ...result,
           crimeType,
           specificCrime,
           hour: selectedHour,
           city: selectedCity
-        });
+        };
+        
+        setPrediction(fullPrediction);
+        
+        // Notify parent component about prediction change for real-time KPI updates
+        if (onPredictionChange) {
+          onPredictionChange(fullPrediction);
+        }
       }
     } catch (error) {
       console.error('Prediction error:', error);
