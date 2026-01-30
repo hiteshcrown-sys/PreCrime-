@@ -32,6 +32,23 @@ export default function LiveCrimePulse() {
 
     window.addEventListener('crimeDataUpdate', (e) => handleUpdate(e.detail));
 
+    // Listen for intelligence events (dispatches)
+    const handleIntelligenceEvent = (e) => {
+      const detail = e.detail;
+      const newEvent = {
+        id: `intel-${Date.now()}`,
+        type: detail.message,
+        zone: detail.unit ? `${detail.unit} Dispatched` : 'Command Center',
+        risk: detail.severity === 'CRITICAL' ? 95 : 75,
+        confidence: 100,
+        timestamp: detail.timestamp || new Date(),
+        isSystem: true
+      };
+      setEvents(prev => [newEvent, ...prev.slice(0, 9)]);
+    };
+
+    window.addEventListener('intelligenceEvent', handleIntelligenceEvent);
+
     // Initial fetch of hotspots to generate initial events if feed is empty
     const initFeed = async () => {
       try {
@@ -55,7 +72,10 @@ export default function LiveCrimePulse() {
 
     initFeed();
 
-    return () => window.removeEventListener('crimeDataUpdate', handleUpdate);
+    return () => {
+      window.removeEventListener('crimeDataUpdate', handleUpdate);
+      window.removeEventListener('intelligenceEvent', handleIntelligenceEvent);
+    };
   }, [selectedCity]);
 
   // Handle status updates from the map component
@@ -174,9 +194,9 @@ export default function LiveCrimePulse() {
                     className="p-3 rounded-xl bg-slate-800/50 border border-slate-700 group hover:border-cyan-500/30 transition-all"
                   >
                     <div className="flex items-start gap-3">
-                      <div className={`p-2 rounded-lg ${event.risk >= 80 ? "bg-red-500/20 text-red-500" : "bg-cyan-500/20 text-cyan-500"
+                      <div className={`p-2 rounded-lg ${event.isSystem ? "bg-yellow-500/20 text-yellow-500" : (event.risk >= 80 ? "bg-red-500/20 text-red-500" : "bg-cyan-500/20 text-cyan-500")
                         }`}>
-                        <AlertTriangle className="w-3 h-3" />
+                        {event.isSystem ? <Zap className="w-3 h-3" /> : <AlertTriangle className="w-3 h-3" />}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-bold text-white text-[11px] truncate leading-tight uppercase tracking-tight">{event.type}</p>

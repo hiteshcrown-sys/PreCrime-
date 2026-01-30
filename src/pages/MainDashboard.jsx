@@ -6,6 +6,11 @@ import KPICard from "@/components/dashboard/KPICard";
 import CrimePredictionModel from "@/components/dashboard/CrimePredictionModel";
 import useCrimeModel from "@/hooks/useCrimeModel";
 import useChatBot from "@/hooks/useChatBot";
+import { useAlerts } from "@/contexts/AlertContext";
+import { Switch } from "@/components/ui/switch";
+import PatrolCommand from "@/components/patrol/PatrolCommand";
+import { livePatrolService } from "@/services/livePatrolService";
+import { useCity } from "@/contexts/CityContext";
 import L from 'leaflet';
 
 // City coordinates mapping (latitude, longitude)
@@ -53,6 +58,10 @@ export default function MainDashboard() {
   const [selectedPrediction, setSelectedPrediction] = useState(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [mapInitialized, setMapInitialized] = useState(false);
+  const [patrolUnits, setPatrolUnits] = useState([]);
+  const patrolMarkersRef = useRef({});
+  const patrolRoutesRef = useRef({});
+  const { selectedCity } = useCity();
   const [kpiData, setKpiData] = useState({
     nationalRisk: 67.4,
     highRiskZones: 4,
@@ -64,6 +73,7 @@ export default function MainDashboard() {
   // Get ML model data
   const { getCityRankings, selectedModel } = useCrimeModel();
   const { updatePredictionContext } = useChatBot();
+  const { autoDispatch, setAutoDispatch } = useAlerts();
 
   // Real-time polling - refresh every 30 seconds
   useEffect(() => {
@@ -111,10 +121,10 @@ export default function MainDashboard() {
         'LOW': { min: 20, max: 40 },
         'VERY_LOW': { min: 10, max: 20 }
       };
-      
+
       const range = riskRanges[selectedPrediction.riskLevel] || { min: 40, max: 60 };
       const predictedRate = selectedPrediction.predictedRate;
-      
+
       // If predictedRate is within range, use it; otherwise calculate based on range
       if (predictedRate >= range.min && predictedRate <= range.max) {
         nationalRisk = Math.round(predictedRate * 10) / 10;
@@ -123,18 +133,18 @@ export default function MainDashboard() {
         const normalized = (predictedRate % (range.max - range.min)) + range.min;
         nationalRisk = Math.round(normalized * 10) / 10;
       }
-      
+
       // High-Risk Zones = count nearby cities with similar risk level + current city
       const currentHour = selectedPrediction.hour;
       const rankings = getCityRankings(currentHour);
-      
+
       if (rankings && rankings.length > 0) {
         // Count all high-risk cities
         const highRiskCount = rankings.filter(city =>
           city.riskLevel === 'CRITICAL' || city.riskLevel === 'HIGH'
         ).length;
         highRiskZones = highRiskCount;
-        
+
         // Alerts = based on the selected city's risk level
         if (selectedPrediction.riskLevel === 'CRITICAL') {
           alertsGenerated = 8;
@@ -146,7 +156,7 @@ export default function MainDashboard() {
           alertsGenerated = 0;
         }
       }
-      
+
       // Trend based on selected prediction's risk
       if (selectedPrediction.riskLevel === 'CRITICAL') {
         trendValue = "+18.5%";
@@ -161,25 +171,25 @@ export default function MainDashboard() {
       // Fallback to time-based rankings
       const currentHour = selectedPredictionHour !== null ? selectedPredictionHour : timeOfDay;
       const rankings = getCityRankings(currentHour);
-      
+
       if (rankings && rankings.length > 0) {
         const allCitiesRisk = rankings.map(city => city.predictedRate);
         const avgRisk = allCitiesRisk.reduce((sum, rate) => sum + rate, 0) / allCitiesRisk.length;
-        
+
         const highRiskCount = rankings.filter(city =>
           city.riskLevel === 'CRITICAL' || city.riskLevel === 'HIGH'
         ).length;
-        
+
         const alertCount = rankings.reduce((total, city) => {
           if (city.riskLevel === 'CRITICAL') return total + 2;
           if (city.riskLevel === 'HIGH') return total + 1;
           return total;
         }, 0);
-        
+
         nationalRisk = Math.min(99, Math.round(avgRisk * 10) / 10);
         highRiskZones = highRiskCount;
         alertsGenerated = alertCount;
-        
+
         const baseTrend = currentHour >= 22 || currentHour <= 6 ? "+12.3%" : "+4.2%";
         const riskIncrease = avgRisk > 70 ? "+8.5%" : avgRisk > 50 ? "+5.2%" : "+2.1%";
         trendValue = highRiskCount > 5 ? riskIncrease : baseTrend;
@@ -331,6 +341,91 @@ export default function MainDashboard() {
     }
   }, [selectedPrediction]);
 
+  // Handle patrol unit updates and marker rendering
+  useEffect(() => {
+    if (!mapInstanceRef.current || !mapInitialized) return;
+
+    // Simulation loop for patrol movements
+    const interval = setInterval(() => {
+      // Get current alerts to help patrol service make decisions
+      const currentAlerts = []; // This could be synced from useAlerts if needed
+      const updatedUnits = livePatrolService.updatePatrols(selectedCity, []);
+      setPatrolUnits([...updatedUnits]);
+
+      // Update markers on map
+      updatedUnits.forEach(unit => {
+        const { id, lat, lng, status, name, targetAlert, targetHotspot } = unit;
+
+        // 1. Update Marker
+        if (!patrolMarkersRef.current[id]) {
+          const icon = L.divIcon({
+            html: `
+              <div class="patrol-marker-container" style="transition: all 0.5s ease-in-out;">
+                <div class="relative">
+                  <div class="patrol-icon ${status === 'Responding' ? 'animate-pulse' : ''}" style="color: ${status === 'Responding' ? '#ef4444' : '#06b6d4'};">
+                    <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor" opacity="0.9">
+                      <path d="M5 11L3 13V19C3 19.5523 3.44772 20 4 20H5C5.55228 20 6 19.5523 6 19V18H18V19C18 19.5523 18.4477 20 19 20H20C20.5523 20 21 19.5523 21 19V13L19 11M5 11L7 5H17L19 11M5 11H19M8 15H8.01M16 15H16.01" stroke="black" stroke-width="1.5" />
+                    </svg>
+                  </div>
+                  <div class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border-2 border-white" style="background-color: ${status === 'Responding' ? '#ef4444' : '#06b6d4'};"></div>
+                </div>
+              </div>`,
+            className: '',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+          });
+
+          patrolMarkersRef.current[id] = L.marker([lat, lng], { icon }).addTo(mapInstanceRef.current);
+          patrolMarkersRef.current[id].bindPopup(`<b>${name}</b><br>Status: ${status}`);
+        } else {
+          patrolMarkersRef.current[id].setLatLng([lat, lng]);
+          // Update icon if status changed (color)
+          const icon = L.divIcon({
+            html: `
+              <div class="patrol-marker-container">
+                <div class="relative">
+                  <div class="patrol-icon ${status === 'Responding' ? 'animate-pulse' : ''}" style="color: ${status === 'Responding' ? '#ef4444' : '#06b6d4'};">
+                    <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor" opacity="0.9">
+                      <path d="M5 11L3 13V19C3 19.5523 3.44772 20 4 20H5C5.55228 20 6 19.5523 6 19V18H18V19C18 19.5523 18.4477 20 19 20H20C20.5523 20 21 19.5523 21 19V13L19 11M5 11L7 5H17L19 11M5 11H19M8 15H8.01M16 15H16.01" stroke="black" stroke-width="1.5" />
+                    </svg>
+                  </div>
+                  <div class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border-2 border-white" style="background-color: ${status === 'Responding' ? '#ef4444' : '#06b6d4'};"></div>
+                </div>
+              </div>`,
+            className: '',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+          });
+          patrolMarkersRef.current[id].setIcon(icon);
+        }
+
+        // 2. Update Route Polyline
+        const target = targetAlert || targetHotspot;
+        if (target) {
+          const targetCoords = [target.lat, target.lng];
+          if (!patrolRoutesRef.current[id]) {
+            patrolRoutesRef.current[id] = L.polyline([[lat, lng], targetCoords], {
+              color: status === 'Responding' ? '#ef4444' : '#06b6d4',
+              weight: 2,
+              dashArray: '5, 10',
+              opacity: 0.5
+            }).addTo(mapInstanceRef.current);
+          } else {
+            patrolRoutesRef.current[id].setLatLngs([[lat, lng], targetCoords]);
+            patrolRoutesRef.current[id].setStyle({
+              color: status === 'Responding' ? '#ef4444' : '#06b6d4'
+            });
+          }
+        } else if (patrolRoutesRef.current[id]) {
+          mapInstanceRef.current.removeLayer(patrolRoutesRef.current[id]);
+          delete patrolRoutesRef.current[id];
+        }
+      });
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [mapInitialized, selectedCity]);
+
 
 
   const getTimeLabel = (hour) => {
@@ -411,7 +506,7 @@ export default function MainDashboard() {
       </div>
 
       {/* AI Crime Prediction Model */}
-      <CrimePredictionModel 
+      <CrimePredictionModel
         onPredictionHourChange={setSelectedPredictionHour}
         onPredictionChange={handlePredictionChange}
       />
@@ -427,16 +522,28 @@ export default function MainDashboard() {
             <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
             <span className="text-xs font-medium text-green-400">Live ML Data</span>
           </div>
+
+          <div className="flex items-center gap-3 px-4 py-1.5 rounded-lg bg-slate-800/50 border border-slate-700">
+            <div className="flex flex-col">
+              <span className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Patrol Command</span>
+              <span className="text-[9px] text-slate-500">Auto Dispatch Critical Alerts</span>
+            </div>
+            <Switch
+              checked={autoDispatch}
+              onCheckedChange={setAutoDispatch}
+              className="data-[state=checked]:bg-red-500"
+            />
+          </div>
         </div>
 
         <div className="relative">
           {/* Leaflet Map */}
-          <div 
+          <div
             ref={mapRef}
             className="w-full bg-slate-800"
             style={{ height: '600px', borderRadius: '0 0 0 0' }}
           />
-          
+
           {/* Risk Legend */}
           <div className="absolute bottom-6 left-6 bg-slate-900/95 border border-slate-700 rounded-lg p-4 backdrop-blur-sm z-10">
             <p className="text-xs font-semibold text-white mb-3">RISK LEVEL</p>
@@ -477,6 +584,20 @@ export default function MainDashboard() {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Patrol Command System */}
+      <div id="patrol-command-section" className="pt-6 border-t border-slate-800">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2 rounded-lg bg-cyan-500/20">
+            <Shield className="w-5 h-5 text-cyan-400" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-white uppercase tracking-tight">Tactical Operations</h2>
+            <p className="text-xs text-slate-500">Manual & AI-Assisted Patrol Dispatch Command</p>
+          </div>
+        </div>
+        <PatrolCommand />
       </div>
     </div>
   );

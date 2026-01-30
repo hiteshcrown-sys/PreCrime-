@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "./utils";
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
   Fingerprint,
@@ -18,8 +18,10 @@ import {
   MapPin
 } from "lucide-react";
 import { useCity } from "./contexts/CityContext";
+import { useAlerts } from "./contexts/AlertContext";
 import { CITY_BASE_RATES } from "./utils/crimeModelService";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import AlertDropdown from "@/components/ui/AlertDropdown";
 
 const navItems = [
   { name: "Main Dashboard", icon: LayoutDashboard, page: "MainDashboard" },
@@ -161,12 +163,9 @@ export default function Layout({ children, currentPageName }) {
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-500/10 border border-green-500/30">
               <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
               <span className="text-xs font-medium text-green-400">System Online</span>
+              <NotificationBell />
             </div>
 
-            <button className="relative p-2 rounded-lg hover:bg-slate-800 transition-colors">
-              <Bell className="w-5 h-5 text-slate-400" />
-              <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500" />
-            </button>
           </div>
         </div>
 
@@ -174,6 +173,42 @@ export default function Layout({ children, currentPageName }) {
           {children}
         </div>
       </main>
+    </div>
+  );
+}
+
+function NotificationBell() {
+  const { criticalAlerts } = useAlerts();
+  const hasCritical = criticalAlerts.length > 0;
+
+  const scrollToDispatch = () => {
+    const element = document.getElementById('patrol-command-section');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      console.log("Patrol section not found on this page");
+    }
+  };
+
+  return (
+    <div className="relative">
+      <button
+        onClick={scrollToDispatch}
+        className="relative p-2 rounded-lg hover:bg-slate-800 transition-colors"
+      >
+        <Bell className={cn(
+          "w-5 h-5 transition-all text-slate-400 hover:text-white",
+          hasCritical ? "text-red-500 animate-pulse" : "text-slate-400"
+        )} />
+        {hasCritical && (
+          <span className="absolute top-1 right-1 flex h-4 w-4">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-4 w-4 bg-red-500 text-[10px] font-bold items-center justify-center text-white">
+              {criticalAlerts.length}
+            </span>
+          </span>
+        )}
+      </button>
     </div>
   );
 }

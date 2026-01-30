@@ -208,7 +208,7 @@ export default function PatrolTrackerMap({ city, showRoutes = true, onStatusChan
                                     <div className="space-y-2">
                                         <div className="flex items-center gap-2 text-[10px] text-slate-600">
                                             <Navigation className="w-3 h-3 text-cyan-500" />
-                                            <span>{patrol.status === 'Idle' ? 'Area Patrol' : `To: ${patrol.targetHotspot?.name}`}</span>
+                                            <span>{patrol.status === 'Idle' ? 'Area Patrol' : `To: ${patrol.targetAlert?.zone || patrol.targetHotspot?.name}`}</span>
                                         </div>
                                         <div className="w-full bg-slate-100 h-1 rounded-full overflow-hidden">
                                             <div className={`h-full bg-cyan-500 ${patrol.status !== 'Idle' ? 'animate-pulse' : ''}`} style={{ width: patrol.status === 'Responding' ? '90%' : '40%' }}></div>
@@ -219,17 +219,20 @@ export default function PatrolTrackerMap({ city, showRoutes = true, onStatusChan
                         </Marker>
 
                         {/* Render Route to Target */}
-                        {showRoutes && patrol.targetHotspot && (
+                        {showRoutes && (patrol.targetHotspot || patrol.targetAlert) && (
                             <Polyline
                                 positions={[
                                     [patrol.lat, patrol.lng],
-                                    [patrol.targetHotspot.lat || patrol.targetHotspot.coordinates?.[0], patrol.targetHotspot.lng || patrol.targetHotspot.coordinates?.[1]]
+                                    [
+                                        patrol.targetAlert ? patrol.targetAlert.lat : (patrol.targetHotspot.lat || patrol.targetHotspot.coordinates?.[0]),
+                                        patrol.targetAlert ? patrol.targetAlert.lng : (patrol.targetHotspot.lng || patrol.targetHotspot.coordinates?.[1])
+                                    ]
                                 ]}
                                 pathOptions={{
-                                    color: patrol.status === 'Responding' ? '#ef4444' : '#06b6d4',
+                                    color: (patrol.status === 'Responding' || patrol.targetAlert) ? '#ef4444' : '#06b6d4',
                                     weight: 3,
                                     dashArray: '10, 10',
-                                    opacity: 0.5,
+                                    opacity: 0.6,
                                     className: 'animate-dash'
                                 }}
                             />
