@@ -50,9 +50,48 @@ class LivePatrolService {
                 lng: startLng,
                 status: "Idle", // Idle, En Route, Responding
                 targetHotspot: null,
+                targetAlert: null,
                 history: [{ lat: startLat, lng: startLng }]
             };
         });
+    }
+
+    /**
+     * Explicitly dispatch a unit to an alert
+     * @param {Object} alert 
+     */
+    dispatchUnitToAlert(alert) {
+        const city = alert.city;
+        const units = this.patrols.get(city);
+        if (!units) return null;
+
+        // Find nearest idle or en-route unit
+        let nearestUnit = null;
+        let minDist = Infinity;
+
+        units.forEach(unit => {
+            const dx = alert.lat - unit.lat;
+            const dy = alert.lng - unit.lng;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            // Prioritize Idle units
+            const weight = unit.status === "Idle" ? 0.5 : 1.0;
+            const weightedDist = dist * weight;
+
+            if (weightedDist < minDist) {
+                minDist = weightedDist;
+                nearestUnit = unit;
+            }
+        });
+
+        if (nearestUnit) {
+            nearestUnit.targetAlert = alert;
+            nearestUnit.status = "Responding";
+            nearestUnit.targetHotspot = null; // Clear hotspot target
+            return nearestUnit;
+        }
+
+        return null;
     }
 
     /**
@@ -63,20 +102,18 @@ class LivePatrolService {
 
         const cityUnits = this.patrols.get(city);
         const updatedUnits = cityUnits.map(unit => {
-            // Logic: If the unit has no target or its target has low risk, find the nearest high-risk hotspot
-            const highRiskHotspots = hotspots.filter(h => h.riskLevel === 'CRITICAL' || h.riskLevel === 'HIGH');
+            let target = unit.targetAlert || unit.targetHotspot;
 
-            let target = unit.targetHotspot;
-
-            // Assign new target if idle or current target is not critical
-            if (!target || target.riskLevel !== 'CRITICAL') {
-                if (highRiskHotspots.length > 0) {
-                    // Find nearest available high risk hotspot
+            // If no active alert target, look for critical hotspots
+            if (!unit.targetAlert) {
+                const highRiskHotspots = hotspots.filter(h => h.riskLevel === 'CRITICAL' || h.riskLevel === 'HIGH');
+                if (!target || (target.riskLevel !== 'CRITICAL' && highRiskHotspots.length > 0)) {
                     target = highRiskHotspots[Math.floor(Math.random() * highRiskHotspots.length)];
+                    unit.targetHotspot = target;
                 }
             }
 
-            const newUnit = { ...unit, targetHotspot: target };
+            const newUnit = { ...unit };
 
             if (target) {
                 // Move towards target
@@ -85,14 +122,19 @@ class LivePatrolService {
                 const dist = Math.sqrt(dx * dx + dy * dy);
 
                 // Step size (simulating patrol speed)
-                const step = 0.002;
+                // Dispatched alerts get faster speed
+                const step = unit.targetAlert ? 0.003 : 0.002;
 
-                if (dist > step) {
+                if (dist > 0.001) {
                     newUnit.lat += (dx / dist) * step;
                     newUnit.lng += (dy / dist) * step;
                     newUnit.status = dist < 0.01 ? "Responding" : "En Route";
                 } else {
                     newUnit.status = "Responding";
+                    // If arrived at alert, clear it (simplified)
+                    if (unit.targetAlert && dist < 0.002) {
+                        newUnit.targetAlert = null;
+                    }
                 }
             } else {
                 // Random drift for idle patrols

@@ -81,7 +81,11 @@ export default function IoTNetwork() {
 
         // Auto-detect gunshots when sound exceeds threshold
         if (db > GUNSHOT_THRESHOLD) {
-          addGunshotAlert(db);
+          const now = Date.now();
+          if (now - lastDetectionRef.current > 2000) {
+            lastDetectionRef.current = now;
+            addGunshotAlert(db);
+          }
         }
 
         animationRef.current = requestAnimationFrame(analyzeAudio);
@@ -130,16 +134,14 @@ export default function IoTNetwork() {
     
     setAlerts(prev => [newAlert, ...prev].slice(0, 8));
     setLiveRiskBoost(prev => Math.min(prev + riskBoost, 100));
+    setDetectionActive(true);
+    setTimeout(() => setDetectionActive(false), 5000);
     
     // Reset boost after 10s
     setTimeout(() => setLiveRiskBoost(prev => Math.max(prev - (riskBoost / 2), 0)), 10000);
     
-    // Trigger Tinkercad buzzer - Prevent multiple triggers within 500ms
-    const now = Date.now();
-    if (now - lastDetectionRef.current > 500) {
-      lastDetectionRef.current = now;
-      triggerTinkercadBuzzer(soundLevel || 80);
-    }
+    // Trigger Tinkercad buzzer
+    triggerTinkercadBuzzer(soundLevel || 80);
   };
 
   const triggerTinkercadBuzzer = (soundLevel) => {
@@ -352,17 +354,17 @@ export default function IoTNetwork() {
           </CardHeader>
           <CardContent className="space-y-6 py-8">
             <div className="aspect-video w-full rounded-2xl border-4 border-purple-500/60 shadow-2xl overflow-hidden bg-gradient-to-br from-purple-900/50 to-indigo-900/50">
-      <iframe
-        src="https://www.tinkercad.com/embed/hGeDgJYUcI5-sizzling-jarv?editbtn=1"
-        width="100%"
-        height="100%"
-        frameBorder="0"
-        allowFullScreen
-        title="PreCrime Streetlamp IoT Live Simulation"
-        className="w-full h-full"
-      />
-    </div>
-            
+              <iframe
+                src="https://www.tinkercad.com/embed/hGeDgJYUcI5-sizzling-jarv?editbtn=1"
+                width="100%"
+                height="100%"
+                frameBorder="0"
+                title="PreCrime IoT Streetlamps"
+                sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-presentation"
+                allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; picture-in-picture; microphone"
+                className="w-full h-full"
+              />
+            </div>
 
             <div className="bg-purple-500/10 border-t border-purple-500/20 p-4 rounded-lg">
               <div className="flex items-center justify-between">
