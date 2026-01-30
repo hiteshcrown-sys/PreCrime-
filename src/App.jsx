@@ -10,6 +10,7 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import { ChatBotProvider } from '@/contexts/ChatBotContext';
 import { CityProvider } from '@/contexts/CityContext';
 import ChatBot from '@/components/AIAssistant/ChatBot';
+import { AlertProvider } from '@/contexts/AlertContext';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -72,16 +73,18 @@ function App() {
   return (
     <AuthProvider>
       <CityProvider>
-        <ChatBotProvider>
-          <QueryClientProvider client={queryClientInstance}>
-            <Router>
-              <NavigationTracker />
-              <AuthenticatedApp />
-              <ChatBot />
-            </Router>
-            <Toaster />
-          </QueryClientProvider>
-        </ChatBotProvider>
+        <AlertProvider>
+          <ChatBotProvider>
+            <QueryClientProvider client={queryClientInstance}>
+              <Router>
+                <NavigationTracker />
+                <AuthenticatedApp />
+                <ChatBot />
+              </Router>
+              <Toaster />
+            </QueryClientProvider>
+          </ChatBotProvider>
+        </AlertProvider>
       </CityProvider>
     </AuthProvider>
   )

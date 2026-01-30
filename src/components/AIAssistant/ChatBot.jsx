@@ -2,13 +2,14 @@ import { useContext, useRef, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, MessageCircle, Sparkles } from 'lucide-react';
 import ChatBotContext from '@/contexts/ChatBotContext';
+import { useAlerts } from '@/contexts/AlertContext';
 import { generateChatbotResponse, getQuickSuggestions, getOutOfScopeResponse, isOutOfScope, getEthicalDisclaimer } from '@/utils/chatbotIntelligence';
 import ReactMarkdown from 'react-markdown';
 
 export default function ChatBot() {
   const context = useContext(ChatBotContext);
   const [showSuggestions, setShowSuggestions] = useState(true);
-  
+
   if (!context) {
     return null;
   }
@@ -29,7 +30,8 @@ export default function ChatBot() {
 
   const inputRef = useRef(null);
   const messagesEndRef = useRef(null);
-  const inputValue = useRef('');
+  const [inputValue, setInputValue] = useState('');
+  const { criticalAlerts, markAsDispatched } = useAlerts();
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -45,13 +47,13 @@ export default function ChatBot() {
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    
-    const text = inputValue.current?.trim();
+
+    const text = inputValue.trim();
     if (!text) return;
 
     // Add user message
     addMessage(text, 'user');
-    inputValue.current = '';
+    setInputValue('');
     setShowSuggestions(false);
     setIsLoading(true);
 
@@ -59,8 +61,15 @@ export default function ChatBot() {
     setTimeout(() => {
       let response = '';
 
-      // Check if query is out of scope
-      if (isOutOfScope(text)) {
+      // Check for dispatch command
+      const isDispatchCmd = /dispatch|send|patrol/i.test(text);
+      if (isDispatchCmd && criticalAlerts.length > 0) {
+        const targetAlert = criticalAlerts[0]; // Dispatch to highest priority/oldest active alert
+        markAsDispatched(targetAlert.id);
+        response = `Affirmative. **Dispatching patrol unit** to ${targetAlert.zone} for ${targetAlert.type}. Direct visual tracking is now active on the map.`;
+      } else if (isDispatchCmd && criticalAlerts.length === 0) {
+        response = "Negative. All sectors are currently clear of critical alerts. No immediate dispatch required.";
+      } else if (isOutOfScope(text)) {
         response = getOutOfScopeResponse();
       } else {
         // Generate intelligent response based on context
@@ -73,7 +82,7 @@ export default function ChatBot() {
       }
 
       addBotMessage(response);
-      
+
       // Add ethical disclaimer if needed
       if (currentPrediction && getEthicalDisclaimer(currentPrediction)) {
         const disclaimer = getEthicalDisclaimer(currentPrediction);
@@ -163,11 +172,10 @@ export default function ChatBot() {
                   className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-xs px-4 py-3 rounded-lg ${
-                      msg.type === 'user'
+                    className={`max-w-xs px-4 py-3 rounded-lg ${msg.type === 'user'
                         ? 'bg-purple-600 text-white rounded-br-none shadow-md'
                         : 'bg-slate-800 text-slate-100 rounded-bl-none border border-slate-700'
-                    }`}
+                      }`}
                   >
                     <div className="text-sm leading-relaxed">
                       {msg.type === 'bot' ? (
@@ -251,15 +259,15 @@ export default function ChatBot() {
                 <input
                   ref={inputRef}
                   type="text"
-                  placeholder="Ask me anything about predictions..."
-                  value={inputValue.current}
-                  onChange={(e) => (inputValue.current = e.target.value)}
+                  placeholder="Ask me anything or say 'dispatch'..."
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
                   disabled={isLoading}
                   className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 disabled:opacity-50 transition-all"
                 />
                 <motion.button
                   type="submit"
-                  disabled={isLoading || !inputValue.current?.trim()}
+                  disabled={isLoading || !inputValue.trim()}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className="bg-gradient-to-r from-cyan-500 to-purple-600 text-white rounded-lg p-2 hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
