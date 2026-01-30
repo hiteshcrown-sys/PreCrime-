@@ -250,9 +250,9 @@ export default function MainDashboard() {
         });
 
         marker.bindPopup(`
-          <div style="font-size: 12px; color: white;">
+          <div style="font-size: 12px; color: #111827;">
             <p style="margin: 0; font-weight: bold;">${cityName}</p>
-            <p style="margin: 4px 0 0 0; color: #cbd5e1;">Select city to predict</p>
+            <p style="margin: 4px 0 0 0; color: #6b7280;">Select city to predict</p>
           </div>
         `);
 
@@ -294,15 +294,15 @@ export default function MainDashboard() {
       // Update popup
       const timestamp = new Date().toLocaleTimeString();
       marker.setPopupContent(`
-        <div class="text-sm bg-slate-900 text-white p-2 rounded" style="max-width: 250px;">
+        <div class="text-sm bg-white text-gray-900 p-2 rounded border border-gray-200" style="max-width: 250px;">
           <p class="font-bold">${city}</p>
-          <div class="text-xs space-y-1 mt-2 text-gray-300">
-            <p><span class="font-semibold">Risk Level:</span> <span style="color: ${riskColor.hex};">${riskLevel}</span></p>
-            <p><span class="font-semibold">Risk Score:</span> ${predictedRate.toFixed(1)}</p>
-            <p><span class="font-semibold">Crime Type:</span> ${crimeType}</p>
-            <p><span class="font-semibold">Time:</span> ${getTimeLabel(hour)}</p>
-            <p><span class="font-semibold">Confidence:</span> 94.2%</p>
-            <p class="text-xs text-cyan-400 mt-2">Updated: ${timestamp}</p>
+          <div class="text-xs space-y-1 mt-2 text-gray-600">
+            <p><span class="text-gray-500">Risk Level:</span> <span style="color: ${riskColor.hex}; font-weight: 600;">${riskLevel}</span></p>
+            <p><span class="text-gray-500">Risk Score:</span> ${predictedRate.toFixed(1)}</p>
+            <p><span class="text-gray-500">Crime Type:</span> ${crimeType}</p>
+            <p><span class="text-gray-500">Time:</span> ${getTimeLabel(hour)}</p>
+            <p><span class="text-gray-500">Confidence:</span> 94.2%</p>
+            <p class="text-xs text-gray-500 mt-2">Updated: ${timestamp}</p>
           </div>
         </div>
       `);
@@ -342,10 +342,9 @@ export default function MainDashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-white">National Command Centre</h1>
-        <p className="text-slate-400 text-sm mt-1">Real-time Crime Intelligence for India</p>
+        <h1 className="text-xl font-semibold text-gray-900">Intelligence Dashboard</h1>
+        <p className="text-sm text-gray-500 mt-1">Real-time Crime Intelligence for India</p>
       </div>
 
       {/* KPI Cards */}
@@ -417,62 +416,53 @@ export default function MainDashboard() {
       />
 
       {/* Real-Time Map Section */}
-      <div className="rounded-2xl bg-slate-900/50 border border-slate-800 overflow-hidden">
-        <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+      <div className="rounded-lg bg-white/95 border border-gray-200 overflow-hidden">
+        <div className="p-4 border-b border-gray-200 flex items-center justify-between" style={{ borderTopWidth: 3, borderTopColor: '#000080' }}>
           <div>
-            <h3 className="text-lg font-semibold text-white">Real-Time Risk Map</h3>
-            <p className="text-xs text-slate-400 mt-1">Live ML predictions synchronized across all cities</p>
+            <h3 className="font-semibold text-gray-900">Real-Time Risk Map</h3>
+            <p className="text-xs text-gray-500 mt-1">Live ML predictions synchronized across all cities</p>
           </div>
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-500/10 border border-green-500/30">
-            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-            <span className="text-xs font-medium text-green-400">Live ML Data</span>
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-50 border border-green-200">
+            <span className="w-2 h-2 rounded-full bg-green-600 animate-pulse" />
+            <span className="text-xs font-medium text-green-800">Live ML Data</span>
           </div>
         </div>
 
         <div className="relative">
-          {/* Leaflet Map */}
-          <div 
-            ref={mapRef}
-            className="w-full bg-slate-800"
-            style={{ height: '600px', borderRadius: '0 0 0 0' }}
-          />
-          
-          {/* Risk Legend */}
-          <div className="absolute bottom-6 left-6 bg-slate-900/95 border border-slate-700 rounded-lg p-4 backdrop-blur-sm z-10">
-            <p className="text-xs font-semibold text-white mb-3">RISK LEVEL</p>
+          <div ref={mapRef} className="w-full bg-gray-100" style={{ height: '600px' }} />
+          <div className="absolute bottom-6 left-6 bg-white/95 border border-gray-200 rounded-lg p-4 shadow-sm z-10">
+            <p className="text-xs font-semibold text-gray-900 mb-3">RISK LEVEL</p>
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: '#22c55e' }}></div>
-                <span className="text-xs text-slate-300">Low Risk</span>
+                <div className="w-4 h-4 rounded-full bg-green-500" />
+                <span className="text-xs text-gray-600">Low Risk</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: '#eab308' }}></div>
-                <span className="text-xs text-slate-300">Medium Risk</span>
+                <div className="w-4 h-4 rounded-full bg-amber-500" />
+                <span className="text-xs text-gray-600">Medium Risk</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: '#f97316' }}></div>
-                <span className="text-xs text-slate-300">High Risk</span>
+                <div className="w-4 h-4 rounded-full bg-orange-500" />
+                <span className="text-xs text-gray-600">High Risk</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: '#ef4444' }}></div>
-                <span className="text-xs text-slate-300">Critical Risk</span>
+                <div className="w-4 h-4 rounded-full bg-red-500" />
+                <span className="text-xs text-gray-600">Critical Risk</span>
               </div>
             </div>
           </div>
-
-          {/* Prediction Info Card - Only show when prediction is selected */}
           {selectedPrediction && (
-            <div className="absolute top-6 right-6 bg-slate-900/95 border border-cyan-500/30 rounded-lg p-4 backdrop-blur-sm max-w-sm z-10">
+            <div className="absolute top-6 right-6 bg-white/95 border border-gray-200 rounded-lg p-4 shadow-sm max-w-sm z-10">
               <div className="flex items-center gap-2 mb-3">
-                <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></div>
-                <p className="text-xs font-semibold text-cyan-400">LIVE PREDICTION</p>
+                <div className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
+                <p className="text-xs font-semibold text-gray-900">LIVE PREDICTION</p>
               </div>
-              <p className="text-sm font-bold text-white mb-2">{selectedPrediction.city} • {getTimeLabel(selectedPrediction.hour)}</p>
-              <div className="text-xs space-y-1 text-slate-300">
-                <p><span className="text-slate-400">Risk Level:</span> <span style={{ color: getRiskColor(selectedPrediction.riskLevel).hex }} className="font-semibold">{selectedPrediction.riskLevel}</span></p>
-                <p><span className="text-slate-400">Risk Score:</span> {selectedPrediction.predictedRate.toFixed(1)}</p>
-                <p><span className="text-slate-400">Crime Type:</span> {selectedPrediction.crimeType}</p>
-                <p><span className="text-slate-400">Model Confidence:</span> 94.2%</p>
+              <p className="text-sm font-bold text-gray-900 mb-2">{selectedPrediction.city} • {getTimeLabel(selectedPrediction.hour)}</p>
+              <div className="text-xs space-y-1 text-gray-600">
+                <p><span className="text-gray-500">Risk Level:</span> <span style={{ color: getRiskColor(selectedPrediction.riskLevel).hex }} className="font-semibold">{selectedPrediction.riskLevel}</span></p>
+                <p><span className="text-gray-500">Risk Score:</span> {selectedPrediction.predictedRate.toFixed(1)}</p>
+                <p><span className="text-gray-500">Crime Type:</span> {selectedPrediction.crimeType}</p>
+                <p><span className="text-gray-500">Model Confidence:</span> 94.2%</p>
               </div>
             </div>
           )}

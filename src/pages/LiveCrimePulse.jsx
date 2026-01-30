@@ -77,39 +77,24 @@ export default function LiveCrimePulse() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <div className="p-2 rounded-lg bg-red-500/20 text-red-500">
-              <Shield className="w-6 h-6" />
-            </div>
-            <motion.span
-              className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"
-              animate={{ scale: [1, 1.3, 1], opacity: [1, 0.5, 1] }}
-              transition={{ duration: 1, repeat: Infinity }}
-            />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-white">Patrol Tracker & Operational Pulse</h1>
-            <p className="text-slate-400 text-sm">Real-time command & control for {selectedCity}</p>
-          </div>
+        <div>
+          <h1 className="text-xl font-semibold text-gray-900">Live Patrol Status</h1>
+          <p className="text-sm text-gray-500 mt-1">Real-time command & control for {selectedCity}</p>
         </div>
-
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-800/50 border border-slate-700">
-            <span className="text-xs text-slate-400 uppercase tracking-widest">Route Prediction</span>
+          <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/95 border border-gray-200">
+            <span className="text-xs text-gray-500 uppercase tracking-wider">Route Prediction</span>
             <button
               onClick={() => setShowRoutes(!showRoutes)}
-              className={`w-10 h-5 rounded-full relative transition-colors ${showRoutes ? 'bg-cyan-500' : 'bg-slate-700'}`}
+              className={`w-10 h-5 rounded-full relative transition-colors ${showRoutes ? "bg-blue-600" : "bg-gray-300"}`}
             >
-              <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${showRoutes ? 'left-6' : 'left-1'}`} />
+              <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${showRoutes ? "left-6" : "left-1"}`} />
             </button>
           </div>
-
-          <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-500/10 border border-green-500/30 font-medium">
-            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-            <span className="text-sm text-green-400 uppercase tracking-tighter">Live Sensor Feed</span>
+          <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-50 border border-green-200">
+            <span className="w-2 h-2 rounded-full bg-green-600 animate-pulse" />
+            <span className="text-sm text-green-800 font-medium uppercase tracking-tighter">Live Sensor Feed</span>
           </div>
         </div>
       </div>
@@ -128,41 +113,39 @@ export default function LiveCrimePulse() {
 
         {/* Operational Analytics & Feed */}
         <div className="xl:col-span-1 space-y-6">
-          {/* Patrol Stats Card */}
-          <div className="rounded-2xl bg-slate-900/50 border border-slate-800 p-5 space-y-4 shadow-xl backdrop-blur-sm">
-            <div className="flex items-center gap-2 text-cyan-400 mb-2">
+          {/* Patrol Stats Card – same style as Crime Pattern Analysis */}
+          <div className="rounded-lg bg-white/95 border border-gray-200 p-5 space-y-4 shadow-sm" style={{ borderTopWidth: 3, borderTopColor: "#000080" }}>
+            <div className="flex items-center gap-2 text-gray-700 mb-2">
               <Navigation className="w-4 h-4" />
-              <h3 className="font-bold text-sm uppercase tracking-wider">Unit Readiness</h3>
+              <h3 className="font-semibold text-sm uppercase tracking-wider text-gray-900">Unit Readiness</h3>
             </div>
-
             <div className="grid grid-cols-2 gap-4">
-              <div className="p-3 bg-slate-800/50 rounded-xl border border-slate-700/50">
-                <p className="text-[10px] text-slate-500 uppercase">Responding</p>
-                <p className="text-xl font-bold text-red-400">{patrolStats.responding}</p>
+              <div className="p-3 rounded-lg bg-gray-50 border border-gray-200 border-l-4" style={{ borderLeftColor: "#dc2626" }}>
+                <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Responding</p>
+                <p className="text-xl font-bold text-gray-900">{patrolStats.responding}</p>
               </div>
-              <div className="p-3 bg-slate-800/50 rounded-xl border border-slate-700/50">
-                <p className="text-[10px] text-slate-500 uppercase">En Route</p>
-                <p className="text-xl font-bold text-cyan-400">{patrolStats.enRoute || 0}</p>
+              <div className="p-3 rounded-lg bg-gray-50 border border-gray-200 border-l-4" style={{ borderLeftColor: "#2563eb" }}>
+                <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">En Route</p>
+                <p className="text-xl font-bold text-gray-900">{patrolStats.enRoute || 0}</p>
               </div>
-              <div className="p-3 bg-slate-800/50 rounded-xl border border-slate-700/50">
-                <p className="text-[10px] text-slate-500 uppercase">Standby</p>
-                <p className="text-xl font-bold text-slate-400">{patrolStats.idle}</p>
+              <div className="p-3 rounded-lg bg-gray-50 border border-gray-200 border-l-4" style={{ borderLeftColor: "#6b7280" }}>
+                <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Standby</p>
+                <p className="text-xl font-bold text-gray-900">{patrolStats.idle}</p>
               </div>
-              <div className="p-3 bg-slate-800/50 rounded-xl border border-slate-700/50">
-                <p className="text-[10px] text-slate-500 uppercase">Total Units</p>
-                <p className="text-xl font-bold text-white">{patrolStats.active}</p>
+              <div className="p-3 rounded-lg bg-gray-50 border border-gray-200 border-l-4" style={{ borderLeftColor: "#138808" }}>
+                <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Total Units</p>
+                <p className="text-xl font-bold text-gray-900">{patrolStats.active}</p>
               </div>
             </div>
           </div>
 
-          {/* Real-time Activity Feed */}
-          <div className="rounded-2xl bg-slate-900/50 border border-slate-800 overflow-hidden h-[340px] flex flex-col shadow-xl">
-            <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-800/30">
-              <h3 className="font-bold text-sm text-white uppercase tracking-wider">Intelligence Stream</h3>
-              <Zap className="w-4 h-4 text-yellow-500 animate-pulse" />
+          {/* Real-time Activity Feed – same card style */}
+          <div className="rounded-lg bg-white/95 border border-gray-200 overflow-hidden h-[340px] flex flex-col shadow-sm" style={{ borderTopWidth: 3, borderTopColor: "#138808" }}>
+            <div className="p-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
+              <h3 className="font-semibold text-sm text-gray-900 uppercase tracking-wider">Intelligence Stream</h3>
+              <Zap className="w-4 h-4 text-amber-500 animate-pulse" />
             </div>
-
-            <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
               <AnimatePresence mode="popLayout">
                 {events.map((event) => (
                   <motion.div
@@ -171,22 +154,21 @@ export default function LiveCrimePulse() {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, scale: 0.95 }}
-                    className="p-3 rounded-xl bg-slate-800/50 border border-slate-700 group hover:border-cyan-500/30 transition-all"
+                    className="p-3 rounded-lg bg-gray-50 border border-gray-200 hover:border-gray-300 transition-all"
                   >
                     <div className="flex items-start gap-3">
-                      <div className={`p-2 rounded-lg ${event.risk >= 80 ? "bg-red-500/20 text-red-500" : "bg-cyan-500/20 text-cyan-500"
-                        }`}>
+                      <div className={`p-2 rounded-lg ${event.risk >= 80 ? "bg-red-100 text-red-600" : "bg-blue-100 text-blue-600"}`}>
                         <AlertTriangle className="w-3 h-3" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-bold text-white text-[11px] truncate leading-tight uppercase tracking-tight">{event.type}</p>
-                        <p className="text-[10px] text-slate-500 mt-1 flex items-center gap-1">
-                          <MapPin className="w-2 h-2" />
+                        <p className="font-bold text-gray-900 text-xs truncate leading-tight uppercase tracking-tight">{event.type}</p>
+                        <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                          <MapPin className="w-3 h-3" />
                           {event.zone}
                         </p>
                       </div>
-                      <span className="text-[9px] text-slate-600 font-mono">
-                        {new Date(event.timestamp).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit' })}
+                      <span className="text-xs text-gray-500 font-mono">
+                        {new Date(event.timestamp).toLocaleTimeString([], { hour12: false, hour: "2-digit", minute: "2-digit" })}
                       </span>
                     </div>
                   </motion.div>
@@ -197,28 +179,28 @@ export default function LiveCrimePulse() {
         </div>
       </div>
 
-      {/* Model Status Bar */}
-      <div className="rounded-xl bg-slate-900/50 border border-slate-800 p-4">
+      {/* Model Status Bar – same card style */}
+      <div className="rounded-lg bg-white/95 border border-gray-200 p-4" style={{ borderTopWidth: 3, borderTopColor: "#ea580c" }}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-6">
             <div>
-              <p className="text-xs text-slate-500 uppercase">Model Status</p>
-              <p className="text-sm font-medium text-white">NowCast v3.2.1</p>
+              <p className="text-xs text-gray-500 uppercase">Model Status</p>
+              <p className="text-sm font-medium text-gray-900">NowCast v3.2.1</p>
             </div>
-            <div className="h-8 w-px bg-slate-700" />
+            <div className="h-8 w-px bg-gray-200" />
             <div>
-              <p className="text-xs text-slate-500 uppercase">Data Streams</p>
-              <p className="text-sm font-medium text-green-400">12 Active</p>
+              <p className="text-xs text-gray-500 uppercase">Data Streams</p>
+              <p className="text-sm font-medium text-gray-900">12 Active</p>
             </div>
-            <div className="h-8 w-px bg-slate-700" />
+            <div className="h-8 w-px bg-gray-200" />
             <div>
-              <p className="text-xs text-slate-500 uppercase">Latency</p>
-              <p className="text-sm font-medium text-cyan-400">142ms</p>
+              <p className="text-xs text-gray-500 uppercase">Latency</p>
+              <p className="text-sm font-medium text-gray-900">142ms</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-400">Next recalculation in:</span>
-            <span className="text-sm font-mono text-white">00:12</span>
+            <span className="text-xs text-gray-500">Next recalculation in:</span>
+            <span className="text-sm font-mono text-gray-900">00:12</span>
           </div>
         </div>
       </div>

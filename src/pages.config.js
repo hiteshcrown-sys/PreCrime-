@@ -58,6 +58,7 @@ import IoTNetwork from './pages/IoTNetwork';
 import LiveCrimePulse from './pages/LiveCrimePulse';
 import MainDashboard from './pages/MainDashboard';
 import ModelPerformance from './pages/ModelPerformance';
+import NCISDashboard from './pages/NCISDashboard';
 import Nowcasting from './pages/Nowcasting';
 import PreventionPlaybooks from './pages/PreventionPlaybooks';
 import TemporalAnalytics from './pages/TemporalAnalytics';
@@ -77,6 +78,7 @@ export const PAGES = {
     "LiveCrimePulse": LiveCrimePulse,
     "MainDashboard": MainDashboard,
     "ModelPerformance": ModelPerformance,
+    "NCISDashboard": NCISDashboard,
     "Nowcasting": Nowcasting,
     "PreventionPlaybooks": PreventionPlaybooks,
     "TemporalAnalytics": TemporalAnalytics,

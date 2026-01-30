@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { BarChart3, MapPin, CheckCircle, Shield } from "lucide-react";
+import { MapPin, CheckCircle, Shield } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCrimeModel } from "@/hooks/useCrimeModel";
 
@@ -155,20 +155,14 @@ export default function FullAnalytics() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      <div>
+        <h1 className="text-xl font-semibold text-gray-900">Reports</h1>
+        <p className="text-sm text-gray-500 mt-1">Comprehensive performance metrics and historical analysis</p>
+      </div>
+
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-cyan-500/20">
-            <BarChart3 className="w-6 h-6 text-cyan-400" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-white">Full Analytics Dashboard</h1>
-            <p className="text-slate-400 text-sm">Comprehensive performance metrics and historical analysis</p>
-          </div>
-        </div>
-        
         <Select value={timeRange} onValueChange={setTimeRange}>
-          <SelectTrigger className="w-48 bg-slate-800 border-slate-700">
+          <SelectTrigger className="w-48 bg-white/95 border-gray-200 text-gray-900">
             <SelectValue placeholder="Time range" />
           </SelectTrigger>
           <SelectContent>
@@ -180,148 +174,120 @@ export default function FullAnalytics() {
         </Select>
       </div>
 
-      {/* Comparison Card - Traditional vs AI */}
+      {/* System Comparison – same card style as Crime Pattern Analysis */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl bg-gradient-to-br from-slate-900/80 to-slate-800/50 border-2 border-cyan-500/30 overflow-hidden"
+        className="rounded-lg bg-white/95 border border-gray-200 overflow-hidden"
+        style={{ borderTopWidth: 3, borderTopColor: "#000080" }}
       >
-        <div className="p-6">
-          <h3 className="text-lg font-bold text-white mb-6">System Comparison</h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Traditional Systems */}
-            <div className="p-6 rounded-xl bg-slate-800/50 border border-slate-700">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-lg bg-slate-700">
-                  <Shield className="w-5 h-5 text-slate-400" />
+        <div className="p-4 border-b border-gray-200">
+          <h3 className="font-semibold text-gray-900">System Comparison</h3>
+          <p className="text-xs text-gray-500 mt-0.5">Traditional vs AI platform</p>
+        </div>
+        <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="p-4 rounded-lg bg-gray-50 border border-gray-200 border-l-4" style={{ borderLeftColor: "#ea580c" }}>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 rounded-lg bg-gray-200">
+                <Shield className="w-5 h-5 text-gray-600" />
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900">Traditional Systems</p>
+                <p className="text-xs text-gray-500">Rule-based analytics</p>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="text-gray-500">Prediction Accuracy</span>
+                  <span className="font-bold text-gray-900">78%</span>
                 </div>
-                <div>
-                  <p className="font-semibold text-white">Traditional Systems</p>
-                  <p className="text-xs text-slate-500">Rule-based analytics</p>
+                <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="h-full bg-orange-500 rounded-full" style={{ width: "78%" }} />
                 </div>
               </div>
-              
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-slate-400">Prediction Accuracy</span>
-                    <span className="font-bold text-orange-400">78%</span>
-                  </div>
-                  <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden">
-                    <div className="h-full bg-orange-500 rounded-full" style={{ width: "78%" }} />
-                  </div>
+              <div>
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="text-gray-500">Response Time</span>
+                  <span className="font-bold text-gray-900">18 min</span>
                 </div>
-                
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-slate-400">Response Time</span>
-                    <span className="font-bold text-orange-400">18 min</span>
-                  </div>
-                  <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden">
-                    <div className="h-full bg-orange-500 rounded-full" style={{ width: "60%" }} />
-                  </div>
+                <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="h-full bg-orange-500 rounded-full" style={{ width: "60%" }} />
                 </div>
-                
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-slate-400">Crime Prevention Rate</span>
-                    <span className="font-bold text-orange-400">65%</span>
-                  </div>
-                  <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden">
-                    <div className="h-full bg-orange-500 rounded-full" style={{ width: "65%" }} />
-                  </div>
+              </div>
+              <div>
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="text-gray-500">Crime Prevention Rate</span>
+                  <span className="font-bold text-gray-900">65%</span>
+                </div>
+                <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="h-full bg-orange-500 rounded-full" style={{ width: "65%" }} />
                 </div>
               </div>
             </div>
-
-            {/* AI Platform */}
-            <div className="p-6 rounded-xl bg-gradient-to-br from-cyan-500/10 to-purple-500/10 border-2 border-cyan-500/50">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-lg bg-cyan-500/20">
-                  <Shield className="w-5 h-5 text-cyan-400" />
+          </div>
+          <div className="p-4 rounded-lg bg-gray-50 border border-gray-200 border-l-4" style={{ borderLeftColor: "#138808" }}>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 rounded-lg bg-gray-200">
+                <Shield className="w-5 h-5 text-gray-600" />
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900">AI Platform</p>
+                <p className="text-xs text-gray-500">PreCrime AI v3.2.1</p>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="text-gray-500">Prediction Accuracy</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-gray-900">99.98%</span>
+                    <CheckCircle className="w-4 h-4 text-green-600" />
+                  </div>
                 </div>
-                <div>
-                  <p className="font-semibold text-white">Our AI Platform</p>
-                  <p className="text-xs text-cyan-400">PreCrime AI v3.2.1</p>
+                <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <motion.div className="h-full bg-green-600 rounded-full" initial={{ width: 0 }} animate={{ width: "99.98%" }} transition={{ duration: 1, delay: 0.2 }} />
                 </div>
               </div>
-              
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-slate-300">Prediction Accuracy</span>
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-green-400">99.98%</span>
-                      <CheckCircle className="w-4 h-4 text-green-400" />
-                    </div>
-                  </div>
-                  <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden">
-                    <motion.div 
-                      className="h-full bg-gradient-to-r from-cyan-500 to-green-500 rounded-full"
-                      initial={{ width: 0 }}
-                      animate={{ width: "99.98%" }}
-                      transition={{ duration: 1, delay: 0.2 }}
-                    />
+              <div>
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="text-gray-500">Response Time</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-gray-900">3.2 min</span>
+                    <CheckCircle className="w-4 h-4 text-green-600" />
                   </div>
                 </div>
-                
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-slate-300">Response Time</span>
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-green-400">3.2 min</span>
-                      <CheckCircle className="w-4 h-4 text-green-400" />
-                    </div>
-                  </div>
-                  <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden">
-                    <motion.div 
-                      className="h-full bg-gradient-to-r from-cyan-500 to-green-500 rounded-full"
-                      initial={{ width: 0 }}
-                      animate={{ width: "98%" }}
-                      transition={{ duration: 1, delay: 0.4 }}
-                    />
-                  </div>
-                </div>
-                
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-slate-300">Crime Prevention Rate</span>
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-green-400">94%</span>
-                      <CheckCircle className="w-4 h-4 text-green-400" />
-                    </div>
-                  </div>
-                  <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden">
-                    <motion.div 
-                      className="h-full bg-gradient-to-r from-cyan-500 to-green-500 rounded-full"
-                      initial={{ width: 0 }}
-                      animate={{ width: "94%" }}
-                      transition={{ duration: 1, delay: 0.6 }}
-                    />
-                  </div>
+                <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <motion.div className="h-full bg-green-600 rounded-full" initial={{ width: 0 }} animate={{ width: "98%" }} transition={{ duration: 1, delay: 0.4 }} />
                 </div>
               </div>
-              
-              <div className="mt-4 pt-4 border-t border-cyan-500/30">
-                <p className="text-xs text-green-400 font-medium">
-                  ✓ +22% accuracy improvement (78% → 99.98%)
-                  <br />
-                  ✓ 82% faster response (18 min → 3.2 min)
-                  <br />
-                  ✓ +29% more crimes prevented (65% → 94%)
-                </p>
+              <div>
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="text-gray-500">Crime Prevention Rate</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-gray-900">94%</span>
+                    <CheckCircle className="w-4 h-4 text-green-600" />
+                  </div>
+                </div>
+                <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <motion.div className="h-full bg-green-600 rounded-full" initial={{ width: 0 }} animate={{ width: "94%" }} transition={{ duration: 1, delay: 0.6 }} />
+                </div>
               </div>
+            </div>
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <p className="text-xs text-gray-600 font-medium">
+                ✓ +22% accuracy improvement (78% → 99.98%) · ✓ 82% faster response · ✓ +29% more crimes prevented
+              </p>
             </div>
           </div>
         </div>
       </motion.div>
 
       {/* Historical Trends */}
-      <div className="rounded-2xl bg-slate-900/50 border border-slate-800 overflow-hidden">
-        <div className="p-4 border-b border-slate-800">
-          <h3 className="font-semibold text-white">Historical Crime Trends</h3>
-          <p className="text-xs text-slate-500 mt-0.5">Monthly incidents, prevention rate, and outcomes</p>
+      <div className="rounded-lg bg-white/95 border border-gray-200 overflow-hidden" style={{ borderTopWidth: 3, borderTopColor: "#138808" }}>
+        <div className="p-4 border-b border-gray-200">
+          <h3 className="font-semibold text-gray-900">Historical Crime Trends</h3>
+          <p className="text-xs text-gray-500 mt-0.5">Monthly incidents, prevention rate, and outcomes</p>
         </div>
         
         <div className="p-6">
@@ -334,50 +300,43 @@ export default function FullAnalytics() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
               >
-                <div className="w-full relative bg-slate-800 rounded-t" style={{ height: "calc(100% - 40px)", minHeight: "120px" }}>
-                  {/* Total incidents bar background */}
+                <div className="w-full relative bg-gray-200 rounded-t" style={{ height: "calc(100% - 40px)", minHeight: "120px" }}>
                   <div className="absolute inset-0 flex flex-col justify-end">
-                    {/* Total bar - showing incidents */}
                     <motion.div
-                      className="w-full bg-slate-700 rounded-t opacity-40"
+                      className="w-full bg-gray-300 rounded-t opacity-60"
                       initial={{ height: 0 }}
                       animate={{ height: `${Math.max(5, (data.incidents / safeMaxIncidents) * 100)}%` }}
                       transition={{ delay: index * 0.05, duration: 0.8 }}
                     />
                   </div>
-                  
-                  {/* Prevented bar - shown on top */}
                   <div className="absolute inset-0 flex flex-col justify-end">
                     <motion.div
-                      className="w-full bg-green-500 rounded-t"
+                      className="w-full bg-green-600 rounded-t"
                       initial={{ height: 0 }}
                       animate={{ height: `${Math.max(5, (data.prevented / safeMaxIncidents) * 100)}%` }}
                       transition={{ delay: index * 0.05 + 0.2, duration: 0.8 }}
                     />
                   </div>
-                  
-                  {/* Hover tooltip */}
                   <div className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity cursor-pointer z-10">
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-xs whitespace-nowrap">
-                      <p className="text-white font-medium">{data.month}</p>
-                      <p className="text-green-400">Prevented: {data.prevented}</p>
-                      <p className="text-red-400">Occurred: {data.occurred}</p>
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs whitespace-nowrap shadow-sm">
+                      <p className="text-gray-900 font-medium">{data.month}</p>
+                      <p className="text-green-700">Prevented: {data.prevented}</p>
+                      <p className="text-red-600">Occurred: {data.occurred}</p>
                     </div>
                   </div>
                 </div>
-                
-                <span className="text-xs text-slate-500">{data.month}</span>
+                <span className="text-xs text-gray-500">{data.month}</span>
               </motion.div>
             ))}
           </div>
           
-          <div className="flex items-center justify-center gap-6 mt-6 text-xs">
+          <div className="flex items-center justify-center gap-6 mt-6 text-xs text-gray-600">
             <span className="flex items-center gap-2">
-              <span className="w-3 h-3 bg-slate-700 rounded" />
+              <span className="w-3 h-3 bg-gray-400 rounded" />
               Total Incidents
             </span>
             <span className="flex items-center gap-2">
-              <span className="w-3 h-3 bg-green-500 rounded" />
+              <span className="w-3 h-3 bg-green-600 rounded" />
               Prevented
             </span>
             <span className="flex items-center gap-2">
@@ -389,12 +348,11 @@ export default function FullAnalytics() {
       </div>
 
       {/* Model Performance Metrics */}
-      <div className="rounded-2xl bg-slate-900/50 border border-slate-800 overflow-hidden">
-        <div className="p-4 border-b border-slate-800">
-          <h3 className="font-semibold text-white">Model Performance Metrics</h3>
-          <p className="text-xs text-slate-500 mt-0.5">Key ML model evaluation metrics</p>
+      <div className="rounded-lg bg-white/95 border border-gray-200 overflow-hidden" style={{ borderTopWidth: 3, borderTopColor: "#000080" }}>
+        <div className="p-4 border-b border-gray-200">
+          <h3 className="font-semibold text-gray-900">Model Performance Metrics</h3>
+          <p className="text-xs text-gray-500 mt-0.5">Key ML model evaluation metrics</p>
         </div>
-        
         <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {dynamicPerformanceMetrics.map((metric, index) => (
             <motion.div
@@ -402,17 +360,16 @@ export default function FullAnalytics() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: index * 0.1 }}
-              className="p-4 rounded-xl bg-slate-800/50 border border-slate-700"
+              className="p-4 rounded-lg bg-white border border-gray-200 border-l-4"
+              style={{ borderLeftColor: index % 3 === 0 ? "#000080" : index % 3 === 1 ? "#138808" : "#ea580c" }}
             >
-              <p className="text-xs text-slate-400 mb-2">{metric.metric}</p>
+              <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">{metric.metric}</p>
               <div className="flex items-end justify-between">
                 <div>
-                  <p className="text-2xl font-bold text-white">{metric.current}</p>
-                  <p className="text-xs text-slate-500">from {metric.previous}</p>
+                  <p className="text-2xl font-bold text-gray-900">{metric.current}</p>
+                  <p className="text-xs text-gray-500">from {metric.previous}</p>
                 </div>
-                <span className={`text-sm font-medium ${
-                  metric.isPositive ? "text-green-400" : "text-red-400"
-                }`}>
+                <span className={`text-sm font-medium ${metric.isPositive ? "text-green-600" : "text-red-600"}`}>
                   {metric.change}
                 </span>
               </div>
@@ -422,21 +379,20 @@ export default function FullAnalytics() {
       </div>
 
       {/* Zone-wise Logs */}
-      <div className="rounded-2xl bg-slate-900/50 border border-slate-800 overflow-hidden">
-        <div className="p-4 border-b border-slate-800">
-          <h3 className="font-semibold text-white">Zone-wise Performance Log</h3>
-          <p className="text-xs text-slate-500 mt-0.5">Detailed breakdown by zone</p>
+      <div className="rounded-lg bg-white/95 border border-gray-200 overflow-hidden" style={{ borderTopWidth: 3, borderTopColor: "#138808" }}>
+        <div className="p-4 border-b border-gray-200">
+          <h3 className="font-semibold text-gray-900">Zone-wise Performance Log</h3>
+          <p className="text-xs text-gray-500 mt-0.5">Detailed breakdown by zone</p>
         </div>
-        
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-slate-700">
-                <th className="text-left py-3 px-4 text-xs font-semibold text-slate-400 uppercase">Zone</th>
-                <th className="text-center py-3 px-4 text-xs font-semibold text-slate-400 uppercase">Predictions</th>
-                <th className="text-center py-3 px-4 text-xs font-semibold text-slate-400 uppercase">Prevented</th>
-                <th className="text-center py-3 px-4 text-xs font-semibold text-slate-400 uppercase">Occurred</th>
-                <th className="text-center py-3 px-4 text-xs font-semibold text-slate-400 uppercase">Accuracy</th>
+              <tr className="border-b border-gray-200 bg-gray-50">
+                <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Zone</th>
+                <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Predictions</th>
+                <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Prevented</th>
+                <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Occurred</th>
+                <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Accuracy</th>
               </tr>
             </thead>
             <tbody>
@@ -446,25 +402,23 @@ export default function FullAnalytics() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: index * 0.05 }}
-                  className="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors"
+                  className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
                 >
                   <td className="py-3 px-4">
                     <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-slate-500" />
-                      <span className="font-medium text-white">{zone.zone}</span>
+                      <MapPin className="w-4 h-4 text-gray-500" />
+                      <span className="font-medium text-gray-900">{zone.zone}</span>
                     </div>
                   </td>
-                  <td className="py-3 px-4 text-center text-slate-300">{zone.predictions}</td>
+                  <td className="py-3 px-4 text-center text-gray-700">{zone.predictions}</td>
                   <td className="py-3 px-4 text-center">
-                    <span className="text-green-400 font-medium">{zone.prevented}</span>
+                    <span className="text-green-700 font-medium">{zone.prevented}</span>
                   </td>
                   <td className="py-3 px-4 text-center">
-                    <span className="text-red-400 font-medium">{zone.occurred}</span>
+                    <span className="text-red-600 font-medium">{zone.occurred}</span>
                   </td>
                   <td className="py-3 px-4 text-center">
-                    <span className={`font-bold ${
-                      zone.accuracy >= 90 ? "text-green-400" : "text-yellow-400"
-                    }`}>
+                    <span className={`font-bold ${zone.accuracy >= 90 ? "text-green-600" : "text-amber-600"}`}>
                       {zone.accuracy}%
                     </span>
                   </td>

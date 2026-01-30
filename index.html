@@ -2,12 +2,96 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="https://base44.com/logo_v2.svg" />
+    <link rel="icon" type="image/png" href="/ncis-logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="manifest" href="/manifest.json" />
-    <title>PreCrime</title>
+    <title>National Crime Intelligence System | Crime DNA</title>
+    <style>
+      /* Splash: centered, light tricolour-matching background. Easy to remove – delete #initial-loading and .splash-* rules. */
+      #root:not(.splash-done) {
+        visibility: hidden;
+      }
+      #initial-loading {
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: #f5f7fa;
+        background-image: linear-gradient(
+          to bottom,
+          rgba(255, 255, 255, 0.92) 0%,
+          rgba(255, 255, 255, 0.95) 50%,
+          rgba(255, 255, 255, 0.92) 100%
+        ), url(/ncis-tricolour-bg.png);
+        background-size: cover;
+        background-position: center;
+        transition: opacity 0.5s ease-out;
+      }
+      #initial-loading.splash-fade-out {
+        opacity: 0;
+        pointer-events: none;
+      }
+      #initial-loading .splash-logo {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 3px solid #000080;
+        background: #fff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        flex-shrink: 0;
+      }
+      #initial-loading .splash-logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+      #initial-loading .splash-title {
+        margin-top: 1.5rem;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #111827;
+        text-align: center;
+        max-width: 20rem;
+        line-height: 1.4;
+      }
+      #initial-loading .splash-loading {
+        margin-top: 0.75rem;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-size: 0.875rem;
+        color: #6b7280;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.15rem;
+      }
+      #initial-loading .splash-loading .dot {
+        opacity: 0.35;
+        animation: splash-dot 1.4s ease-in-out infinite both;
+      }
+      #initial-loading .splash-loading .dot:nth-child(1) { animation-delay: 0s; }
+      #initial-loading .splash-loading .dot:nth-child(2) { animation-delay: 0.2s; }
+      #initial-loading .splash-loading .dot:nth-child(3) { animation-delay: 0.4s; }
+      @keyframes splash-dot {
+        0%, 60%, 100% { opacity: 0.35; }
+        30% { opacity: 1; }
+      }
+    </style>
   </head>
   <body>
+    <div id="initial-loading">
+      <div class="splash-logo">
+        <img src="/ncis-logo.png" alt="National Police" />
+      </div>
+      <p class="splash-title">Crime DNA – Pattern Fingerprinting Engine</p>
+      <p class="splash-loading">
+        Loading<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span>
+      </p>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

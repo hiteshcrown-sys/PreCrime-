@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
@@ -10,6 +11,7 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import { ChatBotProvider } from '@/contexts/ChatBotContext';
 import { CityProvider } from '@/contexts/CityContext';
 import ChatBot from '@/components/AIAssistant/ChatBot';
+import NCISLoadingScreen from '@/components/layout/NCISLoadingScreen';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -22,13 +24,9 @@ const LayoutWrapper = ({ children, currentPageName }) => Layout ?
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
 
-  // Show loading spinner while checking app public settings or auth
+  // Show Indian Government–style loading screen (logo first) while checking app or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
-      </div>
-    );
+    return <NCISLoadingScreen />;
   }
 
   // Handle authentication errors
@@ -68,6 +66,21 @@ const AuthenticatedApp = () => {
 
 
 function App() {
+  // Splash: show 2.5s, then fade out and reveal main app. Easy to remove – delete this useEffect and #initial-loading in index.html.
+  useEffect(() => {
+    const splash = document.getElementById("initial-loading");
+    const root = document.getElementById("root");
+    if (!splash) return;
+    const hideSplash = () => {
+      splash.classList.add("splash-fade-out");
+      setTimeout(() => {
+        splash.remove();
+        if (root) root.classList.add("splash-done");
+      }, 500);
+    };
+    const t = setTimeout(hideSplash, 2500);
+    return () => clearTimeout(t);
+  }, []);
 
   return (
     <AuthProvider>

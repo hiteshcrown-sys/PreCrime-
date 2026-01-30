@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { AlertTriangle, MapPin, Clock, TrendingUp, Zap } from 'lucide-react';
 import { useCrimeModel } from '@/hooks/useCrimeModel';
+import { GOV_PRIMARY_BG, GOV_NAVY, GOV_ACCENT_GREEN, GOV_ACCENT_ORANGE } from '@/lib/designTokens';
 
 /**
  * CrimePredictionModel
- * Interactive ML model widget for Main Dashboard
- * Users can select city and hour to get real-time predictions
+ * Interactive ML model widget for Main Dashboard – light theme, green/orange accents
  */
 
 export default function CrimePredictionModel({ onPredictionHourChange, onPredictionChange }) {
@@ -16,7 +16,6 @@ export default function CrimePredictionModel({ onPredictionHourChange, onPredict
   const [prediction, setPrediction] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // All 29 cities
   const CITIES = [
     'Delhi', 'Mumbai', 'Bangalore', 'Hyderabad', 'Chennai',
     'Kolkata', 'Pune', 'Ahmedabad', 'Jaipur', 'Lucknow',
@@ -26,27 +25,17 @@ export default function CrimePredictionModel({ onPredictionHourChange, onPredict
     'Ranchi', 'Bhubaneswar', 'Aligarh', 'Rajkot'
   ];
 
-  // Crime types distribution
   const CRIME_TYPES = [
-    'Assault',
-    'Robbery',
-    'Theft',
-    'Drug Trafficking',
-    'Fraud',
-    'Other Crime'
+    'Assault', 'Robbery', 'Theft', 'Drug Trafficking', 'Fraud', 'Other Crime'
   ];
 
-  // Handle predict button click
   const handlePredict = async () => {
     setLoading(true);
     try {
       const result = predict(selectedCity, selectedHour);
       if (result) {
-        // Generate crime type and specific crime for this prediction
         const crimeTypeIndex = Math.floor(Math.random() * CRIME_TYPES.length);
         const crimeType = CRIME_TYPES[crimeTypeIndex];
-        
-        // Determine likely specific crime based on type
         const specificCrimes = {
           'Assault': ['Street Fight', 'Domestic Violence', 'Road Rage'],
           'Robbery': ['Mugging', 'Bank Robbery', 'Chain Snatching'],
@@ -55,24 +44,11 @@ export default function CrimePredictionModel({ onPredictionHourChange, onPredict
           'Fraud': ['Online Fraud', 'Financial Scam', 'Identity Theft'],
           'Other Crime': ['Trespassing', 'Vandalism', 'Public Disturbance']
         };
-        
         const crimes = specificCrimes[crimeType] || ['Unknown Crime'];
         const specificCrime = crimes[Math.floor(Math.random() * crimes.length)];
-        
-        const fullPrediction = {
-          ...result,
-          crimeType,
-          specificCrime,
-          hour: selectedHour,
-          city: selectedCity
-        };
-        
+        const fullPrediction = { ...result, crimeType, specificCrime, hour: selectedHour, city: selectedCity };
         setPrediction(fullPrediction);
-        
-        // Notify parent component about prediction change for real-time KPI updates
-        if (onPredictionChange) {
-          onPredictionChange(fullPrediction);
-        }
+        if (onPredictionChange) onPredictionChange(fullPrediction);
       }
     } catch (error) {
       console.error('Prediction error:', error);
@@ -81,59 +57,57 @@ export default function CrimePredictionModel({ onPredictionHourChange, onPredict
     }
   };
 
-  const riskColors = {
-    'CRITICAL': { bg: 'from-red-900/20 to-red-800/10', border: 'border-red-500/30', badge: 'bg-red-500/20 text-red-400', text: 'text-red-400' },
-    'HIGH': { bg: 'from-orange-900/20 to-orange-800/10', border: 'border-orange-500/30', badge: 'bg-orange-500/20 text-orange-400', text: 'text-orange-400' },
-    'MEDIUM': { bg: 'from-yellow-900/20 to-yellow-800/10', border: 'border-yellow-500/30', badge: 'bg-yellow-500/20 text-yellow-400', text: 'text-yellow-400' },
-    'LOW': { bg: 'from-blue-900/20 to-blue-800/10', border: 'border-blue-500/30', badge: 'bg-blue-500/20 text-blue-400', text: 'text-blue-400' },
-    'VERY_LOW': { bg: 'from-green-900/20 to-green-800/10', border: 'border-green-500/30', badge: 'bg-green-500/20 text-green-400', text: 'text-green-400' },
+  const riskStyles = {
+    CRITICAL: { border: '#dc2626', badge: 'bg-red-100 text-red-700 border-red-200', text: 'text-red-600' },
+    HIGH: { border: GOV_ACCENT_ORANGE, badge: 'bg-orange-100 text-orange-700 border-orange-200', text: 'text-orange-600' },
+    MEDIUM: { border: '#ca8a04', badge: 'bg-amber-100 text-amber-800 border-amber-200', text: 'text-amber-600' },
+    LOW: { border: GOV_PRIMARY_BG, badge: 'bg-blue-100 text-blue-700 border-blue-200', text: 'text-blue-600' },
+    VERY_LOW: { border: GOV_ACCENT_GREEN, badge: 'bg-green-100 text-green-700 border-green-200', text: 'text-green-600' },
   };
-
-  const colors = prediction ? riskColors[prediction.riskLevel] || riskColors.MEDIUM : riskColors.MEDIUM;
+  const colors = prediction ? riskStyles[prediction.riskLevel] || riskStyles.MEDIUM : riskStyles.MEDIUM;
 
   return (
     <div className="w-full">
-      {/* Input Section */}
+      {/* Input Section – light theme, green/orange accents */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700 p-6 mb-6"
+        className="rounded-lg bg-white/95 border border-gray-200 p-6 mb-6 shadow-sm"
+        style={{ borderTopWidth: 3, borderTopColor: GOV_ACCENT_ORANGE }}
       >
-        <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-          <Zap className="w-5 h-5 text-cyan-400" />
+        <h3 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
+          <Zap className="w-5 h-5 text-gray-600" />
           AI Crime Prediction Model
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          {/* City Selector */}
           <div>
-            <label className="block text-sm font-semibold text-slate-300 mb-2">
+            <label className="block text-sm font-medium text-gray-500 mb-2">
               <MapPin className="w-4 h-4 inline mr-2" />
               Select City
             </label>
             <select
               value={selectedCity}
               onChange={(e) => setSelectedCity(e.target.value)}
-              className="w-full px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white font-medium hover:border-cyan-500/50 focus:border-cyan-500 focus:outline-none transition-colors"
+              className="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-gray-900 font-medium focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
+              style={{ borderLeftWidth: 4, borderLeftColor: GOV_NAVY }}
             >
               {CITIES.map((city) => (
-                <option key={city} value={city}>
-                  {city}
-                </option>
+                <option key={city} value={city}>{city}</option>
               ))}
             </select>
           </div>
 
-          {/* Hour Selector */}
           <div>
-            <label className="block text-sm font-semibold text-slate-300 mb-2">
+            <label className="block text-sm font-medium text-gray-500 mb-2">
               <Clock className="w-4 h-4 inline mr-2" />
               Select Hour
             </label>
             <select
               value={selectedHour}
               onChange={(e) => setSelectedHour(parseInt(e.target.value))}
-              className="w-full px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white font-medium hover:border-cyan-500/50 focus:border-cyan-500 focus:outline-none transition-colors"
+              className="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-gray-900 font-medium focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
+              style={{ borderLeftWidth: 4, borderLeftColor: GOV_ACCENT_GREEN }}
             >
               {Array.from({ length: 24 }, (_, i) => (
                 <option key={i} value={i}>
@@ -143,12 +117,12 @@ export default function CrimePredictionModel({ onPredictionHourChange, onPredict
             </select>
           </div>
 
-          {/* Predict Button */}
           <div className="flex items-end">
             <button
               onClick={handlePredict}
               disabled={loading}
-              className="w-full px-6 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 disabled:from-slate-600 disabled:to-slate-700 text-white font-bold rounded-lg transition-all transform hover:scale-105 disabled:scale-100"
+              className="w-full px-6 py-2 text-white font-semibold rounded-lg transition-all hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
+              style={{ background: GOV_PRIMARY_BG }}
             >
               {loading ? 'Predicting...' : 'Predict Future Crime'}
             </button>
@@ -156,114 +130,90 @@ export default function CrimePredictionModel({ onPredictionHourChange, onPredict
         </div>
       </motion.div>
 
-      {/* Prediction Results */}
+      {/* Prediction Results – light theme */}
       {prediction && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`rounded-2xl bg-gradient-to-br ${colors.bg} border ${colors.border} p-8 overflow-hidden relative`}
+          className="rounded-lg bg-white/95 border border-gray-200 p-8 overflow-hidden relative shadow-sm"
+          style={{ borderTopWidth: 3, borderTopColor: colors.border }}
         >
-          {/* Background decoration */}
-          <div className="absolute top-0 right-0 w-40 h-40 opacity-20">
+          <div className="absolute top-0 right-0 w-40 h-40 opacity-10">
             <AlertTriangle className={`w-full h-full ${colors.text}`} />
           </div>
 
           <div className="relative z-10">
-            {/* Header */}
             <div className="flex items-start justify-between mb-6">
               <div>
-                <h3 className="text-3xl font-bold text-white">
-                  Crime Prediction Report
-                </h3>
-                <p className="text-slate-400 text-sm mt-2">
+                <h3 className="text-2xl font-bold text-gray-900">Crime Prediction Report</h3>
+                <p className="text-gray-500 text-sm mt-2">
                   {prediction.city} • {prediction.hour === 0 ? '12 AM' : prediction.hour < 12 ? `${prediction.hour} AM` : prediction.hour === 12 ? '12 PM' : `${prediction.hour - 12} PM`}
                 </p>
               </div>
-              <div className={`px-4 py-2 rounded-full ${colors.badge} font-bold text-lg`}>
+              <div className={`px-4 py-2 rounded-full border font-bold text-lg ${colors.badge}`}>
                 {prediction.riskLevel}
               </div>
             </div>
 
-            {/* Main Metrics Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              {/* Predicted Crime Rate */}
-              <div className="bg-slate-800/50 rounded-lg p-4">
-                <p className="text-slate-400 text-sm mb-2">Predicted Crime Rate</p>
-                <p className="text-4xl font-bold text-white">{prediction.predictedRate.toFixed(1)}</p>
-                <p className="text-xs text-slate-500 mt-1">Per 100k people</p>
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 border-l-4" style={{ borderLeftColor: GOV_NAVY }}>
+                <p className="text-gray-500 text-sm mb-2">Predicted Crime Rate</p>
+                <p className="text-3xl font-bold text-gray-900">{prediction.predictedRate.toFixed(1)}</p>
+                <p className="text-xs text-gray-500 mt-1">Per 100k people</p>
               </div>
-
-              {/* Risk Level */}
-              <div className="bg-slate-800/50 rounded-lg p-4">
-                <p className="text-slate-400 text-sm mb-2">Risk Level</p>
-                <p className={`text-4xl font-bold ${colors.text}`}>{prediction.riskLevel}</p>
-                <p className="text-xs text-slate-500 mt-1">Threat Assessment</p>
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 border-l-4" style={{ borderLeftColor: colors.border }}>
+                <p className="text-gray-500 text-sm mb-2">Risk Level</p>
+                <p className={`text-2xl font-bold ${colors.text}`}>{prediction.riskLevel}</p>
+                <p className="text-xs text-gray-500 mt-1">Threat Assessment</p>
               </div>
-
-              {/* Crime Type */}
-              <div className="bg-slate-800/50 rounded-lg p-4">
-                <p className="text-slate-400 text-sm mb-2">Primary Crime Type</p>
-                <p className="text-2xl font-bold text-white">{prediction.crimeType}</p>
-                <p className="text-xs text-slate-500 mt-1">Most Likely Category</p>
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 border-l-4" style={{ borderLeftColor: GOV_ACCENT_ORANGE }}>
+                <p className="text-gray-500 text-sm mb-2">Primary Crime Type</p>
+                <p className="text-xl font-bold text-gray-900">{prediction.crimeType}</p>
+                <p className="text-xs text-gray-500 mt-1">Most Likely Category</p>
               </div>
-
-              {/* Likely Specific Crime */}
-              <div className="bg-slate-800/50 rounded-lg p-4">
-                <p className="text-slate-400 text-sm mb-2">Likely Specific Crime</p>
-                <p className="text-xl font-bold text-white">{prediction.specificCrime}</p>
-                <p className="text-xs text-slate-500 mt-1">Predicted Incident</p>
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 border-l-4" style={{ borderLeftColor: GOV_ACCENT_GREEN }}>
+                <p className="text-gray-500 text-sm mb-2">Likely Specific Crime</p>
+                <p className="text-lg font-bold text-gray-900">{prediction.specificCrime}</p>
+                <p className="text-xs text-gray-500 mt-1">Predicted Incident</p>
               </div>
             </div>
 
-            {/* Model Confidence & Details */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Model Info */}
-              <div className="bg-slate-800/30 rounded-lg p-4">
-                <h4 className="font-semibold text-white mb-3 flex items-center gap-2">
-                  <Zap className="w-4 h-4 text-cyan-400" />
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <Zap className="w-4 h-4 text-gray-600" />
                   Model Confidence
                 </h4>
-                <p className="text-3xl font-bold text-cyan-400 mb-2">
-                  {prediction.confidence.toFixed(2)}%
-                </p>
-                <p className="text-sm text-slate-400">
-                  <strong>Model:</strong> Gradient Boosting<br/>
-                  <strong>Accuracy:</strong> 99.98%
+                <p className="text-2xl font-bold text-gray-900 mb-2">{prediction.confidence.toFixed(2)}%</p>
+                <p className="text-sm text-gray-500">
+                  <strong className="text-gray-700">Model:</strong> Gradient Boosting<br/>
+                  <strong className="text-gray-700">Accuracy:</strong> 99.98%
                 </p>
               </div>
-
-              {/* Risk Assessment */}
-              <div className="bg-slate-800/30 rounded-lg p-4">
-                <h4 className="font-semibold text-white mb-3 flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-orange-400" />
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-gray-600" />
                   Risk Assessment
                 </h4>
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-400">Threat Score:</span>
-                    <span className="font-bold text-white">{prediction.threatLevel}/10</span>
+                    <span className="text-sm text-gray-500">Threat Score:</span>
+                    <span className="font-bold text-gray-900">{prediction.threatLevel}/10</span>
                   </div>
-                  <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden">
+                  <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${prediction.threatLevel * 10}%` }}
                       transition={{ duration: 1.5 }}
-                      className={`h-full bg-gradient-to-r ${
-                        prediction.riskLevel === 'CRITICAL' ? 'from-red-500 to-red-600' :
-                        prediction.riskLevel === 'HIGH' ? 'from-orange-500 to-orange-600' :
-                        prediction.riskLevel === 'MEDIUM' ? 'from-yellow-500 to-yellow-600' :
-                        prediction.riskLevel === 'LOW' ? 'from-blue-500 to-blue-600' :
-                        'from-green-500 to-green-600'
-                      }`}
+                      className="h-full rounded-full bg-blue-600"
                     />
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Timestamp */}
-            <div className="mt-6 pt-4 border-t border-slate-700/50">
-              <p className="text-xs text-slate-500">
+            <div className="mt-6 pt-4 border-t border-gray-200">
+              <p className="text-xs text-gray-500">
                 Prediction generated using ML Model • {new Date().toLocaleString()}
               </p>
             </div>
