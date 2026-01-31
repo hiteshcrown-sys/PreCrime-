@@ -13,6 +13,8 @@ import { CityProvider } from '@/contexts/CityContext';
 import ChatBot from '@/components/AIAssistant/ChatBot';
 import NCISLoadingScreen from '@/components/layout/NCISLoadingScreen';
 import { AlertProvider } from '@/contexts/AlertContext';
+import { LanguageProvider } from '@/contexts/LanguageContext';
+import LanguageChooser from '@/components/layout/LanguageChooser';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -84,22 +86,25 @@ function App() {
   }, []);
 
   return (
-    <AuthProvider>
-      <CityProvider>
-        <AlertProvider>
-          <ChatBotProvider>
-            <QueryClientProvider client={queryClientInstance}>
-              <Router>
-                <NavigationTracker />
-                <AuthenticatedApp />
-                <ChatBot />
-              </Router>
-              <Toaster />
-            </QueryClientProvider>
-          </ChatBotProvider>
-        </AlertProvider>
-      </CityProvider>
-    </AuthProvider>
+    <LanguageProvider>
+      <AuthProvider>
+        <CityProvider>
+          <AlertProvider>
+            <ChatBotProvider>
+              <QueryClientProvider client={queryClientInstance}>
+                <Router>
+                  <LanguageChooser />
+                  <NavigationTracker />
+                  <AuthenticatedApp />
+                  <ChatBot />
+                </Router>
+                <Toaster />
+              </QueryClientProvider>
+            </ChatBotProvider>
+          </AlertProvider>
+        </CityProvider>
+      </AuthProvider>
+    </LanguageProvider>
   )
 }
 

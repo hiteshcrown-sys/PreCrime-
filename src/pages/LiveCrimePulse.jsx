@@ -3,11 +3,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Radio, MapPin, AlertTriangle, Activity, RefreshCw, Zap, Shield, Navigation } from "lucide-react";
 import RiskBadge from "@/components/ui/RiskBadge";
 import { useCity } from "@/contexts/CityContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import PatrolTrackerMap from "@/components/live/PatrolTrackerMap";
 import { livePatrolService } from "@/services/livePatrolService";
 import { crimeDataService } from "@/api/crimeDataService";
 
 export default function LiveCrimePulse() {
+  const { t } = useLanguage();
   const { selectedCity } = useCity();
   const [events, setEvents] = useState([]);
   const [isRecalculating, setIsRecalculating] = useState(false);
@@ -99,12 +101,12 @@ export default function LiveCrimePulse() {
     <div className="space-y-6">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
-          <h1 className="text-xl font-semibold text-gray-900">Live Patrol Status</h1>
-          <p className="text-sm text-gray-500 mt-1">Real-time command & control for {selectedCity}</p>
+          <h1 className="text-xl font-semibold text-gray-900">{t('livePatrolStatus')}</h1>
+          <p className="text-sm text-gray-500 mt-1">{t('realTimeCommandFor')} {selectedCity}</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/95 border border-gray-200">
-            <span className="text-xs text-gray-500 uppercase tracking-wider">Route Prediction</span>
+            <span className="text-xs text-gray-500 uppercase tracking-wider">{t('routePrediction')}</span>
             <button
               onClick={() => setShowRoutes(!showRoutes)}
               className={`w-10 h-5 rounded-full relative transition-colors ${showRoutes ? "bg-blue-600" : "bg-gray-300"}`}
@@ -114,7 +116,7 @@ export default function LiveCrimePulse() {
           </div>
           <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-50 border border-green-200">
             <span className="w-2 h-2 rounded-full bg-green-600 animate-pulse" />
-            <span className="text-sm text-green-800 font-medium uppercase tracking-tighter">Live Sensor Feed</span>
+            <span className="text-sm text-green-800 font-medium uppercase tracking-tighter">{t('liveSensorFeed')}</span>
           </div>
         </div>
       </div>

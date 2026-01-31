@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { predictScenario, CITY_BASE_RATES } from "@/utils/crimeModelService";
 import crimeModelService from "@/utils/crimeModelService";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Dashboard cities (same as used in IndiaMap2D component)
 const DASHBOARD_CITIES = [
@@ -42,20 +43,20 @@ const createZonesFromCities = () => {
 
 const zones = createZonesFromCities();
 
-const interventions = [
-  { id: "patrols", name: "Police Patrols", icon: Shield, maxValue: 10, unit: "teams", description: "Additional police presence in high-risk areas" },
-  { id: "lighting", name: "Street Lighting", icon: Lightbulb, maxValue: 10, unit: "sites", description: "Improved lighting to deter criminal activity" },
-  { id: "access", name: "Access Control", icon: Lock, maxValue: 10, unit: "points", description: "Controlled entry points and security measures" },
-  { id: "community", name: "Community Programs", icon: Users, maxValue: 10, unit: "initiatives", description: "Local engagement and prevention programs" }
+const INTERVENTION_IDS = [
+  { id: "patrols", nameKey: "policePatrols", unitKey: "teams", descKey: "additionalPolicePresence", icon: Shield, maxValue: 10 },
+  { id: "lighting", nameKey: "streetLighting", unitKey: "sites", descKey: "improvedLightingDeter", icon: Lightbulb, maxValue: 10 },
+  { id: "access", nameKey: "accessControl", unitKey: "points", descKey: "controlledEntrySecurity", icon: Lock, maxValue: 10 },
+  { id: "community", nameKey: "communityPrograms", unitKey: "initiatives", descKey: "localEngagementPrevention", icon: Users, maxValue: 10 }
 ];
 
-const HeatmapGrid = ({ prediction, label }) => {
+const HeatmapGrid = ({ prediction, label, t }) => {
   if (!prediction) return null;
 
-  const riskScore = prediction.riskScore * 100; // Convert to percentage for display
+  const riskScore = prediction.riskScore * 100;
   const cells = [];
   for (let i = 0; i < 64; i++) {
-    const cellRisk = riskScore - 15 + Math.random() * 30; // Variation around the predicted risk
+    const cellRisk = riskScore - 15 + Math.random() * 30;
     const normalizedRisk = Math.max(0, Math.min(100, cellRisk));
     cells.push(normalizedRisk);
   }
@@ -82,10 +83,10 @@ const HeatmapGrid = ({ prediction, label }) => {
       </div>
       <div className="flex items-center justify-between">
         <span className="text-2xl font-bold text-gray-900">{Math.round(prediction.predictedRate)}</span>
-        <span className="text-xs text-gray-500">Predicted Crimes</span>
+        <span className="text-xs text-gray-500">{t('predictedCrimesLabel')}</span>
       </div>
       <div className="mt-2 text-xs text-gray-500">
-        Risk Level: <span className={`font-medium ${prediction.riskLevel === 'CRITICAL' ? 'text-red-400' :
+        {t('riskLevel')}: <span className={`font-medium ${prediction.riskLevel === 'CRITICAL' ? 'text-red-400' :
             prediction.riskLevel === 'HIGH' ? 'text-orange-400' :
               prediction.riskLevel === 'MEDIUM' ? 'text-yellow-400' :
                 prediction.riskLevel === 'LOW' ? 'text-blue-400' : 'text-green-400'
@@ -185,8 +186,8 @@ export default function WhatIfSimulator() {
             <FlaskConical className="w-6 h-6 text-gray-700" />
           </div>
           <div>
-            <h1 className="text-xl font-semibold text-gray-900">Scenario Planning</h1>
-            <p className="text-gray-500 text-sm">Test crime prevention strategies</p>
+            <h1 className="text-xl font-semibold text-gray-900">{t('scenarioPlanning')}</h1>
+            <p className="text-gray-500 text-sm">{t('testCrimePreventionStrategies')}</p>
           </div>
         </div>
 
@@ -198,7 +199,7 @@ export default function WhatIfSimulator() {
           }}
         >
           <SelectTrigger className="w-64 bg-white/95 border-gray-200">
-            <SelectValue placeholder="Select city" />
+            <SelectValue placeholder={t('selectCityPlaceholder')} />
           </SelectTrigger>
           <SelectContent>
             {zones.map(zone => (
@@ -214,20 +215,20 @@ export default function WhatIfSimulator() {
         {/* Intervention Controls – light theme, green/orange accents */}
         <div className="rounded-lg bg-white/95 border border-gray-200 overflow-hidden" style={{ borderTopWidth: 3, borderTopColor: "#2563eb" }}>
           <div className="p-4 border-b border-gray-200">
-            <h3 className="font-semibold text-gray-900">Prevention Strategies</h3>
-            <p className="text-xs text-gray-500 mt-0.5">Select and adjust intervention measures</p>
+            <h3 className="font-semibold text-gray-900">{t('preventionStrategies')}</h3>
+            <p className="text-xs text-gray-500 mt-0.5">{t('selectAndAdjustInterventions')}</p>
           </div>
 
           <div className="p-6 space-y-6">
-            {interventions.map((int) => (
+            {INTERVENTION_IDS.map((int) => (
               <div key={int.id} className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <int.icon className="w-4 h-4 text-gray-600" />
-                    <span className="font-medium text-gray-900 text-sm">{int.name}</span>
+                    <span className="font-medium text-gray-900 text-sm">{t(int.nameKey)}</span>
                   </div>
                   <span className="text-sm text-gray-500">
-                    {interventionValues[int.id]} {int.unit}
+                    {interventionValues[int.id]} {t(int.unitKey)}
                   </span>
                 </div>
                 <Slider
@@ -241,11 +242,11 @@ export default function WhatIfSimulator() {
                   className="w-full"
                 />
                 <div className="flex justify-between text-xs text-gray-500">
-                  <span>0 {int.unit}</span>
-                  <span className="font-medium text-gray-700">{interventionValues[int.id]} {int.unit}</span>
-                  <span>{int.maxValue} {int.unit}</span>
+                  <span>0 {t(int.unitKey)}</span>
+                  <span className="font-medium text-gray-700">{interventionValues[int.id]} {t(int.unitKey)}</span>
+                  <span>{int.maxValue} {t(int.unitKey)}</span>
                 </div>
-                <p className="text-xs text-gray-500 mt-1">{int.description}</p>
+                <p className="text-xs text-gray-500 mt-1">{t(int.descKey)}</p>
               </div>
             ))}
 
@@ -263,12 +264,12 @@ export default function WhatIfSimulator() {
                     >
                       <RotateCcw className="w-4 h-4 mr-2" />
                     </motion.div>
-                    Analyzing...
+                    {t('analyzing')}
                   </>
                 ) : (
                   <>
                     <Play className="w-4 h-4 mr-2" />
-                    Test Strategy
+                    {t('testStrategy')}
                   </>
                 )}
               </Button>
@@ -286,35 +287,35 @@ export default function WhatIfSimulator() {
         {/* Comparison View */}
         <div className="rounded-lg bg-white/95 border border-gray-200 overflow-hidden">
           <div className="p-4 border-b border-gray-200" style={{ borderTopWidth: 3, borderTopColor: "#138808" }}>
-            <h3 className="font-semibold text-gray-900">Impact Analysis</h3>
-            <p className="text-xs text-gray-500 mt-0.5">{selectedZone.name} - Before vs After Strategy</p>
+            <h3 className="font-semibold text-gray-900">{t('impactAnalysis')}</h3>
+            <p className="text-xs text-gray-500 mt-0.5">{selectedZone.name} - {t('beforeVsAfterStrategy')}</p>
           </div>
 
           <div className="p-6">
             <div className="grid grid-cols-2 gap-4 mb-6">
-              <HeatmapGrid prediction={basePrediction} label="Current State" />
-              <HeatmapGrid prediction={projectedPrediction || basePrediction} label="Projected State" />
+              <HeatmapGrid prediction={basePrediction} label={t('currentState')} t={t} />
+              <HeatmapGrid prediction={projectedPrediction || basePrediction} label={t('projectedState')} t={t} />
             </div>
 
             {/* Impact Summary */}
             <div className="flex items-center justify-center gap-4 p-4 rounded-lg bg-white/95 border border-gray-200">
               <div className="text-center">
                 <p className="text-3xl font-bold text-red-600">{Math.round(baseRisk)}</p>
-                <p className="text-xs text-gray-500">Current Crimes</p>
+                <p className="text-xs text-gray-500">{t('currentCrimes')}</p>
               </div>
 
               <ArrowRight className="w-8 h-8 text-gray-500" />
 
               <div className="text-center">
                 <p className="text-3xl font-bold text-green-400">{Math.round(currentRisk)}</p>
-                <p className="text-xs text-gray-500">Projected Crimes</p>
+                <p className="text-xs text-gray-500">{t('projectedCrimes')}</p>
               </div>
 
               <div className="pl-4 border-l border-gray-200">
                 <p className={`text-2xl font-bold ${riskReduction > 0 ? "text-green-600" : "text-red-600"}`}>
                   {riskReduction > 0 ? "-" : "+"}{Math.abs(Math.round(riskReduction))}
                 </p>
-                <p className="text-xs text-gray-500">Crime Reduction</p>
+                <p className="text-xs text-gray-500">{t('crimeReduction')}</p>
                 <p className="text-xs text-gray-500">({riskReductionPercent > 0 ? "-" : "+"}{Math.abs(Math.round(riskReductionPercent))}%) </p>
               </div>
             </div>
@@ -326,12 +327,11 @@ export default function WhatIfSimulator() {
                 className="mt-4 p-4 rounded-lg bg-green-50 border border-green-200"
               >
                 <p className="text-sm text-green-800">
-                  <strong>Strategy Analysis Complete:</strong> Your proposed interventions could reduce
-                  crime in {selectedZone.name} by {Math.round(riskReduction)} incidents
-                  ({Math.round(riskReductionPercent)}%), improving safety from {basePrediction?.riskLevel} to {projectedPrediction?.riskLevel} risk level.
+                  <strong>{t('strategyAnalysisComplete')}</strong> {t('strategyAnalysisMessage')} {selectedZone.name} {t('byIncidents')} {Math.round(riskReduction)} {t('incidents')}
+                  ({Math.round(riskReductionPercent)}%), {t('improvingSafetyFrom')} {basePrediction?.riskLevel} {t('toRiskLevel')} {projectedPrediction?.riskLevel} {t('riskLevelLabel')}
                   <br />
                   <span className="text-xs text-gray-500 mt-1 block">
-                    Based on historical crime patterns and intervention effectiveness data.
+                    {t('basedOnHistoricalPatterns')}
                   </span>
                 </p>
               </motion.div>

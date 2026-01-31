@@ -6,12 +6,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { GOV_NAVY, GOV_PRIMARY_BG, GOV_CARD_BG, GOV_BORDER, GOV_ACCENT_GREEN, GOV_ACCENT_ORANGE } from '@/lib/designTokens';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const GUNSHOT_THRESHOLD = 40; // dB threshold for gunshot detection
 const ZONE_NAMES = ['Dadar Station', 'Bandra West', 'Colaba Market', 'Fort Area', 'Marine Drive'];
 const SENSOR_ZONES = ['D2-D8', 'D9-D14', 'D15-D21', 'D22-D28', 'D29-D35'];
 
 export default function IoTNetwork() {
+  const { t } = useLanguage();
   const [alerts, setAlerts] = useState([]);
   const [liveRiskBoost, setLiveRiskBoost] = useState(0);
   const [audioLevel, setAudioLevel] = useState(0);
@@ -177,10 +179,10 @@ export default function IoTNetwork() {
         {/* Header – theme-aligned */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight" style={{ color: GOV_NAVY }}>
-            🛰️ Live IoT Network
+            🛰️ {t('liveIoTNetwork')}
           </h1>
           <p className="text-xl font-semibold text-gray-800 max-w-3xl mx-auto leading-relaxed">
-            Real-time acoustic & visual threat detection across 29 cities | Streetlamp sensor array + Piezo-electric pickups
+            {t('iotSubtitle')}
           </p>
         </div>
 
@@ -190,13 +192,13 @@ export default function IoTNetwork() {
             <CardHeader style={{ borderLeft: `4px solid ${GOV_PRIMARY_BG}` }}>
               <CardTitle className="flex items-center text-xl font-bold" style={{ color: GOV_NAVY }}>
                 <Mic className={`w-7 h-7 mr-3 ${isListening ? 'animate-pulse' : ''}`} style={{ color: GOV_PRIMARY_BG }} />
-                Audio Sensor
+                {t('audioSensor')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6 pt-6">
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-base font-bold text-gray-800">Sound Level</span>
+                  <span className="text-base font-bold text-gray-800">{t('soundLevel')}</span>
                   <Badge className="text-base font-bold" style={{ background: GOV_PRIMARY_BG, color: 'white' }}>
                     {audioLevel}dB
                   </Badge>
@@ -217,7 +219,7 @@ export default function IoTNetwork() {
               </div>
 
               <div className="rounded-lg p-3 border bg-gray-50" style={{ borderColor: GOV_BORDER }}>
-                <div className="text-sm font-bold text-gray-700 mb-1">Peak Level</div>
+                <div className="text-sm font-bold text-gray-700 mb-1">{t('peakLevel')}</div>
                 <div className="text-2xl font-bold" style={{ color: GOV_PRIMARY_BG }}>{peakLevel}dB</div>
               </div>
 
@@ -229,7 +231,7 @@ export default function IoTNetwork() {
                   style={isListening ? { background: '#dc2626', color: 'white' } : { background: GOV_PRIMARY_BG, color: 'white' }}
                 >
                   <Mic className="w-5 h-5 mr-2" />
-                  {isListening ? 'Stop Listening' : 'Start Detection'}
+                  {isListening ? t('stopListening') : t('startDetection')}
                 </Button>
                 <Button
                   onClick={() => setPeakLevel(0)}
@@ -238,7 +240,7 @@ export default function IoTNetwork() {
                   className="w-full font-bold border-2"
                   style={{ borderColor: GOV_BORDER, color: GOV_NAVY }}
                 >
-                  Reset Peak
+                  {t('resetPeak')}
                 </Button>
               </div>
 
@@ -261,25 +263,25 @@ export default function IoTNetwork() {
             <CardHeader style={{ borderLeft: `4px solid ${GOV_ACCENT_GREEN}` }}>
               <CardTitle className="flex items-center text-xl font-bold" style={{ color: GOV_NAVY }}>
                 <Radio className={`w-7 h-7 mr-3 ${liveRiskBoost > 0 ? 'animate-pulse text-red-600' : ''}`} style={liveRiskBoost > 0 ? {} : { color: GOV_ACCENT_GREEN }} />
-                Network Status
+                {t('networkStatus')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6 pt-6">
               <div className="grid grid-cols-2 gap-4 text-center">
                 <div className="rounded-xl p-4 border-2 bg-gray-50" style={{ borderColor: GOV_BORDER }}>
                   <div className="text-3xl font-bold" style={{ color: GOV_NAVY }}>{alerts.length}</div>
-                  <div className="text-sm font-bold text-gray-700 uppercase tracking-wider mt-2">Active Alerts</div>
+                  <div className="text-sm font-bold text-gray-700 uppercase tracking-wider mt-2">{t('activeAlertsCount')}</div>
                 </div>
                 <div className={`rounded-xl p-4 border-2 ${liveRiskBoost > 50 ? 'bg-red-50 border-red-400' : liveRiskBoost > 20 ? 'bg-amber-50 border-amber-400' : 'bg-green-50'}`} style={liveRiskBoost <= 20 ? { borderColor: GOV_ACCENT_GREEN } : {}}>
                   <div className={`text-3xl font-bold ${liveRiskBoost > 50 ? 'text-red-700' : liveRiskBoost > 20 ? 'text-amber-700' : ''}`} style={liveRiskBoost <= 20 ? { color: GOV_ACCENT_GREEN } : {}}>
                     {liveRiskBoost}%
                   </div>
-                  <div className="text-sm font-bold text-gray-700 uppercase tracking-wider mt-2">Risk Boost</div>
+                  <div className="text-sm font-bold text-gray-700 uppercase tracking-wider mt-2">{t('riskBoost')}</div>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <div className="text-base font-bold text-gray-800">Sensor Array Status</div>
+                <div className="text-base font-bold text-gray-800">{t('sensorArrayStatus')}</div>
                 <div className="grid grid-cols-3 gap-2">
                   {[...Array(6)].map((_, i) => (
                     <div
@@ -304,30 +306,30 @@ export default function IoTNetwork() {
             <CardHeader style={{ borderLeft: `4px solid ${GOV_ACCENT_ORANGE}` }}>
               <CardTitle className="flex items-center text-xl font-bold" style={{ color: GOV_NAVY }}>
                 <Volume2 className="w-7 h-7 mr-3" style={{ color: GOV_ACCENT_ORANGE }} />
-                Simulation Data
+                {t('simulationData')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6 pt-6">
               <div className="space-y-4">
                 <div className="rounded-lg p-4 border-2 bg-gray-50" style={{ borderColor: GOV_BORDER }}>
-                  <div className="text-sm font-bold text-gray-700 mb-2">Detection Threshold</div>
+                  <div className="text-sm font-bold text-gray-700 mb-2">{t('detectionThreshold')}</div>
                   <div className="text-2xl font-bold" style={{ color: GOV_ACCENT_ORANGE }}>{GUNSHOT_THRESHOLD}dB</div>
-                  <div className="text-sm font-bold text-gray-600 mt-2">Typical gunshot: 150-190dB</div>
+                  <div className="text-sm font-bold text-gray-600 mt-2">{t('typicalGunshot')}</div>
                 </div>
                 <div className="rounded-lg p-4 border-2 bg-gray-50" style={{ borderColor: GOV_BORDER }}>
-                  <div className="text-sm font-bold text-gray-700 mb-2">Cities Monitored</div>
+                  <div className="text-sm font-bold text-gray-700 mb-2">{t('citiesMonitored')}</div>
                   <div className="text-2xl font-bold" style={{ color: GOV_ACCENT_ORANGE }}>29</div>
-                  <div className="text-sm font-bold text-gray-600 mt-2">Across India</div>
+                  <div className="text-sm font-bold text-gray-600 mt-2">{t('acrossIndia')}</div>
                 </div>
                 <div className="rounded-lg p-4 border-2 bg-gray-50" style={{ borderColor: GOV_BORDER }}>
-                  <div className="text-sm font-bold text-gray-700 mb-2">Active Sensors</div>
+                  <div className="text-sm font-bold text-gray-700 mb-2">{t('activeSensors')}</div>
                   <div className="text-2xl font-bold" style={{ color: GOV_ACCENT_ORANGE }}>203</div>
-                  <div className="text-sm font-bold text-gray-600 mt-2">Streetlamps + Piezo</div>
+                  <div className="text-sm font-bold text-gray-600 mt-2">{t('streetlampsPiezo')}</div>
                 </div>
               </div>
               <div className="rounded-lg p-3 border-2 bg-amber-50" style={{ borderColor: GOV_ACCENT_ORANGE }}>
                 <div className="text-sm font-bold text-gray-800">
-                  💡 <strong>Tip:</strong> Make loud sounds near your microphone to trigger detections
+                  💡 <strong>{t('tip')}:</strong> {t('iotTip')}
                 </div>
               </div>
             </CardContent>
@@ -340,7 +342,7 @@ export default function IoTNetwork() {
             <CardTitle className="flex items-center justify-between text-xl font-bold" style={{ color: GOV_NAVY }}>
               <span className="flex items-center">
                 <Share2 className="w-6 h-6 mr-3" style={{ color: GOV_PRIMARY_BG }} />
-                Live Hardware Simulation (Tinkercad)
+                {t('liveHardwareSimulation')}
               </span>
               <Badge className="font-bold" style={alerts.length > 0 ? { background: '#dc2626', color: 'white' } : { background: GOV_PRIMARY_BG, color: 'white' }}>
                 {alerts.length > 0 ? '🔊 BUZZER ACTIVE' : '7 Streetlamps + Piezo'}
@@ -363,7 +365,7 @@ export default function IoTNetwork() {
             <div className="rounded-lg p-4 border-2 bg-gray-50" style={{ borderColor: GOV_BORDER }}>
               <div className="flex items-center justify-between">
                 <span className="text-base font-bold text-gray-800">
-                  🔴 <strong>Circuit Status:</strong> {alerts.length > 0 ? `🔊 Buzzer triggered – ${alerts.length} active detection(s)` : '✓ Monitoring for sounds above 40dB – Buzzer ready'}
+                  🔴 <strong>{t('circuitStatus')}:</strong> {alerts.length > 0 ? `🔊 Buzzer triggered – ${alerts.length} active detection(s)` : `✓ ${t('monitoringReady')}`}
                 </span>
               </div>
               {alerts.length > 0 && (
@@ -381,10 +383,10 @@ export default function IoTNetwork() {
             <CardTitle className="flex items-center justify-between text-xl font-bold" style={{ color: GOV_NAVY }}>
               <span className="flex items-center">
                 <AlertCircle className="w-7 h-7 mr-3 text-red-600" />
-                Real-Time Incident Log
+                {t('realTimeIncidentLog')}
               </span>
               <Badge variant="outline" className="text-base font-bold" style={{ borderColor: GOV_NAVY, color: GOV_NAVY }}>
-                {alerts.length} Active
+                {alerts.length} {t('active')}
               </Badge>
             </CardTitle>
           </CardHeader>
@@ -392,9 +394,9 @@ export default function IoTNetwork() {
             {alerts.length === 0 ? (
               <div className="text-center py-16 text-gray-600">
                 <AlertCircle className="w-20 h-20 mx-auto mb-6 opacity-40" style={{ color: GOV_NAVY }} />
-                <p className="text-2xl font-bold text-gray-800">Network Quiet</p>
-                <p className="text-lg font-bold mt-2 text-gray-700">No gunshot detections recorded</p>
-                <p className="text-base font-bold mt-4 text-gray-600">Enable audio detection to start monitoring</p>
+                <p className="text-2xl font-bold text-gray-800">{t('networkQuiet')}</p>
+                <p className="text-lg font-bold mt-2 text-gray-700">{t('noDetections')}</p>
+                <p className="text-base font-bold mt-4 text-gray-600">{t('enableAudioToMonitor')}</p>
               </div>
             ) : (
               <div className="space-y-4">

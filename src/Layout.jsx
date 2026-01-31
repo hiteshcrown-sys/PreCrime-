@@ -2,15 +2,16 @@ import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { cn } from "@/lib/utils";
 import { GOV_SAFFRON, GOV_NAVY, GOV_PRIMARY_BG } from "@/lib/designTokens";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const NCIS_NAV_ITEMS = [
-  { label: "Intelligence Dashboard", path: "/", page: "MainDashboard" },
-  { label: "Crime Pattern Analysis", path: null, page: "NCISDashboard" },
-  { label: "Prevention Strategies", path: null, page: "PreventionPlaybooks" },
-  { label: "Scenario Planning", path: null, page: "WhatIfSimulator" },
-  { label: "Reports", path: null, page: "FullAnalytics" },
-  { label: "IoT", path: null, page: "IoTNetwork" },
-  { label: "Live Patrol Status", path: null, page: "LiveCrimePulse" },
+  { labelKey: "navIntelligenceDashboard", path: "/", page: "MainDashboard" },
+  { labelKey: "navCrimePatternAnalysis", path: null, page: "NCISDashboard" },
+  { labelKey: "navPreventionStrategies", path: null, page: "PreventionPlaybooks" },
+  { labelKey: "navScenarioPlanning", path: null, page: "WhatIfSimulator" },
+  { labelKey: "navReports", path: null, page: "FullAnalytics" },
+  { labelKey: "navIoT", path: null, page: "IoTNetwork" },
+  { labelKey: "navLivePatrolStatus", path: null, page: "LiveCrimePulse" },
 ];
 
 function getNavHref(item) {
@@ -27,6 +28,7 @@ function isNavActive(item, pathname) {
 export default function Layout({ children }) {
   const location = useLocation();
   const pathname = location.pathname;
+  const { lang, setLang, t } = useLanguage();
 
   return (
     <div
@@ -43,8 +45,8 @@ export default function Layout({ children }) {
         className="flex-shrink-0 h-9 flex items-center justify-center gap-4 text-white text-sm font-bold tracking-wide"
         style={{ background: GOV_SAFFRON }}
       >
-        <span>Government of India</span>
-        <span className="opacity-90">भारत सरकार</span>
+        <span>{t("govOfIndia")}</span>
+        <span className="opacity-90">{t("bharatSarkar")}</span>
       </div>
 
       {/* Top horizontal navigation – no sidebar */}
@@ -56,15 +58,15 @@ export default function Layout({ children }) {
           >
             <img
               src="/ncis-logo.png"
-              alt="National Police"
+              alt={t("nationalCrimeIntelligence")}
               className="w-full h-full object-contain"
             />
           </div>
           <div className="hidden sm:block min-w-0">
             <h1 className="text-lg font-bold text-gray-900 truncate">
-              Crime DNA
+              {t("crimeDNA")}
             </h1>
-            <p className="text-sm font-semibold text-gray-600 truncate">National Crime Intelligence System</p>
+            <p className="text-sm font-semibold text-gray-600 truncate">{t("nationalCrimeIntelligence")}</p>
           </div>
         </Link>
 
@@ -88,11 +90,35 @@ export default function Layout({ children }) {
                     : {}
                 }
               >
-                {item.label}
+                {t(item.labelKey)}
               </Link>
             );
           })}
         </nav>
+
+        {/* Language toggle: EN | मराठी */}
+        <div className="flex-shrink-0 flex items-center gap-1 border rounded-lg overflow-hidden border-gray-300 bg-gray-50">
+          <button
+            type="button"
+            onClick={() => setLang("en")}
+            className={cn(
+              "px-3 py-2 text-sm font-bold transition-colors",
+              lang === "en" ? "bg-white text-gray-900 shadow-sm" : "text-gray-600 hover:text-gray-900"
+            )}
+          >
+            EN
+          </button>
+          <button
+            type="button"
+            onClick={() => setLang("mr")}
+            className={cn(
+              "px-3 py-2 text-sm font-bold transition-colors",
+              lang === "mr" ? "bg-white text-gray-900 shadow-sm" : "text-gray-600 hover:text-gray-900"
+            )}
+          >
+            मराठी
+          </button>
+        </div>
       </header>
 
       {/* Page content */}
@@ -103,8 +129,8 @@ export default function Layout({ children }) {
       {/* Government portal footer */}
       <footer className="flex-shrink-0 border-t border-gray-200 bg-white/90">
         <div className="px-6 py-3 text-center text-sm font-semibold text-gray-700">
-          <p>© National Crime Intelligence System. This is an official Government of India portal.</p>
-          <p className="mt-1">Content is maintained by the concerned ministry/department.</p>
+          <p>{t("footerCopyright")}</p>
+          <p className="mt-1">{t("footerMaintained")}</p>
         </div>
       </footer>
     </div>
