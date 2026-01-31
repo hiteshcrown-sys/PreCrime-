@@ -522,15 +522,15 @@ export default function MainDashboard() {
             <span className="text-xs font-medium text-green-800">Live ML Data</span>
           </div>
 
-          <div className="flex items-center gap-3 px-4 py-1.5 rounded-lg bg-slate-800/50 border border-slate-700">
+          <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/95 border border-gray-200 border-l-4" style={{ borderLeftColor: "#138808" }}>
             <div className="flex flex-col">
-              <span className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Patrol Command</span>
-              <span className="text-[9px] text-slate-500">Auto Dispatch Critical Alerts</span>
+              <span className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Patrol Command</span>
+              <span className="text-xs text-gray-500">Auto Dispatch Critical Alerts</span>
             </div>
             <Switch
               checked={autoDispatch}
               onCheckedChange={setAutoDispatch}
-              className="data-[state=checked]:bg-red-500"
+              className="data-[state=checked]:bg-blue-600"
             />
           </div>
         </div>
@@ -576,15 +576,15 @@ export default function MainDashboard() {
         </div>
       </div>
 
-      {/* Patrol Command System */}
-      <div id="patrol-command-section" className="pt-6 border-t border-slate-800">
+      {/* Patrol Command System – light theme */}
+      <div id="patrol-command-section" className="pt-6 border-t border-gray-200">
         <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 rounded-lg bg-cyan-500/20">
-            <Shield className="w-5 h-5 text-cyan-400" />
+          <div className="p-2 rounded-lg bg-white/95 border border-gray-200 border-l-4" style={{ borderLeftColor: "#000080" }}>
+            <Shield className="w-5 h-5 text-gray-700" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-white uppercase tracking-tight">Tactical Operations</h2>
-            <p className="text-xs text-slate-500">Manual & AI-Assisted Patrol Dispatch Command</p>
+            <h2 className="text-xl font-semibold text-gray-900 uppercase tracking-tight">Tactical Operations</h2>
+            <p className="text-xs text-gray-500">Manual & AI-Assisted Patrol Dispatch Command</p>
           </div>
         </div>
         <PatrolCommand />

@@ -112,7 +112,7 @@ export default function ChatBot() {
       {/* Floating button */}
       <motion.button
         onClick={toggleChat}
-        className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-gradient-to-br from-cyan-500 to-purple-600 text-white shadow-lg hover:shadow-2xl transition-all flex items-center justify-center hover:scale-110"
+        className="fixed bottom-6 right-6 z-[9999] w-14 h-14 rounded-full bg-gradient-to-br from-cyan-500 to-purple-600 text-white shadow-lg hover:shadow-2xl transition-all flex items-center justify-center hover:scale-110"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         title="Open AI Assistant"
@@ -150,7 +150,7 @@ export default function ChatBot() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.8, y: 20 }}
             transition={{ duration: 0.3 }}
-            className="fixed bottom-24 right-6 z-40 w-96 max-w-[calc(100vw-24px)] h-[600px] rounded-2xl bg-gradient-to-b from-slate-900 via-slate-950 to-slate-950 border border-slate-700 shadow-2xl flex flex-col overflow-hidden"
+            className="fixed bottom-24 right-6 z-[9999] w-96 max-w-[calc(100vw-24px)] h-[600px] rounded-2xl bg-gradient-to-b from-slate-900 via-slate-950 to-slate-950 border border-slate-700 shadow-2xl flex flex-col overflow-hidden"
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-cyan-500/20 to-purple-600/20 border-b border-slate-700 p-4">

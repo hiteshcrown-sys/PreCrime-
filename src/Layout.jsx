@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { cn } from "@/lib/utils";
-import { GOV_SAFFRON, GOV_GREEN, GOV_NAVY, GOV_PRIMARY_BG } from "@/lib/designTokens";
+import { GOV_SAFFRON, GOV_NAVY, GOV_PRIMARY_BG } from "@/lib/designTokens";
 
 const NCIS_NAV_ITEMS = [
   { label: "Intelligence Dashboard", path: "/", page: "MainDashboard" },
@@ -9,6 +9,7 @@ const NCIS_NAV_ITEMS = [
   { label: "Prevention Strategies", path: null, page: "PreventionPlaybooks" },
   { label: "Scenario Planning", path: null, page: "WhatIfSimulator" },
   { label: "Reports", path: null, page: "FullAnalytics" },
+  { label: "IoT", path: null, page: "IoTNetwork" },
   { label: "Live Patrol Status", path: null, page: "LiveCrimePulse" },
 ];
 
@@ -39,7 +40,7 @@ export default function Layout({ children }) {
     >
       {/* Government of India top strip – subtle */}
       <div
-        className="flex-shrink-0 h-9 flex items-center justify-center gap-4 text-white text-xs font-semibold tracking-wide"
+        className="flex-shrink-0 h-9 flex items-center justify-center gap-4 text-white text-sm font-bold tracking-wide"
         style={{ background: GOV_SAFFRON }}
       >
         <span>Government of India</span>
@@ -60,14 +61,14 @@ export default function Layout({ children }) {
             />
           </div>
           <div className="hidden sm:block min-w-0">
-            <h1 className="text-base font-semibold text-gray-900 truncate">
+            <h1 className="text-lg font-bold text-gray-900 truncate">
               Crime DNA
             </h1>
-            <p className="text-xs text-gray-500 truncate">National Crime Intelligence System</p>
+            <p className="text-sm font-semibold text-gray-600 truncate">National Crime Intelligence System</p>
           </div>
         </Link>
 
-        <nav className="flex-1 flex items-center gap-0 overflow-x-auto">
+        <nav className="flex-1 flex items-center gap-0 overflow-x-auto scrollbar-hide">
           {NCIS_NAV_ITEMS.map((item) => {
             const active = isNavActive(item, pathname);
             const href = getNavHref(item);
@@ -76,7 +77,7 @@ export default function Layout({ children }) {
                 key={item.page}
                 to={href}
                 className={cn(
-                  "flex-shrink-0 px-3 py-4 text-sm font-medium transition-colors border-b-2 -mb-px",
+                  "flex-shrink-0 px-3 py-4 text-base font-bold transition-colors border-b-2 -mb-px",
                   active
                     ? "text-gray-900 border-current"
                     : "text-gray-600 hover:text-gray-900 border-transparent"
@@ -92,16 +93,6 @@ export default function Layout({ children }) {
             );
           })}
         </nav>
-
-        {/* Thin tricolor accent */}
-        <div
-          className="hidden lg:flex h-7 w-20 rounded overflow-hidden flex-shrink-0"
-          style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.08)" }}
-        >
-          <div className="w-1/3" style={{ background: GOV_SAFFRON }} />
-          <div className="w-1/3 bg-white border-x border-gray-200" />
-          <div className="w-1/3" style={{ background: GOV_GREEN }} />
-        </div>
       </header>
 
       {/* Page content */}
@@ -110,9 +101,8 @@ export default function Layout({ children }) {
       </div>
 
       {/* Government portal footer */}
-      <footer className="flex-shrink-0 border-t bg-white/90">
-        <div className="h-1" style={{ background: GOV_GREEN }} />
-        <div className="px-6 py-3 text-center text-xs text-gray-500">
+      <footer className="flex-shrink-0 border-t border-gray-200 bg-white/90">
+        <div className="px-6 py-3 text-center text-sm font-semibold text-gray-700">
           <p>© National Crime Intelligence System. This is an official Government of India portal.</p>
           <p className="mt-1">Content is maintained by the concerned ministry/department.</p>
         </div>

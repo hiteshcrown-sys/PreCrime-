@@ -67,13 +67,6 @@ export default function NCISDashboard() {
         </div>
       )}
 
-      {/* Thin tricolor bar – Indian flag */}
-      <div className="flex h-1 rounded overflow-hidden shadow-sm">
-        <div className="flex-1" style={{ background: SAFFRON }} />
-        <div className="flex-1 bg-white border-x border-gray-200" />
-        <div className="flex-1" style={{ background: GREEN }} />
-      </div>
-
       {/* Main area: visualization + right panel */}
       <div className="flex gap-6 min-h-0">
         {/* Crime pattern cluster visualization */}
