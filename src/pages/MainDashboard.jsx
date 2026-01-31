@@ -91,19 +91,20 @@ export default function MainDashboard() {
     setSelectedPrediction(prediction);
   };
 
-  // Update chatbot context when prediction changes
+  // Update chatbot context when prediction or city changes
   useEffect(() => {
     if (selectedPrediction) {
-      // Extract factors from the prediction if available
       const factors = selectedPrediction.factors || [];
       updatePredictionContext(
         selectedPrediction,
         factors,
-        selectedPrediction.city || 'Selected City',
+        selectedPrediction.city || selectedCity || 'Selected City',
         timeOfDay
       );
+    } else if (selectedCity) {
+      updatePredictionContext(null, null, selectedCity, timeOfDay);
     }
-  }, [selectedPrediction, timeOfDay, updatePredictionContext]);
+  }, [selectedPrediction, selectedCity, timeOfDay, updatePredictionContext]);
 
   // Update KPI data based on selected prediction OR city rankings
   useEffect(() => {
@@ -443,10 +444,10 @@ export default function MainDashboard() {
 
 
   const getTimeLabel = (hour) => {
-    if (hour === 0) return t('time12AM');
-    if (hour < 12) return `${hour} ${t('timeAM')}`;
-    if (hour === 12) return t('time12PM');
-    return `${hour - 12} ${t('timePM')}`;
+    if (hour === 0) return '12 AM';
+    if (hour < 12) return `${hour} AM`;
+    if (hour === 12) return '12 PM';
+    return `${hour - 12} PM`;
   };
 
   return (

@@ -1,11 +1,10 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { livePatrolService } from '@/services/livePatrolService';
 import { crimeDataService } from '@/api/crimeDataService';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, AlertCircle, Navigation, Info } from 'lucide-react';
+import { Navigation } from 'lucide-react';
 
 // Fix for default Leaflet marker icons in React
 delete L.Icon.Default.prototype._getIconUrl;

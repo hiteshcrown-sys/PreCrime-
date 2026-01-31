@@ -55,8 +55,22 @@ const classifyQuery = (query) => {
     return 'help';
   }
   if (lower.includes('hello') || lower.includes('hi') || lower.includes('hey') ||
-    lower.includes('नमस्ते') || lower.includes('नमस्कार')) {
+    lower.includes('नमस्ते') || lower.includes('नमस्कार') || lower.includes('हॅलो')) {
     return 'greeting';
+  }
+  if ((lower.includes('how') && lower.includes('trust')) || lower.includes('data input') || 
+    lower.includes('city time') || lower.includes('input trust') ||
+    lower.includes('कैसे भरोसा') || lower.includes('डेटा इनपुट')) {
+    return 'data_input_trust';
+  }
+  if (lower.includes('dashboard') || lower.includes('flags') || lower.includes('ml model') || 
+    lower.includes('model check') || lower.includes('how dashboard') ||
+    lower.includes('डॅशबोर्ड') || lower.includes('एमएल मॉडल')) {
+    return 'dashboard_ml_integration';
+  }
+  if (lower.includes('display') || lower.includes('show') || lower.includes('same as dashboard') ||
+    lower.includes('dashboard display') || lower.includes('दाखवते') || lower.includes('डिस्प्ले')) {
+    return 'dashboard_display_consistency';
   }
 
   return 'general_question';
@@ -74,6 +88,9 @@ const generateContextlesResponse = (queryType, t) => {
     factors_importance: t('cbFactorsImportance'),
     confidence: t('cbConfidence'),
     simplify: t('cbSimplify'),
+    data_input_trust: t('cbDataInputTrust'),
+    dashboard_ml_integration: t('cbDashboardMLIntegration'),
+    dashboard_display_consistency: t('cbDashboardDisplayConsistency'),
     general_question: t('cbGeneralQuestion')
   };
 
@@ -102,6 +119,27 @@ export const generateChatbotResponse = (query, predictionContext, t) => {
     );
   }
 
+  // Handle city awareness even without specific prediction data
+  if (predictionContext?.city) {
+    const cityResponse = generateAnswerForQuery(
+      query,
+      null,
+      null,
+      null,
+      predictionContext.city,
+      predictionContext.hour,
+      t
+    );
+    // If we got a specific answer (not the default fallback), return it
+    if (!cityResponse.includes(t('rememberNote'))) {
+      return cityResponse;
+    }
+
+    // Otherwise, maybe prefix the contextless response with city awareness
+    const contextless = generateContextlesResponse(queryType, t);
+    return `${t('basedOnCurrentConditions').replace('{city}', predictionContext.city).replace('{time}', predictionContext.hour !== null ? `${predictionContext.hour}:00` : '').trim()}\n\n${contextless}`;
+  }
+
   // No context - provide general responses
   return generateContextlesResponse(queryType, t);
 };
@@ -110,24 +148,57 @@ export const generateChatbotResponse = (query, predictionContext, t) => {
  * Generate suggestion pills for quick common questions
  * Helps users discover what they can ask about
  */
-export const getQuickSuggestions = (t, hasPrediction = false) => {
+export const getQuickSuggestions = (t, context = {}) => {
+  const { city, prediction } = context;
+  const hasPrediction = !!prediction;
+
   if (hasPrediction) {
+    const riskLevel = prediction?.riskLevel || 'MEDIUM';
+    const riskKey = `risk${riskLevel.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join('')}`;
+    const riskLabel = t(riskKey) || riskLevel;
+    const cityLabel = city || (prediction?.city) || 'this area';
+    const timeLabel = prediction?.hour !== undefined ? 
+      (prediction.hour === 0 ? '12 AM' : 
+       prediction.hour < 12 ? `${prediction.hour} AM` : 
+       prediction.hour === 12 ? '12 PM' : 
+       `${prediction.hour - 12} PM`) : 'this time';
+
     return [
-      { label: t('sugWhyRisk'), query: "Why is this area marked high risk?" },
-      { label: t('sugHowConfident'), query: "How confident is this prediction?" },
-      { label: t('sugWhatFactors'), query: "What factors affected this result the most?" },
-      { label: t('sugExplainSimply'), query: "Explain this prediction in simple words" },
-      { label: t('sugCanITrust'), query: "Can I trust this prediction?" },
-      { label: t('sugHowItWorks'), query: "How does the AI decide crime rate?" }
+      {
+        label: t('sugWhyCityRisk').replace('{city}', cityLabel).replace('{risk}', riskLabel),
+        query: t('queryWhyRisk').replace('this area', cityLabel)
+      },
+      {
+        label: t('sugWhyCityPatternsMatter'),
+        query: t('queryWhyCityPatternsMatter')
+      },
+      {
+        label: t('sugHowTimeAffectsPredictions'),
+        query: t('queryHowTimeAffectsPredictions')
+      },
+      {
+        label: t('sugMLInsightsForCity').replace('{city}', cityLabel),
+        query: t('queryMLInsightsForCity').replace('{city}', cityLabel)
+      },
+      {
+        label: t('sugCompareCityPatterns'),
+        query: t('queryCompareCityPatterns')
+      },
+      {
+        label: t('sugTimeInfluenceOnRisk'),
+        query: t('queryTimeInfluenceOnRisk')
+      },
+      { label: t('sugCanITrust'), query: t('queryCanITrust') },
+      { label: t('sugDataInputTrust'), query: t('queryDataInputTrust') }
     ];
   }
 
   return [
-    { label: t('sugHowItWorks'), query: "How does the AI work?" },
-    { label: t('sugCanITrust'), query: "Can I trust crime predictions?" },
-    { label: t('sugWhatFactors'), query: "What factors affect predictions?" },
-    { label: t('sugWhatHelp'), query: "What can you help me with?" },
-    { label: t('sugExplainSimply'), query: "Explain predictions in simple words" }
+    { label: t('sugHowItWorks'), query: t('queryHowItWorksDefault') },
+    { label: t('sugCanITrust'), query: t('queryCanITrustDefault') },
+    { label: t('sugWhatFactors'), query: t('queryWhatFactorsDefault') },
+    { label: t('sugWhatHelp'), query: t('queryWhatHelp') },
+    { label: t('sugExplainSimply'), query: t('queryExplainSimplyDefault') }
   ];
 };
 

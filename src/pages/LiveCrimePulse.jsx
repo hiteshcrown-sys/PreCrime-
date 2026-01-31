@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Radio, MapPin, AlertTriangle, Activity, RefreshCw, Zap, Shield, Navigation } from "lucide-react";
-import RiskBadge from "@/components/ui/RiskBadge";
+import { MapPin, AlertTriangle, Zap, Navigation } from "lucide-react";
 import { useCity } from "@/contexts/CityContext";
 import { useTranslate } from "@/hooks/useTranslate";
 import PatrolTrackerMap from "@/components/live/PatrolTrackerMap";
-import { livePatrolService } from "@/services/livePatrolService";
 import { crimeDataService } from "@/api/crimeDataService";
 
 export default function LiveCrimePulse() {

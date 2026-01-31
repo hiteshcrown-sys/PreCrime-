@@ -278,6 +278,137 @@ Try asking a question about crime predictions or the platform!
 
 ---
 
+## New Sample Questions: Data Input Trust & Dashboard Integration
+
+### Query: "How does the system ensure trust when I add city and time?"
+
+**Response**:
+```
+Great question about data input trust! Here's how the system ensures reliability when you add city and time:
+
+Data Validation Process:
+1. City Verification 🏙️ - System cross-references with official city boundaries and coordinates
+2. Time Normalization 🕐 - Converts your input to 24-hour format for consistent processing
+3. Historical Data Check 📊 - Verifies sufficient historical data exists for that city/time combination
+4. Geographic Accuracy 📍 - Uses precise latitude/longitude coordinates for location-specific analysis
+
+Trust Indicators:
+✅ Green Check - City recognized, sufficient data available
+⚠️ Orange Warning - Limited historical data, use with caution
+❌ Red Alert - Insufficient data, prediction may be unreliable
+
+Why This Matters: The model's accuracy depends on having enough similar past cases. When you select a city and time, the system automatically checks data availability and shows confidence levels accordingly.
+
+Select a city to see the data validation in action!
+```
+
+---
+
+### Query: "How do the flags and risk shown in dashboard go into the ML model check?"
+
+**Response**:
+```
+Excellent question about how dashboard elements feed into the ML model! Here's the complete flow:
+
+Dashboard → ML Model Pipeline:
+
+1. Input Collection 📝
+   • City selection → Geographic coordinates & historical patterns
+   • Time selection → Hourly crime distribution analysis
+   • Current conditions → Real-time activity levels
+
+2. Data Processing 🔄
+   • Risk Flags → Converted to numerical weights (High=3, Medium=2, Low=1)
+   • Threat Scores → Normalized 0-1 scale for model input
+   • Confidence Levels → Used as uncertainty multipliers
+
+3. ML Model Check 🤖
+   • Feature Engineering - Combines all dashboard inputs into model features
+   • Prediction Generation - Runs through Gradient Boosting algorithm
+   • Output Validation - Cross-checks with historical accuracy metrics
+
+4. Result Display 📊
+   • Risk Level → Color-coded (🔴 High, 🟡 Medium, 🟢 Low)
+   • Confidence Score → Percentage based on data quality
+   • Factors List → Top 3 influencing features ranked by importance
+
+Key Integration Points:
+• Dashboard flags become model input features
+• Risk assessments influence prediction weights
+• All displayed metrics are directly computed from ML model outputs
+
+The dashboard and ML model work together seamlessly - what you see is exactly what the model predicts!
+```
+
+---
+
+### Query: "Does the chatbot answer the same way as what the dashboard displays?"
+
+**Response**:
+```
+Perfect! I answer questions using the exact same data and logic as the dashboard displays. Here's how consistency is maintained:
+
+Same Data Sources:
+• Crime Statistics - Official government crime data (2001-2026)
+• Geographic Data - Precise city coordinates and boundaries
+• Time Patterns - 24-hour crime distribution analysis
+• Historical Trends - Multi-year pattern recognition
+
+Same Calculation Methods:
+• Risk Assessment - Identical algorithm as dashboard (Gradient Boosting)
+• Confidence Scoring - Same statistical confidence intervals
+• Factor Ranking - Top 3 features by importance weight
+• Threat Level - 1-10 scale with same thresholds
+
+Same Display Logic:
+• Color Coding - 🔴 High (70%+), 🟡 Medium (50-70%), 🟢 Low (<50%)
+• Risk Labels - Critical, High, Medium, Low, Very Low
+• Percentage Formats - Consistent decimal places and rounding
+• Time Formats - 12-hour display with AM/PM indicators
+
+Why This Matters: You get the same accurate, reliable information whether you ask me or look at the dashboard. No discrepancies, no different interpretations - just consistent, trustworthy crime intelligence.
+
+Try selecting a city and time, then ask me about the prediction - you'll see it matches the dashboard exactly!
+```
+
+---
+
+### Query: "What extra questions can I ask about the system?"
+
+**Response**:
+```
+Great! Here are some additional sample questions you can ask me:
+
+🔍 About Data & Trust:
+• "How does the system validate city and time inputs?"
+• "What happens if there's not enough historical data?"
+• "How accurate is the geographic data?"
+
+🤖 About ML Model:
+• "How does the Gradient Boosting algorithm work?"
+• "What features does the model consider most important?"
+• "How often is the model retrained?"
+
+📊 About Dashboard Integration:
+• "How do risk flags become model inputs?"
+• "What happens when I change the time selection?"
+• "How are confidence scores calculated?"
+
+⚙️ About System Operations:
+• "How does real-time data affect predictions?"
+• "What emergency protocols are in place?"
+• "How does the system handle multiple cities?"
+
+💡 About Decision Making:
+• "When should I trust high-risk predictions?"
+• "How do I combine this with other information?"
+• "What are the limitations of AI predictions?"
+
+Feel free to ask any of these or anything else about the crime prediction system!
+```
+
+---
+
 ## Out-of-Scope Query
 
 ### Query: "What's John's address?"

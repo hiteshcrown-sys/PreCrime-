@@ -3,7 +3,6 @@ import { Fingerprint, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import NCISPatternCluster from "@/components/crimedna/NCISPatternCluster";
 import usePatternDetection from "@/hooks/usePatternDetection";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { GOV_SAFFRON, GOV_GREEN, GOV_NAVY, GOV_PRIMARY_BG } from "@/lib/designTokens";
 import { useTranslate } from "@/hooks/useTranslate";
 

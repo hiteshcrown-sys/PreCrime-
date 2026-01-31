@@ -14,6 +14,24 @@ export default function ChatBot() {
   const { t } = useTranslate();
   const { selectedLanguage } = useLanguage();
 
+  // Move ALL hooks before any early returns
+  const inputRef = useRef(null);
+  const messagesEndRef = useRef(null);
+  const [inputValue, setInputValue] = useState('');
+  const { criticalAlerts, markAsDispatched } = useAlerts();
+
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [context?.messages || []]);
+
+  // Focus input when chat opens
+  useEffect(() => {
+    if (context?.isOpen && inputRef.current) {
+      setTimeout(() => inputRef.current?.focus(), 100);
+    }
+  }, [context?.isOpen]);
+
   if (!context) {
     return null;
   }
@@ -31,23 +49,6 @@ export default function ChatBot() {
     selectedCity,
     selectedHour
   } = context;
-
-  const inputRef = useRef(null);
-  const messagesEndRef = useRef(null);
-  const [inputValue, setInputValue] = useState('');
-  const { criticalAlerts, markAsDispatched } = useAlerts();
-
-  // Scroll to bottom when messages change
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  // Focus input when chat opens
-  useEffect(() => {
-    if (isOpen && inputRef.current) {
-      setTimeout(() => inputRef.current?.focus(), 100);
-    }
-  }, [isOpen]);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -102,7 +103,7 @@ export default function ChatBot() {
   };
 
   const handleSuggestionClick = (suggestionQuery) => {
-    inputValue.current = suggestionQuery;
+    setInputValue(suggestionQuery);
     setTimeout(() => {
       const form = inputRef.current?.closest('form');
       if (form) {
@@ -111,7 +112,11 @@ export default function ChatBot() {
     }, 50);
   };
 
-  const quickSuggestions = getQuickSuggestions(t, !!currentPrediction);
+  const quickSuggestions = getQuickSuggestions(t, {
+    city: selectedCity,
+    prediction: currentPrediction,
+    hour: selectedHour
+  });
 
   return (
     <>

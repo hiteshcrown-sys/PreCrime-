@@ -7,7 +7,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useTranslate } from "@/hooks/useTranslate";
 import { predictScenario, CITY_BASE_RATES } from "@/utils/crimeModelService";
 import crimeModelService from "@/utils/crimeModelService";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 // Dashboard cities (same as used in IndiaMap2D component)
 const DASHBOARD_CITIES = [
