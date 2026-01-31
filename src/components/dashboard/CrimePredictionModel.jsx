@@ -113,11 +113,14 @@ export default function CrimePredictionModel({ onPredictionHourChange, onPredict
               className="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-gray-900 font-medium focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
               style={{ borderLeftWidth: 4, borderLeftColor: GOV_ACCENT_GREEN }}
             >
-              {Array.from({ length: 24 }, (_, i) => (
-                <option key={i} value={i}>
-                  {i === 0 ? t('time12AM') : i < 12 ? `${i} ${t('timeAM')}` : i === 12 ? t('time12PM') : `${i - 12} ${t('timePM')}`}
-                </option>
-              ))}
+              {Array.from({ length: 24 }, (_, i) => {
+                const timeLabel = i === 0 ? '12 AM' : i < 12 ? `${i} AM` : i === 12 ? '12 PM' : `${i - 12} PM`;
+                return (
+                  <option key={i} value={i}>
+                    {timeLabel}
+                  </option>
+                );
+              })}
             </select>
           </div>
 

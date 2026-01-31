@@ -149,7 +149,7 @@ export const generateChatbotResponse = (query, predictionContext, t) => {
  * Helps users discover what they can ask about
  */
 export const getQuickSuggestions = (t, context = {}) => {
-  const { city, prediction } = context;
+  const { city, prediction, hour } = context;
   const hasPrediction = !!prediction;
 
   if (hasPrediction) {
@@ -165,40 +165,49 @@ export const getQuickSuggestions = (t, context = {}) => {
 
     return [
       {
-        label: t('sugWhyCityRisk').replace('{city}', cityLabel).replace('{risk}', riskLabel),
-        query: t('queryWhyRisk').replace('this area', cityLabel)
+        label: `Why is ${cityLabel} flagged as ${riskLabel}?`,
+        query: `Explain why ${cityLabel} is flagged as ${riskLabel} at ${timeLabel}. What are the main factors contributing to this risk level based on the ML model?`
       },
       {
-        label: t('sugWhyCityPatternsMatter'),
-        query: t('queryWhyCityPatternsMatter')
+        label: `Key factors driving the ${riskLabel} in ${cityLabel}`,
+        query: `What are the top 3-5 most important ML model factors that led to the ${riskLabel} risk prediction for ${cityLabel} at ${timeLabel}?`
       },
       {
-        label: t('sugHowTimeAffectsPredictions'),
-        query: t('queryHowTimeAffectsPredictions')
+        label: `How does ${timeLabel} affect crime prediction?`,
+        query: `Why is ${timeLabel} particularly significant for crime patterns? How does the model use time-based features to predict crime in ${cityLabel}?`
       },
       {
-        label: t('sugMLInsightsForCity').replace('{city}', cityLabel),
-        query: t('queryMLInsightsForCity').replace('{city}', cityLabel)
+        label: `AI insights on ${cityLabel} at ${timeLabel}`,
+        query: `Provide a detailed AI analysis of why ${cityLabel} shows ${riskLabel} risk at ${timeLabel}. What patterns does the trained model detect?`
       },
       {
-        label: t('sugCompareCityPatterns'),
-        query: t('queryCompareCityPatterns')
+        label: `Compare ${cityLabel} with other major cities`,
+        query: `How does the crime risk in ${cityLabel} at ${timeLabel} compare with other major Indian cities? What makes this prediction unique?`
       },
       {
-        label: t('sugTimeInfluenceOnRisk'),
-        query: t('queryTimeInfluenceOnRisk')
+        label: `What data powers this prediction?`,
+        query: `What historical crime data, temporal patterns, and real-time information does the ML model use to predict ${riskLabel} for ${cityLabel}?`
       },
-      { label: t('sugCanITrust'), query: t('queryCanITrust') },
-      { label: t('sugDataInputTrust'), query: t('queryDataInputTrust') }
+      {
+        label: `How confident is this prediction?`,
+        query: `What is the model's confidence level and accuracy for the ${riskLabel} prediction for ${cityLabel} at ${timeLabel}?`
+      },
+      {
+        label: `Can I trust this ${riskLabel} flag?`,
+        query: `Why should I trust the ${riskLabel} prediction for ${cityLabel}? What are the model's strengths, limitations, and potential biases?`
+      }
     ];
   }
 
   return [
-    { label: t('sugHowItWorks'), query: t('queryHowItWorksDefault') },
-    { label: t('sugCanITrust'), query: t('queryCanITrustDefault') },
-    { label: t('sugWhatFactors'), query: t('queryWhatFactorsDefault') },
-    { label: t('sugWhatHelp'), query: t('queryWhatHelp') },
-    { label: t('sugExplainSimply'), query: t('queryExplainSimplyDefault') }
+    { label: 'How does the model predict crimes?', query: 'How does the ML model work? What data and algorithms does it use to predict crime patterns across Indian cities?' },
+    { label: 'What factors matter most?', query: 'What are the most important factors the model considers when making crime predictions? How does it weight them?' },
+    { label: 'How accurate are predictions?', query: 'How accurate and reliable are the crime predictions? What is the model confidence level and how is it measured?' },
+    { label: 'Why should I trust it?', query: 'Why should law enforcement trust this ML model? What are its strengths, limitations, and potential biases I should know about?' },
+    { label: 'Time and Crime Patterns', query: 'How do time-based factors like day of week, time of day, and seasonality affect crime predictions? Why is timing important?' },
+    { label: 'Understanding Risk Levels', query: 'How are risk levels (Critical, High, Medium, Low) determined? What crime rate thresholds define each level?' },
+    { label: 'Can I customize predictions?', query: 'Can I filter predictions by crime type, time range, or geographic area? What customization options are available?' },
+    { label: 'How to interpret results?', query: 'How should I interpret the prediction scores, confidence levels, and risk badges? What do they mean in practical terms?' }
   ];
 };
 
