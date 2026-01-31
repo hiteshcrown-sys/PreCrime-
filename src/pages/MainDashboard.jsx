@@ -458,7 +458,7 @@ export default function MainDashboard() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      < div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" >
         <motion.div
           key={kpiData.nationalRisk}
           initial={{ scale: 0.95 }}
@@ -517,57 +517,42 @@ export default function MainDashboard() {
           trend="up"
           trendValue={`+1.8% ${t("improvement")}`}
         />
-      </div>
+      </div >
 
       {/* AI Crime Prediction Model */}
-      <CrimePredictionModel
+      < CrimePredictionModel
         onPredictionHourChange={setSelectedPredictionHour}
         onPredictionChange={handlePredictionChange}
       />
 
       {/* Real-Time Map Section */}
-      <div className="rounded-lg bg-white/95 border border-gray-200 overflow-hidden">
+      < div className="rounded-lg bg-white/95 border border-gray-200 overflow-hidden" >
         <div className="p-4 border-b border-gray-200 flex items-center justify-between" style={{ borderTopWidth: 3, borderTopColor: '#000080' }}>
           <div>
-<<<<<<< HEAD
             <h3 className="font-semibold text-gray-900">{t("realTimeRiskMap")}</h3>
             <p className="text-xs text-gray-500 mt-1">{t("liveMLPredictions")}</p>
           </div>
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-50 border border-green-200">
             <span className="w-2 h-2 rounded-full bg-green-600 animate-pulse" />
             <span className="text-xs font-medium text-green-800">{t("liveMLData")}</span>
-=======
-            <h3 className="font-semibold text-gray-900">{t('realTimeRiskMap')}</h3>
-            <p className="text-xs text-gray-500 mt-1">{t('liveMLPredictionsSync')}</p>
-          </div>
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-50 border border-green-200">
-            <span className="w-2 h-2 rounded-full bg-green-600 animate-pulse" />
-            <span className="text-xs font-medium text-green-800">{t('liveMLData')}</span>
->>>>>>> 57a111b526fdc52a8a2277e3f0c638363d3bf4c0
           </div>
 
           <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/95 border border-gray-200 border-l-4" style={{ borderLeftColor: "#138808" }}>
             <div className="flex flex-col">
-<<<<<<< HEAD
               <span className="text-xs text-gray-500 uppercase tracking-wider font-semibold">{t("patrolCommand")}</span>
               <span className="text-xs text-gray-500">{t("autoDispatchAlerts")}</span>
-=======
-              <span className="text-xs text-gray-500 uppercase tracking-wider font-semibold">{t('patrolCommand')}</span>
-              <span className="text-xs text-gray-500">{t('autoDispatchCriticalAlerts')}</span>
->>>>>>> 57a111b526fdc52a8a2277e3f0c638363d3bf4c0
-            </div>
+            </div >
             <Switch
               checked={autoDispatch}
               onCheckedChange={setAutoDispatch}
               className="data-[state=checked]:bg-blue-600"
             />
-          </div>
-        </div>
+          </div >
+        </div >
 
         <div className="relative">
           <div ref={mapRef} className="w-full bg-gray-100" style={{ height: '600px' }} />
           <div className="absolute bottom-6 left-6 bg-white/95 border border-gray-200 rounded-lg p-4 shadow-sm z-10">
-<<<<<<< HEAD
             <p className="text-xs font-semibold text-gray-900 mb-3">{t("riskLevel")}</p>
             <div className="space-y-2">
               <div className="flex items-center gap-2">
@@ -585,25 +570,6 @@ export default function MainDashboard() {
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded-full bg-red-500" />
                 <span className="text-xs text-gray-600">{t("criticalRisk")}</span>
-=======
-            <p className="text-xs font-semibold text-gray-900 mb-3">{t('riskLevelLegend')}</p>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-green-500" />
-                <span className="text-xs text-gray-600">{t('lowRisk')}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-amber-500" />
-                <span className="text-xs text-gray-600">{t('mediumRisk')}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-orange-500" />
-                <span className="text-xs text-gray-600">{t('highRisk')}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-red-500" />
-                <span className="text-xs text-gray-600">{t('criticalRisk')}</span>
->>>>>>> 57a111b526fdc52a8a2277e3f0c638363d3bf4c0
               </div>
             </div>
           </div>
@@ -611,7 +577,6 @@ export default function MainDashboard() {
             <div className="absolute top-6 right-6 bg-white/95 border border-gray-200 rounded-lg p-4 shadow-sm max-w-sm z-10">
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
-<<<<<<< HEAD
                 <p className="text-xs font-semibold text-gray-900">{t("livePrediction")}</p>
               </div>
               <p className="text-sm font-bold text-gray-900 mb-2">{selectedPrediction.city} • {getTimeLabel(selectedPrediction.hour)}</p>
@@ -620,40 +585,26 @@ export default function MainDashboard() {
                 <p><span className="text-gray-500">{t("riskScore")}:</span> {selectedPrediction.predictedRate.toFixed(1)}</p>
                 <p><span className="text-gray-500">{t("crimeType")}:</span> {selectedPrediction.crimeType}</p>
                 <p><span className="text-gray-500">{t("confidence")}:</span> 94.2%</p>
-=======
-                <p className="text-xs font-semibold text-gray-900">{t('livePrediction')}</p>
               </div>
-              <p className="text-sm font-bold text-gray-900 mb-2">{selectedPrediction.city} • {getTimeLabel(selectedPrediction.hour)}</p>
-              <div className="text-xs space-y-1 text-gray-600">
-                <p><span className="text-gray-500">{t('riskLevel')}:</span> <span style={{ color: getRiskColor(selectedPrediction.riskLevel).hex }} className="font-semibold">{selectedPrediction.riskLevel}</span></p>
-                <p><span className="text-gray-500">{t('riskScore')}:</span> {selectedPrediction.predictedRate.toFixed(1)}</p>
-                <p><span className="text-gray-500">{t('crimeType')}:</span> {selectedPrediction.crimeType}</p>
-                <p><span className="text-gray-500">{t('modelConfidence')}:</span> 94.2%</p>
->>>>>>> 57a111b526fdc52a8a2277e3f0c638363d3bf4c0
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+            </div >
+          )
+          }
+        </div >
+      </div >
 
       {/* Patrol Command System – light theme */}
-      <div id="patrol-command-section" className="pt-6 border-t border-gray-200">
+      < div id="patrol-command-section" className="pt-6 border-t border-gray-200" >
         <div className="flex items-center gap-3 mb-6">
           <div className="p-2 rounded-lg bg-white/95 border border-gray-200 border-l-4" style={{ borderLeftColor: "#000080" }}>
             <Shield className="w-5 h-5 text-gray-700" />
           </div>
           <div>
-<<<<<<< HEAD
             <h2 className="text-xl font-semibold text-gray-900 uppercase tracking-tight">{t("tacticalOperations")}</h2>
             <p className="text-xs text-gray-500">{t("tacticalOpsSubtitle")}</p>
-=======
-            <h2 className="text-xl font-semibold text-gray-900 uppercase tracking-tight">{t('tacticalOperations')}</h2>
-            <p className="text-xs text-gray-500">{t('manualAIDispatchCommand')}</p>
->>>>>>> 57a111b526fdc52a8a2277e3f0c638363d3bf4c0
-          </div>
-        </div>
+          </div >
+        </div >
         <PatrolCommand />
-      </div>
-    </div>
+      </div >
+    </div >
   );
 }
