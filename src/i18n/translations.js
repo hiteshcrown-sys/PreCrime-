@@ -1,5 +1,12 @@
 export const translations = {
         en: {
+                // Language Selection
+                chooseLanguageTitle: "Choose Language",
+                selectPreferredLanguage: "Please select your preferred language to continue",
+                english: "English",
+                marathi: "Marathi",
+                hindi: "Hindi",
+
                 // Navigation
                 navIntelligenceDashboard: "Intelligence Dashboard",
                 navCrimePatternAnalysis: "Crime Pattern Analysis",
@@ -574,6 +581,13 @@ Feel free to ask about predictions instead! 😊`,
                 rememberNote: "Remember: This prediction is based on historical patterns and is one tool among many for decision-making, not a certainty."
         },
         hi: {
+                // Language Selection
+                chooseLanguageTitle: "भाषा चुनें",
+                selectPreferredLanguage: "जारी रखने के लिए कृपया अपनी पसंदीदा भाषा चुनें",
+                english: "अंग्रेज़ी",
+                marathi: "मराठी",
+                hindi: "हिंदी",
+
                 // Navigation
                 navIntelligenceDashboard: "इंटेलिजेंस डैशबोर्ड",
                 navCrimePatternAnalysis: "अपराध पैटर्न विश्लेषण",
@@ -1142,6 +1156,13 @@ Feel free to ask about predictions instead! 😊`,
                 rememberNote: "याद रखें: यह भविष्यवाणी ऐतिहासिक पैटर्न पर आधारित है और निर्णय लेने के लिए कई उपकरणों में से एक है, निश्चितता नहीं।"
         },
         mr: {
+                // Language Selection
+                chooseLanguageTitle: "भाषा निवडा",
+                selectPreferredLanguage: "पुढील कार्यवाहीसाठी कृपया तुमची पसंतीची भाषा निवडा",
+                english: "इंग्रजी",
+                marathi: "मराठी",
+                hindi: "हिंदी",
+
                 // Navigation
                 navIntelligenceDashboard: "इंटेलिजन्स डॅशबोर्ड",
                 navCrimePatternAnalysis: "गुन्हेगारी नमुना विश्लेषण",
