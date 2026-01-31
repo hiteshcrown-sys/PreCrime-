@@ -11,11 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import PatrolCommand from "@/components/patrol/PatrolCommand";
 import { livePatrolService } from "@/services/livePatrolService";
 import { useCity } from "@/contexts/CityContext";
-<<<<<<< HEAD
 import { useTranslate } from "@/hooks/useTranslate";
-=======
-import { useLanguage } from "@/contexts/LanguageContext";
->>>>>>> 57a111b526fdc52a8a2277e3f0c638363d3bf4c0
 import L from 'leaflet';
 
 // City coordinates mapping (latitude, longitude)
@@ -52,11 +48,7 @@ const CITY_COORDINATES = {
 };
 
 export default function MainDashboard() {
-<<<<<<< HEAD
   const { t } = useTranslate();
-=======
-  const { t } = useLanguage();
->>>>>>> 57a111b526fdc52a8a2277e3f0c638363d3bf4c0
   const [timeOfDay, setTimeOfDay] = useState(20);
   const [hoveredState, setHoveredState] = useState(null);
 
@@ -272,11 +264,7 @@ export default function MainDashboard() {
         marker.bindPopup(`
           <div style="font-size: 12px; color: #111827;">
             <p style="margin: 0; font-weight: bold;">${cityName}</p>
-<<<<<<< HEAD
             <p style="margin: 4px 0 0 0; color: #6b7280;">${t("selectCityToPredict")}</p>
-=======
-            <p style="margin: 4px 0 0 0; color: #6b7280;">${t('selectCityToPredict')}</p>
->>>>>>> 57a111b526fdc52a8a2277e3f0c638363d3bf4c0
           </div>
         `);
 
@@ -321,21 +309,12 @@ export default function MainDashboard() {
         <div class="text-sm bg-white text-gray-900 p-2 rounded border border-gray-200" style="max-width: 250px;">
           <p class="font-bold">${city}</p>
           <div class="text-xs space-y-1 mt-2 text-gray-600">
-<<<<<<< HEAD
             <p><span class="text-gray-500">${t("riskLevel")}:</span> <span style="color: ${riskColor.hex}; font-weight: 600;">${riskLevel}</span></p>
             <p><span class="text-gray-500">${t("riskScore")}:</span> ${predictedRate.toFixed(1)}</p>
             <p><span class="text-gray-500">${t("crimeType")}:</span> ${crimeType}</p>
             <p><span class="text-gray-500">${t("time")}:</span> ${getTimeLabel(hour)}</p>
             <p><span class="text-gray-500">${t("confidence")}:</span> 94.2%</p>
             <p class="text-xs text-gray-500 mt-2">${t("updated")}: ${timestamp}</p>
-=======
-            <p><span class="text-gray-500">${t('riskLevel')}:</span> <span style="color: ${riskColor.hex}; font-weight: 600;">${riskLevel}</span></p>
-            <p><span class="text-gray-500">${t('riskScore')}:</span> ${predictedRate.toFixed(1)}</p>
-            <p><span class="text-gray-500">${t('crimeType')}:</span> ${crimeType}</p>
-            <p><span class="text-gray-500">${t('timeLabel')}</span> ${getTimeLabel(hour)}</p>
-            <p><span class="text-gray-500">${t('confidence')}:</span> 94.2%</p>
-            <p class="text-xs text-gray-500 mt-2">${t('updated')} ${timestamp}</p>
->>>>>>> 57a111b526fdc52a8a2277e3f0c638363d3bf4c0
           </div>
         </div>
       `);
@@ -474,13 +453,8 @@ export default function MainDashboard() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-<<<<<<< HEAD
         <h1 className="text-xl font-semibold text-gray-900">{t("dashboardTitle")}</h1>
         <p className="text-sm text-gray-500 mt-1">{t("dashboardSubtitle")}</p>
-=======
-        <h1 className="text-xl font-semibold text-gray-900">{t('dashboardTitle')}</h1>
-        <p className="text-sm text-gray-500 mt-1">{t('realTimeCrimeIntel')}</p>
->>>>>>> 57a111b526fdc52a8a2277e3f0c638363d3bf4c0
       </div>
 
       {/* KPI Cards */}
@@ -492,15 +466,9 @@ export default function MainDashboard() {
           transition={{ duration: 0.3 }}
         >
           <KPICard
-<<<<<<< HEAD
             title={t("nationalRiskIndex")}
             value={kpiData.nationalRisk.toFixed(1)}
             subtitle={t("monitoredZones")}
-=======
-            title={t('nationalRiskIndex')}
-            value={kpiData.nationalRisk.toFixed(1)}
-            subtitle={t('acrossAllMonitoredZones')}
->>>>>>> 57a111b526fdc52a8a2277e3f0c638363d3bf4c0
             icon={Shield}
             accentColor="orange"
             trend="up"
@@ -515,15 +483,9 @@ export default function MainDashboard() {
           transition={{ duration: 0.3, delay: 0.1 }}
         >
           <KPICard
-<<<<<<< HEAD
             title={t("highRiskZonesActive")}
             value={kpiData.highRiskZones}
             subtitle={t("aboveThreshold")}
-=======
-            title={t('highRiskZones')}
-            value={kpiData.highRiskZones}
-            subtitle={t('above70Threshold')}
->>>>>>> 57a111b526fdc52a8a2277e3f0c638363d3bf4c0
             icon={MapPin}
             accentColor="red"
           />
@@ -536,7 +498,6 @@ export default function MainDashboard() {
           transition={{ duration: 0.3, delay: 0.2 }}
         >
           <KPICard
-<<<<<<< HEAD
             title={t("alertsGenerated")}
             value={kpiData.alertsGenerated}
             subtitle={t("requiringAttention")}
@@ -544,20 +505,10 @@ export default function MainDashboard() {
             accentColor="orange"
             trend="up"
             trendValue={`+${Math.floor(kpiData.alertsGenerated / 3)} ${t("newAlerts")}`}
-=======
-            title={t('alertsGenerated')}
-            value={kpiData.alertsGenerated}
-            subtitle={t('requiringAttention')}
-            icon={AlertTriangle}
-            accentColor="orange"
-            trend="up"
-            trendValue={`+${Math.floor(kpiData.alertsGenerated / 3)} ${t('newAlerts')}`}
->>>>>>> 57a111b526fdc52a8a2277e3f0c638363d3bf4c0
           />
         </motion.div>
 
         <KPICard
-<<<<<<< HEAD
           title={t("modelConfidence")}
           value={`${kpiData.modelConfidence}%`}
           subtitle={t("predictionAccuracy")}
@@ -565,15 +516,6 @@ export default function MainDashboard() {
           accentColor="green"
           trend="up"
           trendValue={`+1.8% ${t("improvement")}`}
-=======
-          title={t('modelConfidence')}
-          value={`${kpiData.modelConfidence}%`}
-          subtitle={t('predictionAccuracy')}
-          icon={Activity}
-          accentColor="green"
-          trend="up"
-          trendValue={`+1.8% ${t('improvement')}`}
->>>>>>> 57a111b526fdc52a8a2277e3f0c638363d3bf4c0
         />
       </div>
 
