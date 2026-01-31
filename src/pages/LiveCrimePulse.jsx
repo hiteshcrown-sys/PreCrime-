@@ -3,21 +3,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Radio, MapPin, AlertTriangle, Activity, RefreshCw, Zap, Shield, Navigation } from "lucide-react";
 import RiskBadge from "@/components/ui/RiskBadge";
 import { useCity } from "@/contexts/CityContext";
-<<<<<<< HEAD
 import { useTranslate } from "@/hooks/useTranslate";
-=======
-import { useLanguage } from "@/contexts/LanguageContext";
->>>>>>> 57a111b526fdc52a8a2277e3f0c638363d3bf4c0
 import PatrolTrackerMap from "@/components/live/PatrolTrackerMap";
 import { livePatrolService } from "@/services/livePatrolService";
 import { crimeDataService } from "@/api/crimeDataService";
 
 export default function LiveCrimePulse() {
-<<<<<<< HEAD
   const { t } = useTranslate();
-=======
-  const { t } = useLanguage();
->>>>>>> 57a111b526fdc52a8a2277e3f0c638363d3bf4c0
   const { selectedCity } = useCity();
   const [events, setEvents] = useState([]);
   const [isRecalculating, setIsRecalculating] = useState(false);
@@ -109,21 +101,12 @@ export default function LiveCrimePulse() {
     <div className="space-y-6">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
-<<<<<<< HEAD
           <h1 className="text-xl font-semibold text-gray-900">{t("livePatrolStatus")}</h1>
           <p className="text-sm text-gray-500 mt-1">{t("realTimeCommand").replace("{city}", selectedCity)}</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/95 border border-gray-200">
             <span className="text-xs text-gray-500 uppercase tracking-wider">{t("routePrediction")}</span>
-=======
-          <h1 className="text-xl font-semibold text-gray-900">{t('livePatrolStatus')}</h1>
-          <p className="text-sm text-gray-500 mt-1">{t('realTimeCommandFor')} {selectedCity}</p>
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/95 border border-gray-200">
-            <span className="text-xs text-gray-500 uppercase tracking-wider">{t('routePrediction')}</span>
->>>>>>> 57a111b526fdc52a8a2277e3f0c638363d3bf4c0
             <button
               onClick={() => setShowRoutes(!showRoutes)}
               className={`w-10 h-5 rounded-full relative transition-colors ${showRoutes ? "bg-blue-600" : "bg-gray-300"}`}
@@ -133,14 +116,10 @@ export default function LiveCrimePulse() {
           </div>
           <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-50 border border-green-200">
             <span className="w-2 h-2 rounded-full bg-green-600 animate-pulse" />
-<<<<<<< HEAD
             <span className="text-sm text-green-800 font-medium uppercase tracking-tighter">{t("liveSensorFeed")}</span>
-=======
-            <span className="text-sm text-green-800 font-medium uppercase tracking-tighter">{t('liveSensorFeed')}</span>
->>>>>>> 57a111b526fdc52a8a2277e3f0c638363d3bf4c0
-          </div>
-        </div>
-      </div>
+          </div >
+        </div >
+      </div >
 
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
         {/* Real-time Patrol Map */}
@@ -247,6 +226,6 @@ export default function LiveCrimePulse() {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 }
