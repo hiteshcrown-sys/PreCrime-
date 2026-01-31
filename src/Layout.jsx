@@ -57,11 +57,11 @@ export default function Layout({ children }) {
         style={{ background: GOV_SAFFRON }}
       >
         <span>{t("govOfIndia")}</span>
-        <span className="opacity-90">भारत सरकार</span>
-      </div>
+        <span className="opacity-90">{t("bharatSarkar")}</span>
+      </div >
 
       {/* Top horizontal navigation – no sidebar */}
-      <header className="flex-shrink-0 flex items-center gap-6 h-16 px-6 bg-white/95 border-b shadow-sm border-gray-200">
+      < header className="flex-shrink-0 flex items-center gap-6 h-16 px-6 bg-white/95 border-b shadow-sm border-gray-200" >
         <Link to="/" className="flex items-center gap-3 flex-shrink-0">
           <div
             className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 bg-white flex items-center justify-center"
@@ -69,17 +69,17 @@ export default function Layout({ children }) {
           >
             <img
               src="/ncis-logo.png"
-              alt="National Police"
+              alt={t("nationalCrimeIntelligence")}
               className="w-full h-full object-contain"
             />
           </div>
           <div className="hidden sm:block min-w-0">
             <h1 className="text-lg font-bold text-gray-900 truncate">
               {t('appTitle')}
-            </h1>
+            </h1 >
             <p className="text-sm font-semibold text-gray-600 truncate">{t("nationalCrimeIntelligence")}</p>
-          </div>
-        </Link>
+          </div >
+        </Link >
 
         <nav className="flex-1 flex items-center gap-0 overflow-x-auto scrollbar-hide">
           {NCIS_NAV_ITEMS.map((item) => {
@@ -102,10 +102,10 @@ export default function Layout({ children }) {
                 }
               >
                 {t(item.key)}
-              </Link>
+              </Link >
             );
           })}
-        </nav>
+        </nav >
 
         <div className="flex items-center gap-4 ml-4">
           <NotificationBell />
@@ -135,9 +135,9 @@ export default function Layout({ children }) {
         <div className="px-6 py-3 text-center text-sm font-semibold text-gray-700">
           <p>{t("officialPortalNotice")}</p>
           <p className="mt-1">{t("ministryNotice")}</p>
-        </div>
-      </footer>
-    </div>
+        </div >
+      </footer >
+    </div >
   );
 }
 

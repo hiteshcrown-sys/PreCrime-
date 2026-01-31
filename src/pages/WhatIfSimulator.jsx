@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useTranslate } from "@/hooks/useTranslate";
 import { predictScenario, CITY_BASE_RATES } from "@/utils/crimeModelService";
 import crimeModelService from "@/utils/crimeModelService";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Dashboard cities (same as used in IndiaMap2D component)
 const DASHBOARD_CITIES = [
@@ -54,10 +55,10 @@ const HeatmapGrid = ({ prediction, label }) => {
   const { t } = useTranslate();
   if (!prediction) return null;
 
-  const riskScore = prediction.riskScore * 100; // Convert to percentage for display
+  const riskScore = prediction.riskScore * 100;
   const cells = [];
   for (let i = 0; i < 64; i++) {
-    const cellRisk = riskScore - 15 + Math.random() * 30; // Variation around the predicted risk
+    const cellRisk = riskScore - 15 + Math.random() * 30;
     const normalizedRisk = Math.max(0, Math.min(100, cellRisk));
     cells.push(normalizedRisk);
   }
@@ -201,7 +202,7 @@ export default function WhatIfSimulator() {
           }}
         >
           <SelectTrigger className="w-64 bg-white/95 border-gray-200">
-            <SelectValue placeholder="Select city" />
+            <SelectValue placeholder={t('selectCityPlaceholder')} />
           </SelectTrigger>
           <SelectContent>
             {zones.map(zone => (
@@ -303,7 +304,7 @@ export default function WhatIfSimulator() {
             <div className="flex items-center justify-center gap-4 p-4 rounded-lg bg-white/95 border border-gray-200">
               <div className="text-center">
                 <p className="text-3xl font-bold text-red-600">{Math.round(baseRisk)}</p>
-                <p className="text-xs text-gray-500">Current Crimes</p>
+                <p className="text-xs text-gray-500">{t('currentCrimes')}</p>
               </div>
 
               <ArrowRight className="w-8 h-8 text-gray-500" />
@@ -331,8 +332,8 @@ export default function WhatIfSimulator() {
                 <p className="text-sm text-green-800">
                   <strong>{t("strategyAnalysisComplete")}:</strong> {t("strategyReport")
                     .replace("{city}", selectedZone.name)
-                    .replace("{reduction}", Math.round(riskReduction))
-                    .replace("{percent}", Math.round(riskReductionPercent))
+                    .replace("{reduction}", Math.round(riskReduction).toString())
+                    .replace("{percent}", Math.round(riskReductionPercent).toString())
                     .replace("{from}", t(`risk${basePrediction?.riskLevel?.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join('')}`))
                     .replace("{to}", t(`risk${projectedPrediction?.riskLevel?.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join('')}`))}
                   <br />

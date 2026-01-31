@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { AlertTriangle, MapPin, Clock, TrendingUp, Zap } from 'lucide-react';
 import { useCrimeModel } from '@/hooks/useCrimeModel';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { GOV_PRIMARY_BG, GOV_NAVY, GOV_ACCENT_GREEN, GOV_ACCENT_ORANGE } from '@/lib/designTokens';
 import { useTranslate } from '@/hooks/useTranslate';
 
@@ -13,6 +14,7 @@ import { useTranslate } from '@/hooks/useTranslate';
 export default function CrimePredictionModel({ onPredictionHourChange, onPredictionChange }) {
   const { t } = useTranslate();
   const { predict } = useCrimeModel();
+  const { language } = useLanguage();
   const [selectedCity, setSelectedCity] = useState('Delhi');
   const [selectedHour, setSelectedHour] = useState(new Date().getHours());
   const [prediction, setPrediction] = useState(null);
@@ -113,7 +115,7 @@ export default function CrimePredictionModel({ onPredictionHourChange, onPredict
             >
               {Array.from({ length: 24 }, (_, i) => (
                 <option key={i} value={i}>
-                  {i === 0 ? '12 AM' : i < 12 ? `${i} AM` : i === 12 ? '12 PM' : `${i - 12} PM`}
+                  {i === 0 ? t('time12AM') : i < 12 ? `${i} ${t('timeAM')}` : i === 12 ? t('time12PM') : `${i - 12} ${t('timePM')}`}
                 </option>
               ))}
             </select>
@@ -127,105 +129,107 @@ export default function CrimePredictionModel({ onPredictionHourChange, onPredict
               style={{ background: GOV_PRIMARY_BG }}
             >
               {loading ? t("predicting") : t("predictFutureCrime")}
-            </button>
-          </div>
-        </div>
-      </motion.div>
+            </button >
+          </div >
+        </div >
+      </motion.div >
 
       {/* Prediction Results – light theme */}
-      {prediction && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="rounded-lg bg-white/95 border border-gray-200 p-8 overflow-hidden relative shadow-sm"
-          style={{ borderTopWidth: 3, borderTopColor: colors.border }}
-        >
-          <div className="absolute top-0 right-0 w-40 h-40 opacity-10">
-            <AlertTriangle className={`w-full h-full ${colors.text}`} />
-          </div>
-
-          <div className="relative z-10">
-            <div className="flex items-start justify-between mb-6">
-              <div>
-                <h3 className="text-2xl font-bold text-gray-900">{t("crimePredictionReport")}</h3>
-                <p className="text-gray-500 text-sm mt-2">
-                  {prediction.city} • {prediction.hour === 0 ? '12 AM' : prediction.hour < 12 ? `${prediction.hour} AM` : prediction.hour === 12 ? '12 PM' : `${prediction.hour - 12} PM`}
-                </p>
-              </div>
-              <div className={`px-4 py-2 rounded-full border font-bold text-lg ${colors.badge}`}>
-                {t(`risk${prediction.riskLevel.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join('')}`)}
-              </div>
+      {
+        prediction && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-lg bg-white/95 border border-gray-200 p-8 overflow-hidden relative shadow-sm"
+            style={{ borderTopWidth: 3, borderTopColor: colors.border }}
+          >
+            <div className="absolute top-0 right-0 w-40 h-40 opacity-10">
+              <AlertTriangle className={`w-full h-full ${colors.text}`} />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 border-l-4" style={{ borderLeftColor: GOV_NAVY }}>
-                <p className="text-gray-500 text-sm mb-2">{t("predictedCrimeRate")}</p>
-                <p className="text-3xl font-bold text-gray-900">{prediction.predictedRate.toFixed(1)}</p>
-                <p className="text-xs text-gray-500 mt-1">{t("per100k")}</p>
-              </div>
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 border-l-4" style={{ borderLeftColor: colors.border }}>
-                <p className="text-gray-500 text-sm mb-2">{t("riskLevel")}</p>
-                <p className={`text-2xl font-bold ${colors.text}`}>
+            <div className="relative z-10">
+              <div className="flex items-start justify-between mb-6">
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900">{t("crimePredictionReport")}</h3>
+                  <p className="text-gray-500 text-sm mt-2">
+                    {prediction.city} • {prediction.hour === 0 ? t('time12AM') : prediction.hour < 12 ? `${prediction.hour} ${t('timeAM')}` : prediction.hour === 12 ? t('time12PM') : `${prediction.hour - 12} ${t('timePM')}`}
+                  </p>
+                </div>
+                <div className={`px-4 py-2 rounded-full border font-bold text-lg ${colors.badge}`}>
                   {t(`risk${prediction.riskLevel.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join('')}`)}
-                </p>
-                <p className="text-xs text-gray-500 mt-1">{t("threatAssessment")}</p>
+                </div>
               </div>
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 border-l-4" style={{ borderLeftColor: GOV_ACCENT_ORANGE }}>
-                <p className="text-gray-500 text-sm mb-2">{t("primaryCrimeType")}</p>
-                <p className="text-xl font-bold text-gray-900">
-                  {t(`crime${prediction.crimeType.replace(' ', '')}`)}
-                </p>
-                <p className="text-xs text-gray-500 mt-1">{t("mostLikelyCategory")}</p>
-              </div>
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 border-l-4" style={{ borderLeftColor: GOV_ACCENT_GREEN }}>
-                <p className="text-gray-500 text-sm mb-2">{t("likelySpecificCrime")}</p>
-                <p className="text-lg font-bold text-gray-900">{prediction.specificCrime}</p>
-                <p className="text-xs text-gray-500 mt-1">{t("predictedIncident")}</p>
-              </div>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  <Zap className="w-4 h-4 text-gray-600" />
-                  Model Confidence
-                </h4>
-                <p className="text-2xl font-bold text-gray-900 mb-2">{prediction.confidence.toFixed(2)}%</p>
-                <p className="text-sm text-gray-500">
-                  <strong className="text-gray-700">Model:</strong> Gradient Boosting<br />
-                  <strong className="text-gray-700">Accuracy:</strong> 99.98%
-                </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 border-l-4" style={{ borderLeftColor: GOV_NAVY }}>
+                  <p className="text-gray-500 text-sm mb-2">{t("predictedCrimeRate")}</p>
+                  <p className="text-3xl font-bold text-gray-900">{prediction.predictedRate.toFixed(1)}</p>
+                  <p className="text-xs text-gray-500 mt-1">{t("per100k")}</p>
+                </div>
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 border-l-4" style={{ borderLeftColor: colors.border }}>
+                  <p className="text-gray-500 text-sm mb-2">{t("riskLevel")}</p>
+                  <p className={`text-2xl font-bold ${colors.text}`}>
+                    {t(`risk${prediction.riskLevel.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join('')}`)}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">{t("threatAssessment")}</p>
+                </div>
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 border-l-4" style={{ borderLeftColor: GOV_ACCENT_ORANGE }}>
+                  <p className="text-gray-500 text-sm mb-2">{t("primaryCrimeType")}</p>
+                  <p className="text-xl font-bold text-gray-900">
+                    {t(`crime${prediction.crimeType.replace(' ', '')}`)}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">{t("mostLikelyCategory")}</p>
+                </div>
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 border-l-4" style={{ borderLeftColor: GOV_ACCENT_GREEN }}>
+                  <p className="text-gray-500 text-sm mb-2">{t("likelySpecificCrime")}</p>
+                  <p className="text-lg font-bold text-gray-900">{prediction.specificCrime}</p>
+                  <p className="text-xs text-gray-500 mt-1">{t("predictedIncident")}</p>
+                </div>
               </div>
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-gray-600" />
-                  Risk Assessment
-                </h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-500">{t("threatScore")}:</span>
-                    <span className="font-bold text-gray-900">{prediction.threatLevel}/10</span>
-                  </div>
-                  <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${prediction.threatLevel * 10}%` }}
-                      transition={{ duration: 1.5 }}
-                      className="h-full rounded-full bg-blue-600"
-                    />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                  <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                    <Zap className="w-4 h-4 text-gray-600" />
+                    {t('modelConfidence')}
+                  </h4>
+                  <p className="text-2xl font-bold text-gray-900 mb-2">{prediction.confidence.toFixed(2)}%</p>
+                  <p className="text-sm text-gray-500">
+                    <strong className="text-gray-700">Model:</strong> Gradient Boosting<br />
+                    <strong className="text-gray-700">Accuracy:</strong> 99.98%
+                  </p>
+                </div>
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                  <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4 text-gray-600" />
+                    {t('riskAssessment')}
+                  </h4>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-500">{t("threatScore")}:</span>
+                      <span className="font-bold text-gray-900">{prediction.threatLevel}/10</span>
+                    </div>
+                    <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${prediction.threatLevel * 10}%` }}
+                        transition={{ duration: 1.5 }}
+                        className="h-full rounded-full bg-blue-600"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div className="mt-6 pt-4 border-t border-gray-200">
-              <p className="text-xs text-gray-500">
-                Prediction generated using ML Model • {new Date().toLocaleString()}
-              </p>
+              <div className="mt-6 pt-4 border-t border-gray-200">
+                <p className="text-xs text-gray-500">
+                  {t('predictionGeneratedML')} • {new Date().toLocaleString()}
+                </p>
+              </div>
             </div>
-          </div>
-        </motion.div>
-      )}
-    </div>
+          </motion.div>
+        )
+      }
+    </div >
   );
 }

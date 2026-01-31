@@ -11,7 +11,11 @@ import { Switch } from "@/components/ui/switch";
 import PatrolCommand from "@/components/patrol/PatrolCommand";
 import { livePatrolService } from "@/services/livePatrolService";
 import { useCity } from "@/contexts/CityContext";
+<<<<<<< HEAD
 import { useTranslate } from "@/hooks/useTranslate";
+=======
+import { useLanguage } from "@/contexts/LanguageContext";
+>>>>>>> 57a111b526fdc52a8a2277e3f0c638363d3bf4c0
 import L from 'leaflet';
 
 // City coordinates mapping (latitude, longitude)
@@ -48,7 +52,11 @@ const CITY_COORDINATES = {
 };
 
 export default function MainDashboard() {
+<<<<<<< HEAD
   const { t } = useTranslate();
+=======
+  const { t } = useLanguage();
+>>>>>>> 57a111b526fdc52a8a2277e3f0c638363d3bf4c0
   const [timeOfDay, setTimeOfDay] = useState(20);
   const [hoveredState, setHoveredState] = useState(null);
 
@@ -264,7 +272,11 @@ export default function MainDashboard() {
         marker.bindPopup(`
           <div style="font-size: 12px; color: #111827;">
             <p style="margin: 0; font-weight: bold;">${cityName}</p>
+<<<<<<< HEAD
             <p style="margin: 4px 0 0 0; color: #6b7280;">${t("selectCityToPredict")}</p>
+=======
+            <p style="margin: 4px 0 0 0; color: #6b7280;">${t('selectCityToPredict')}</p>
+>>>>>>> 57a111b526fdc52a8a2277e3f0c638363d3bf4c0
           </div>
         `);
 
@@ -309,12 +321,21 @@ export default function MainDashboard() {
         <div class="text-sm bg-white text-gray-900 p-2 rounded border border-gray-200" style="max-width: 250px;">
           <p class="font-bold">${city}</p>
           <div class="text-xs space-y-1 mt-2 text-gray-600">
+<<<<<<< HEAD
             <p><span class="text-gray-500">${t("riskLevel")}:</span> <span style="color: ${riskColor.hex}; font-weight: 600;">${riskLevel}</span></p>
             <p><span class="text-gray-500">${t("riskScore")}:</span> ${predictedRate.toFixed(1)}</p>
             <p><span class="text-gray-500">${t("crimeType")}:</span> ${crimeType}</p>
             <p><span class="text-gray-500">${t("time")}:</span> ${getTimeLabel(hour)}</p>
             <p><span class="text-gray-500">${t("confidence")}:</span> 94.2%</p>
             <p class="text-xs text-gray-500 mt-2">${t("updated")}: ${timestamp}</p>
+=======
+            <p><span class="text-gray-500">${t('riskLevel')}:</span> <span style="color: ${riskColor.hex}; font-weight: 600;">${riskLevel}</span></p>
+            <p><span class="text-gray-500">${t('riskScore')}:</span> ${predictedRate.toFixed(1)}</p>
+            <p><span class="text-gray-500">${t('crimeType')}:</span> ${crimeType}</p>
+            <p><span class="text-gray-500">${t('timeLabel')}</span> ${getTimeLabel(hour)}</p>
+            <p><span class="text-gray-500">${t('confidence')}:</span> 94.2%</p>
+            <p class="text-xs text-gray-500 mt-2">${t('updated')} ${timestamp}</p>
+>>>>>>> 57a111b526fdc52a8a2277e3f0c638363d3bf4c0
           </div>
         </div>
       `);
@@ -342,6 +363,18 @@ export default function MainDashboard() {
       updateMapFromPrediction(selectedPrediction);
     }
   }, [selectedPrediction]);
+
+  // Update marker popups when language changes
+  useEffect(() => {
+    if (!mapInstanceRef.current || !markersRef.current) return;
+    const sub = t('selectCityToPredict');
+    Object.entries(markersRef.current).forEach(([cityName, marker]) => {
+      marker.setPopupContent(
+        `<div style="font-size: 12px; color: #111827;"><p style="margin: 0; font-weight: bold;">${cityName}</p><p style="margin: 4px 0 0 0; color: #6b7280;">${sub}</p></div>`
+      );
+    });
+    if (selectedPrediction) updateMapFromPrediction(selectedPrediction);
+  }, [t, selectedPrediction]);
 
   // Handle patrol unit updates and marker rendering
   useEffect(() => {
@@ -431,18 +464,23 @@ export default function MainDashboard() {
 
 
   const getTimeLabel = (hour) => {
-    if (hour === 0) return "12 AM";
-    if (hour < 12) return `${hour} AM`;
-    if (hour === 12) return "12 PM";
-    return `${hour - 12} PM`;
+    if (hour === 0) return t('time12AM');
+    if (hour < 12) return `${hour} ${t('timeAM')}`;
+    if (hour === 12) return t('time12PM');
+    return `${hour - 12} ${t('timePM')}`;
   };
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
+<<<<<<< HEAD
         <h1 className="text-xl font-semibold text-gray-900">{t("dashboardTitle")}</h1>
         <p className="text-sm text-gray-500 mt-1">{t("dashboardSubtitle")}</p>
+=======
+        <h1 className="text-xl font-semibold text-gray-900">{t('dashboardTitle')}</h1>
+        <p className="text-sm text-gray-500 mt-1">{t('realTimeCrimeIntel')}</p>
+>>>>>>> 57a111b526fdc52a8a2277e3f0c638363d3bf4c0
       </div>
 
       {/* KPI Cards */}
@@ -454,9 +492,15 @@ export default function MainDashboard() {
           transition={{ duration: 0.3 }}
         >
           <KPICard
+<<<<<<< HEAD
             title={t("nationalRiskIndex")}
             value={kpiData.nationalRisk.toFixed(1)}
             subtitle={t("monitoredZones")}
+=======
+            title={t('nationalRiskIndex')}
+            value={kpiData.nationalRisk.toFixed(1)}
+            subtitle={t('acrossAllMonitoredZones')}
+>>>>>>> 57a111b526fdc52a8a2277e3f0c638363d3bf4c0
             icon={Shield}
             accentColor="orange"
             trend="up"
@@ -471,9 +515,15 @@ export default function MainDashboard() {
           transition={{ duration: 0.3, delay: 0.1 }}
         >
           <KPICard
+<<<<<<< HEAD
             title={t("highRiskZonesActive")}
             value={kpiData.highRiskZones}
             subtitle={t("aboveThreshold")}
+=======
+            title={t('highRiskZones')}
+            value={kpiData.highRiskZones}
+            subtitle={t('above70Threshold')}
+>>>>>>> 57a111b526fdc52a8a2277e3f0c638363d3bf4c0
             icon={MapPin}
             accentColor="red"
           />
@@ -486,6 +536,7 @@ export default function MainDashboard() {
           transition={{ duration: 0.3, delay: 0.2 }}
         >
           <KPICard
+<<<<<<< HEAD
             title={t("alertsGenerated")}
             value={kpiData.alertsGenerated}
             subtitle={t("requiringAttention")}
@@ -493,10 +544,20 @@ export default function MainDashboard() {
             accentColor="orange"
             trend="up"
             trendValue={`+${Math.floor(kpiData.alertsGenerated / 3)} ${t("newAlerts")}`}
+=======
+            title={t('alertsGenerated')}
+            value={kpiData.alertsGenerated}
+            subtitle={t('requiringAttention')}
+            icon={AlertTriangle}
+            accentColor="orange"
+            trend="up"
+            trendValue={`+${Math.floor(kpiData.alertsGenerated / 3)} ${t('newAlerts')}`}
+>>>>>>> 57a111b526fdc52a8a2277e3f0c638363d3bf4c0
           />
         </motion.div>
 
         <KPICard
+<<<<<<< HEAD
           title={t("modelConfidence")}
           value={`${kpiData.modelConfidence}%`}
           subtitle={t("predictionAccuracy")}
@@ -504,6 +565,15 @@ export default function MainDashboard() {
           accentColor="green"
           trend="up"
           trendValue={`+1.8% ${t("improvement")}`}
+=======
+          title={t('modelConfidence')}
+          value={`${kpiData.modelConfidence}%`}
+          subtitle={t('predictionAccuracy')}
+          icon={Activity}
+          accentColor="green"
+          trend="up"
+          trendValue={`+1.8% ${t('improvement')}`}
+>>>>>>> 57a111b526fdc52a8a2277e3f0c638363d3bf4c0
         />
       </div>
 
@@ -517,18 +587,32 @@ export default function MainDashboard() {
       <div className="rounded-lg bg-white/95 border border-gray-200 overflow-hidden">
         <div className="p-4 border-b border-gray-200 flex items-center justify-between" style={{ borderTopWidth: 3, borderTopColor: '#000080' }}>
           <div>
+<<<<<<< HEAD
             <h3 className="font-semibold text-gray-900">{t("realTimeRiskMap")}</h3>
             <p className="text-xs text-gray-500 mt-1">{t("liveMLPredictions")}</p>
           </div>
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-50 border border-green-200">
             <span className="w-2 h-2 rounded-full bg-green-600 animate-pulse" />
             <span className="text-xs font-medium text-green-800">{t("liveMLData")}</span>
+=======
+            <h3 className="font-semibold text-gray-900">{t('realTimeRiskMap')}</h3>
+            <p className="text-xs text-gray-500 mt-1">{t('liveMLPredictionsSync')}</p>
+          </div>
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-50 border border-green-200">
+            <span className="w-2 h-2 rounded-full bg-green-600 animate-pulse" />
+            <span className="text-xs font-medium text-green-800">{t('liveMLData')}</span>
+>>>>>>> 57a111b526fdc52a8a2277e3f0c638363d3bf4c0
           </div>
 
           <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/95 border border-gray-200 border-l-4" style={{ borderLeftColor: "#138808" }}>
             <div className="flex flex-col">
+<<<<<<< HEAD
               <span className="text-xs text-gray-500 uppercase tracking-wider font-semibold">{t("patrolCommand")}</span>
               <span className="text-xs text-gray-500">{t("autoDispatchAlerts")}</span>
+=======
+              <span className="text-xs text-gray-500 uppercase tracking-wider font-semibold">{t('patrolCommand')}</span>
+              <span className="text-xs text-gray-500">{t('autoDispatchCriticalAlerts')}</span>
+>>>>>>> 57a111b526fdc52a8a2277e3f0c638363d3bf4c0
             </div>
             <Switch
               checked={autoDispatch}
@@ -541,6 +625,7 @@ export default function MainDashboard() {
         <div className="relative">
           <div ref={mapRef} className="w-full bg-gray-100" style={{ height: '600px' }} />
           <div className="absolute bottom-6 left-6 bg-white/95 border border-gray-200 rounded-lg p-4 shadow-sm z-10">
+<<<<<<< HEAD
             <p className="text-xs font-semibold text-gray-900 mb-3">{t("riskLevel")}</p>
             <div className="space-y-2">
               <div className="flex items-center gap-2">
@@ -558,6 +643,25 @@ export default function MainDashboard() {
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded-full bg-red-500" />
                 <span className="text-xs text-gray-600">{t("criticalRisk")}</span>
+=======
+            <p className="text-xs font-semibold text-gray-900 mb-3">{t('riskLevelLegend')}</p>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-full bg-green-500" />
+                <span className="text-xs text-gray-600">{t('lowRisk')}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-full bg-amber-500" />
+                <span className="text-xs text-gray-600">{t('mediumRisk')}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-full bg-orange-500" />
+                <span className="text-xs text-gray-600">{t('highRisk')}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-full bg-red-500" />
+                <span className="text-xs text-gray-600">{t('criticalRisk')}</span>
+>>>>>>> 57a111b526fdc52a8a2277e3f0c638363d3bf4c0
               </div>
             </div>
           </div>
@@ -565,6 +669,7 @@ export default function MainDashboard() {
             <div className="absolute top-6 right-6 bg-white/95 border border-gray-200 rounded-lg p-4 shadow-sm max-w-sm z-10">
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
+<<<<<<< HEAD
                 <p className="text-xs font-semibold text-gray-900">{t("livePrediction")}</p>
               </div>
               <p className="text-sm font-bold text-gray-900 mb-2">{selectedPrediction.city} • {getTimeLabel(selectedPrediction.hour)}</p>
@@ -573,6 +678,16 @@ export default function MainDashboard() {
                 <p><span className="text-gray-500">{t("riskScore")}:</span> {selectedPrediction.predictedRate.toFixed(1)}</p>
                 <p><span className="text-gray-500">{t("crimeType")}:</span> {selectedPrediction.crimeType}</p>
                 <p><span className="text-gray-500">{t("confidence")}:</span> 94.2%</p>
+=======
+                <p className="text-xs font-semibold text-gray-900">{t('livePrediction')}</p>
+              </div>
+              <p className="text-sm font-bold text-gray-900 mb-2">{selectedPrediction.city} • {getTimeLabel(selectedPrediction.hour)}</p>
+              <div className="text-xs space-y-1 text-gray-600">
+                <p><span className="text-gray-500">{t('riskLevel')}:</span> <span style={{ color: getRiskColor(selectedPrediction.riskLevel).hex }} className="font-semibold">{selectedPrediction.riskLevel}</span></p>
+                <p><span className="text-gray-500">{t('riskScore')}:</span> {selectedPrediction.predictedRate.toFixed(1)}</p>
+                <p><span className="text-gray-500">{t('crimeType')}:</span> {selectedPrediction.crimeType}</p>
+                <p><span className="text-gray-500">{t('modelConfidence')}:</span> 94.2%</p>
+>>>>>>> 57a111b526fdc52a8a2277e3f0c638363d3bf4c0
               </div>
             </div>
           )}
@@ -586,8 +701,13 @@ export default function MainDashboard() {
             <Shield className="w-5 h-5 text-gray-700" />
           </div>
           <div>
+<<<<<<< HEAD
             <h2 className="text-xl font-semibold text-gray-900 uppercase tracking-tight">{t("tacticalOperations")}</h2>
             <p className="text-xs text-gray-500">{t("tacticalOpsSubtitle")}</p>
+=======
+            <h2 className="text-xl font-semibold text-gray-900 uppercase tracking-tight">{t('tacticalOperations')}</h2>
+            <p className="text-xs text-gray-500">{t('manualAIDispatchCommand')}</p>
+>>>>>>> 57a111b526fdc52a8a2277e3f0c638363d3bf4c0
           </div>
         </div>
         <PatrolCommand />
