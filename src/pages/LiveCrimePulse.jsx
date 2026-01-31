@@ -3,11 +3,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Radio, MapPin, AlertTriangle, Activity, RefreshCw, Zap, Shield, Navigation } from "lucide-react";
 import RiskBadge from "@/components/ui/RiskBadge";
 import { useCity } from "@/contexts/CityContext";
+import { useTranslate } from "@/hooks/useTranslate";
 import PatrolTrackerMap from "@/components/live/PatrolTrackerMap";
 import { livePatrolService } from "@/services/livePatrolService";
 import { crimeDataService } from "@/api/crimeDataService";
 
 export default function LiveCrimePulse() {
+  const { t } = useTranslate();
   const { selectedCity } = useCity();
   const [events, setEvents] = useState([]);
   const [isRecalculating, setIsRecalculating] = useState(false);
@@ -99,12 +101,12 @@ export default function LiveCrimePulse() {
     <div className="space-y-6">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
-          <h1 className="text-xl font-semibold text-gray-900">Live Patrol Status</h1>
-          <p className="text-sm text-gray-500 mt-1">Real-time command & control for {selectedCity}</p>
+          <h1 className="text-xl font-semibold text-gray-900">{t("livePatrolStatus")}</h1>
+          <p className="text-sm text-gray-500 mt-1">{t("realTimeCommand").replace("{city}", selectedCity)}</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/95 border border-gray-200">
-            <span className="text-xs text-gray-500 uppercase tracking-wider">Route Prediction</span>
+            <span className="text-xs text-gray-500 uppercase tracking-wider">{t("routePrediction")}</span>
             <button
               onClick={() => setShowRoutes(!showRoutes)}
               className={`w-10 h-5 rounded-full relative transition-colors ${showRoutes ? "bg-blue-600" : "bg-gray-300"}`}
@@ -114,7 +116,7 @@ export default function LiveCrimePulse() {
           </div>
           <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-50 border border-green-200">
             <span className="w-2 h-2 rounded-full bg-green-600 animate-pulse" />
-            <span className="text-sm text-green-800 font-medium uppercase tracking-tighter">Live Sensor Feed</span>
+            <span className="text-sm text-green-800 font-medium uppercase tracking-tighter">{t("liveSensorFeed")}</span>
           </div>
         </div>
       </div>
@@ -137,23 +139,23 @@ export default function LiveCrimePulse() {
           <div className="rounded-lg bg-white/95 border border-gray-200 p-5 space-y-4 shadow-sm" style={{ borderTopWidth: 3, borderTopColor: "#000080" }}>
             <div className="flex items-center gap-2 text-gray-700 mb-2">
               <Navigation className="w-4 h-4" />
-              <h3 className="font-semibold text-sm uppercase tracking-wider text-gray-900">Unit Readiness</h3>
+              <h3 className="font-semibold text-sm uppercase tracking-wider text-gray-900">{t("unitReadiness")}</h3>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="p-3 rounded-lg bg-gray-50 border border-gray-200 border-l-4" style={{ borderLeftColor: "#dc2626" }}>
-                <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Responding</p>
+                <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">{t("responding")}</p>
                 <p className="text-xl font-bold text-gray-900">{patrolStats.responding}</p>
               </div>
               <div className="p-3 rounded-lg bg-gray-50 border border-gray-200 border-l-4" style={{ borderLeftColor: "#2563eb" }}>
-                <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">En Route</p>
+                <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">{t("enRoute")}</p>
                 <p className="text-xl font-bold text-gray-900">{patrolStats.enRoute || 0}</p>
               </div>
               <div className="p-3 rounded-lg bg-gray-50 border border-gray-200 border-l-4" style={{ borderLeftColor: "#6b7280" }}>
-                <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Standby</p>
+                <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">{t("standby")}</p>
                 <p className="text-xl font-bold text-gray-900">{patrolStats.idle}</p>
               </div>
               <div className="p-3 rounded-lg bg-gray-50 border border-gray-200 border-l-4" style={{ borderLeftColor: "#138808" }}>
-                <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Total Units</p>
+                <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">{t("totalUnits")}</p>
                 <p className="text-xl font-bold text-gray-900">{patrolStats.active}</p>
               </div>
             </div>
@@ -162,7 +164,7 @@ export default function LiveCrimePulse() {
           {/* Real-time Activity Feed – same card style */}
           <div className="rounded-lg bg-white/95 border border-gray-200 overflow-hidden h-[340px] flex flex-col shadow-sm" style={{ borderTopWidth: 3, borderTopColor: "#138808" }}>
             <div className="p-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
-              <h3 className="font-semibold text-sm text-gray-900 uppercase tracking-wider">Intelligence Stream</h3>
+              <h3 className="font-semibold text-sm text-gray-900 uppercase tracking-wider">{t("intelligenceStream")}</h3>
               <Zap className="w-4 h-4 text-amber-500 animate-pulse" />
             </div>
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
@@ -204,22 +206,22 @@ export default function LiveCrimePulse() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-6">
             <div>
-              <p className="text-xs text-gray-500 uppercase">Model Status</p>
+              <p className="text-xs text-gray-500 uppercase">{t("modelStatus")}</p>
               <p className="text-sm font-medium text-gray-900">NowCast v3.2.1</p>
             </div>
             <div className="h-8 w-px bg-gray-200" />
             <div>
-              <p className="text-xs text-gray-500 uppercase">Data Streams</p>
-              <p className="text-sm font-medium text-gray-900">12 Active</p>
+              <p className="text-xs text-gray-500 uppercase">{t("dataStreams")}</p>
+              <p className="text-sm font-medium text-gray-900">{t("activeStreams").replace("{count}", 12)}</p>
             </div>
             <div className="h-8 w-px bg-gray-200" />
             <div>
-              <p className="text-xs text-gray-500 uppercase">Latency</p>
+              <p className="text-xs text-gray-500 uppercase">{t("latency")}</p>
               <p className="text-sm font-medium text-gray-900">142ms</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-500">Next recalculation in:</span>
+            <span className="text-xs text-gray-500">{t("nextRecalculation")}:</span>
             <span className="text-sm font-mono text-gray-900">00:12</span>
           </div>
         </div>

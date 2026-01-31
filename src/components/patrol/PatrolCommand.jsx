@@ -7,6 +7,7 @@ import { useCity } from "@/contexts/CityContext";
 import { useAlerts } from "@/contexts/AlertContext";
 import { livePatrolService } from "@/services/livePatrolService";
 import { GOV_NAVY, GOV_ACCENT_GREEN, GOV_ACCENT_ORANGE, GOV_PRIMARY_BG } from "@/lib/designTokens";
+import { useTranslate } from "@/hooks/useTranslate";
 
 const staticZones = [
   { name: "Sector A", risk: 45, status: "covered" },
@@ -16,6 +17,7 @@ const staticZones = [
 ];
 
 export default function PatrolCommand() {
+  const { t } = useTranslate();
   const { selectedCity } = useCity();
   const { criticalAlerts, markAsDispatched } = useAlerts();
   const [dispatching, setDispatching] = useState(null);
@@ -35,6 +37,13 @@ export default function PatrolCommand() {
     setDispatching(alertId);
     markAsDispatched(alertId);
     setTimeout(() => setDispatching(null), 1500);
+  };
+
+  const translateStatus = (status) => {
+    if (status === "Responding") return t("responding");
+    if (status === "En Route") return t("enRoute");
+    if (status === "Standby") return t("standby");
+    return status;
   };
 
   const getStatusColor = (status) => {
@@ -57,11 +66,11 @@ export default function PatrolCommand() {
       <div className="lg:col-span-3 space-y-4">
         <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider flex items-center gap-2">
           <Truck className="w-4 h-4 text-gray-600" />
-          Active Units
+          {t("activeUnits")}
         </h3>
         {units.length === 0 ? (
           <div className="p-4 rounded-lg bg-white/95 border border-gray-200 border-dashed text-center">
-            <p className="text-xs text-gray-500">No active units in {selectedCity}</p>
+            <p className="text-xs text-gray-500">{t("noActiveUnits").replace("{city}", selectedCity)}</p>
           </div>
         ) : (
           units.map((unit, index) => (
@@ -84,19 +93,19 @@ export default function PatrolCommand() {
                   </div>
                 </div>
                 <Badge className={unit.status === "Responding" ? "bg-red-100 text-red-700 border-red-200" : unit.status === "En Route" ? "bg-blue-100 text-blue-700 border-blue-200" : "bg-gray-100 text-gray-700 border-gray-200"}>
-                  {unit.status}
+                  {translateStatus(unit.status)}
                 </Badge>
               </div>
               <div className="space-y-1.5 text-[10px]">
                 <div className="flex justify-between">
-                  <span className="text-gray-500 uppercase tracking-tighter">Objective</span>
+                  <span className="text-gray-500 uppercase tracking-tighter">{t("objective")}</span>
                   <span className="text-gray-900 font-medium truncate max-w-[120px]">
-                    {unit.targetAlert ? unit.targetAlert.zone : (unit.targetHotspot ? unit.targetHotspot.name : "Sector Patrol")}
+                    {unit.targetAlert ? unit.targetAlert.zone : (unit.targetHotspot ? unit.targetHotspot.name : t("sectorPatrol"))}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500 uppercase tracking-tighter">Velocity</span>
-                  <span className="text-gray-900 font-bold">{unit.status === "Responding" ? "FAST" : "NORMAL"}</span>
+                  <span className="text-gray-500 uppercase tracking-tighter">{t("velocity")}</span>
+                  <span className="text-gray-900 font-bold">{unit.status === "Responding" ? t("fast") : t("normal")}</span>
                 </div>
               </div>
             </motion.div>
@@ -110,20 +119,20 @@ export default function PatrolCommand() {
           <div className="p-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
             <div className="flex items-center gap-2">
               <Zap className="w-4 h-4 text-red-600" />
-              <h3 className="font-semibold text-gray-900">Critical Dispatch Queue</h3>
+              <h3 className="font-semibold text-gray-900">{t("dispatchQueue")}</h3>
             </div>
             <Badge className="bg-red-100 text-red-700 border-red-200">
-              {criticalAlerts.length} PENDING
+              {t("pendingAlerts").replace("{count}", criticalAlerts.length)}
             </Badge>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-200 bg-gray-50">
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Detection</th>
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Zone</th>
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Confidence</th>
-                  <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Action</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t("detection")}</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t("zone")}</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t("confidence")}</th>
+                  <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t("action")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -132,7 +141,7 @@ export default function PatrolCommand() {
                     <td colSpan="4" className="py-12 text-center text-gray-500 text-sm">
                       <div className="flex flex-col items-center gap-2">
                         <CheckCircle className="w-8 h-8 text-gray-400" />
-                        <p>All sectors in {selectedCity} are clear.</p>
+                        <p>{t("allSectorsClear").replace("{selectedCity}", selectedCity)}</p>
                       </div>
                     </td>
                   </tr>
@@ -163,10 +172,10 @@ export default function PatrolCommand() {
                           {dispatching === alert.id ? (
                             <div className="flex items-center gap-2">
                               <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                              DISPATCHING...
+                              {t("dispatching")}
                             </div>
                           ) : (
-                            "DISPATCH UNIT"
+                            t("dispatchUnit")
                           )}
                         </Button>
                       </td>
@@ -182,13 +191,15 @@ export default function PatrolCommand() {
           <div className="rounded-lg bg-white/95 border border-gray-200 p-4 border-l-4" style={{ borderLeftColor: GOV_ACCENT_GREEN }}>
             <h4 className="text-xs font-semibold text-gray-900 uppercase tracking-wider mb-4 flex items-center gap-2">
               <MapPin className="w-4 h-4 text-gray-600" />
-              Sector Status Grid
+              {t("sectorStatusGrid")}
             </h4>
             <div className="grid grid-cols-2 gap-3">
               {staticZones.map((zone) => (
                 <div key={zone.name} className={`p-3 rounded-lg border ${getStatusColor(zone.status)}`}>
                   <div className="flex justify-between items-center mb-1">
-                    <span className="text-xs font-bold text-gray-900 uppercase">{zone.name}</span>
+                    <span className="text-xs font-bold text-gray-900 uppercase">
+                      {zone.name.replace("Sector", t("sector"))}
+                    </span>
                     <span className="text-lg">{getStatusIcon(zone.status)}</span>
                   </div>
                   <div className="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden mt-2">
@@ -202,12 +213,12 @@ export default function PatrolCommand() {
           <div className="rounded-lg bg-white/95 border border-gray-200 p-5 border-l-4" style={{ borderLeftColor: GOV_NAVY }}>
             <h4 className="text-xs font-semibold text-gray-900 uppercase tracking-wider mb-4 flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-gray-600" />
-              Coverage Optimizer
+              {t("coverageOptimizer")}
             </h4>
             <div className="space-y-4">
               <div>
                 <div className="flex justify-between text-xs mb-1">
-                  <span className="text-gray-500 uppercase font-semibold">Current Coverage</span>
+                  <span className="text-gray-500 uppercase font-semibold">{t("currentCoverage")}</span>
                   <span className="text-gray-900 font-bold">68%</span>
                 </div>
                 <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
@@ -216,16 +227,16 @@ export default function PatrolCommand() {
               </div>
               <div>
                 <div className="flex justify-between text-xs mb-1">
-                  <span className="text-gray-500 uppercase font-semibold">Optimized Target</span>
+                  <span className="text-gray-500 uppercase font-semibold">{t("optimizedTarget")}</span>
                   <span className="text-gray-900 font-bold">94%</span>
                 </div>
                 <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
                   <motion.div initial={{ width: 0 }} animate={{ width: "94%" }} className="h-full rounded-full bg-blue-600" style={{ background: GOV_PRIMARY_BG }} />
                 </div>
               </div>
-              <Button className="w-full mt-4 text-white font-semibold text-xs py-5" style={{ background: GOV_PRIMARY_BG }}>
-                <Navigation className="w-4 h-4 mr-2" />
-                REDEPLOY UNITS FOR MAX COVERAGE
+              <Button className="w-full mt-4 text-white font-semibold text-[10px] py-5 px-1 leading-tight" style={{ background: GOV_PRIMARY_BG }}>
+                <Navigation className="w-4 h-4 mr-2 flex-shrink-0" />
+                {t("redeployUnits")}
               </Button>
             </div>
           </div>

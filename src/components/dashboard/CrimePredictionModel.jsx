@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { AlertTriangle, MapPin, Clock, TrendingUp, Zap } from 'lucide-react';
 import { useCrimeModel } from '@/hooks/useCrimeModel';
 import { GOV_PRIMARY_BG, GOV_NAVY, GOV_ACCENT_GREEN, GOV_ACCENT_ORANGE } from '@/lib/designTokens';
+import { useTranslate } from '@/hooks/useTranslate';
 
 /**
  * CrimePredictionModel
@@ -10,6 +11,7 @@ import { GOV_PRIMARY_BG, GOV_NAVY, GOV_ACCENT_GREEN, GOV_ACCENT_ORANGE } from '@
  */
 
 export default function CrimePredictionModel({ onPredictionHourChange, onPredictionChange }) {
+  const { t } = useTranslate();
   const { predict } = useCrimeModel();
   const [selectedCity, setSelectedCity] = useState('Delhi');
   const [selectedHour, setSelectedHour] = useState(new Date().getHours());
@@ -77,14 +79,14 @@ export default function CrimePredictionModel({ onPredictionHourChange, onPredict
       >
         <h3 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
           <Zap className="w-5 h-5 text-gray-600" />
-          AI Crime Prediction Model
+          {t("predictionModelTitle")}
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div>
             <label className="block text-sm font-medium text-gray-500 mb-2">
               <MapPin className="w-4 h-4 inline mr-2" />
-              Select City
+              {t("selectCity")}
             </label>
             <select
               value={selectedCity}
@@ -101,7 +103,7 @@ export default function CrimePredictionModel({ onPredictionHourChange, onPredict
           <div>
             <label className="block text-sm font-medium text-gray-500 mb-2">
               <Clock className="w-4 h-4 inline mr-2" />
-              Select Hour
+              {t("selectHour")}
             </label>
             <select
               value={selectedHour}
@@ -124,7 +126,7 @@ export default function CrimePredictionModel({ onPredictionHourChange, onPredict
               className="w-full px-6 py-2 text-white font-semibold rounded-lg transition-all hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
               style={{ background: GOV_PRIMARY_BG }}
             >
-              {loading ? 'Predicting...' : 'Predict Future Crime'}
+              {loading ? t("predicting") : t("predictFutureCrime")}
             </button>
           </div>
         </div>
@@ -145,36 +147,40 @@ export default function CrimePredictionModel({ onPredictionHourChange, onPredict
           <div className="relative z-10">
             <div className="flex items-start justify-between mb-6">
               <div>
-                <h3 className="text-2xl font-bold text-gray-900">Crime Prediction Report</h3>
+                <h3 className="text-2xl font-bold text-gray-900">{t("crimePredictionReport")}</h3>
                 <p className="text-gray-500 text-sm mt-2">
                   {prediction.city} • {prediction.hour === 0 ? '12 AM' : prediction.hour < 12 ? `${prediction.hour} AM` : prediction.hour === 12 ? '12 PM' : `${prediction.hour - 12} PM`}
                 </p>
               </div>
               <div className={`px-4 py-2 rounded-full border font-bold text-lg ${colors.badge}`}>
-                {prediction.riskLevel}
+                {t(`risk${prediction.riskLevel.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join('')}`)}
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 border-l-4" style={{ borderLeftColor: GOV_NAVY }}>
-                <p className="text-gray-500 text-sm mb-2">Predicted Crime Rate</p>
+                <p className="text-gray-500 text-sm mb-2">{t("predictedCrimeRate")}</p>
                 <p className="text-3xl font-bold text-gray-900">{prediction.predictedRate.toFixed(1)}</p>
-                <p className="text-xs text-gray-500 mt-1">Per 100k people</p>
+                <p className="text-xs text-gray-500 mt-1">{t("per100k")}</p>
               </div>
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 border-l-4" style={{ borderLeftColor: colors.border }}>
-                <p className="text-gray-500 text-sm mb-2">Risk Level</p>
-                <p className={`text-2xl font-bold ${colors.text}`}>{prediction.riskLevel}</p>
-                <p className="text-xs text-gray-500 mt-1">Threat Assessment</p>
+                <p className="text-gray-500 text-sm mb-2">{t("riskLevel")}</p>
+                <p className={`text-2xl font-bold ${colors.text}`}>
+                  {t(`risk${prediction.riskLevel.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join('')}`)}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">{t("threatAssessment")}</p>
               </div>
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 border-l-4" style={{ borderLeftColor: GOV_ACCENT_ORANGE }}>
-                <p className="text-gray-500 text-sm mb-2">Primary Crime Type</p>
-                <p className="text-xl font-bold text-gray-900">{prediction.crimeType}</p>
-                <p className="text-xs text-gray-500 mt-1">Most Likely Category</p>
+                <p className="text-gray-500 text-sm mb-2">{t("primaryCrimeType")}</p>
+                <p className="text-xl font-bold text-gray-900">
+                  {t(`crime${prediction.crimeType.replace(' ', '')}`)}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">{t("mostLikelyCategory")}</p>
               </div>
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 border-l-4" style={{ borderLeftColor: GOV_ACCENT_GREEN }}>
-                <p className="text-gray-500 text-sm mb-2">Likely Specific Crime</p>
+                <p className="text-gray-500 text-sm mb-2">{t("likelySpecificCrime")}</p>
                 <p className="text-lg font-bold text-gray-900">{prediction.specificCrime}</p>
-                <p className="text-xs text-gray-500 mt-1">Predicted Incident</p>
+                <p className="text-xs text-gray-500 mt-1">{t("predictedIncident")}</p>
               </div>
             </div>
 
@@ -186,7 +192,7 @@ export default function CrimePredictionModel({ onPredictionHourChange, onPredict
                 </h4>
                 <p className="text-2xl font-bold text-gray-900 mb-2">{prediction.confidence.toFixed(2)}%</p>
                 <p className="text-sm text-gray-500">
-                  <strong className="text-gray-700">Model:</strong> Gradient Boosting<br/>
+                  <strong className="text-gray-700">Model:</strong> Gradient Boosting<br />
                   <strong className="text-gray-700">Accuracy:</strong> 99.98%
                 </p>
               </div>
@@ -197,7 +203,7 @@ export default function CrimePredictionModel({ onPredictionHourChange, onPredict
                 </h4>
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-500">Threat Score:</span>
+                    <span className="text-sm text-gray-500">{t("threatScore")}:</span>
                     <span className="font-bold text-gray-900">{prediction.threatLevel}/10</span>
                   </div>
                   <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">

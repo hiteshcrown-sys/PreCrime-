@@ -3,13 +3,14 @@ import { motion } from "framer-motion";
 import { MapPin, CheckCircle, Shield } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCrimeModel } from "@/hooks/useCrimeModel";
+import { useTranslate } from "@/hooks/useTranslate";
 
 // Month labels for reference
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 // Crime zones mapping
 const CRIME_ZONES = [
-  "Delhi", "Mumbai", "Bangalore", "Hyderabad", "Chennai", 
+  "Delhi", "Mumbai", "Bangalore", "Hyderabad", "Chennai",
   "Kolkata", "Pune", "Ahmedabad"
 ];
 
@@ -23,30 +24,35 @@ const performanceMetrics = [
 ];
 
 export default function FullAnalytics() {
+  const { t } = useTranslate();
   const [timeRange, setTimeRange] = useState("12months");
   const [selectedZone, setSelectedZone] = useState("all");
   const { predict, getCityRankings, getModelInfo } = useCrimeModel();
 
+  const MONTHS_T = useMemo(() => {
+    return ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"].map(m => t(m));
+  }, [t]);
+
   // Generate historical data based on ML predictions
   const historicalData = useMemo(() => {
-    return MONTHS.map((month, monthIndex) => {
+    return MONTHS_T.map((month, monthIndex) => {
       const hour = 12; // Average prediction for noon
       const city = CRIME_ZONES[monthIndex % CRIME_ZONES.length];
-      
+
       try {
         // Get base prediction from model
         const basePrediction = predict(city, hour);
         const baseIncidents = Math.round((basePrediction?.predictedRate) || 300);
-        
+
         // Simulate seasonal variation (0.8x to 1.3x base)
         const seasonalFactor = 0.8 + (monthIndex / 12) * 0.5;
         const incidents = Math.round(baseIncidents * seasonalFactor);
-        
+
         // Crime prevention success rate: ~80% prevented, ~20% occurred
         const preventionRate = 0.80 + Math.random() * 0.05;
         const prevented = Math.round(incidents * preventionRate);
         const occurred = incidents - prevented;
-        
+
         return {
           month,
           incidents: Math.max(50, incidents),
@@ -72,15 +78,15 @@ export default function FullAnalytics() {
         const prediction = predict(zone, 12);
         const baseAccuracy = (prediction?.accuracy) || 99.98;
         const predictedRate = (prediction?.predictedRate) || 300;
-        
+
         // Scale accuracy based on city risk (higher risk = slightly lower accuracy)
         const accuracy = Math.max(85, Math.min(99.9, baseAccuracy - (predictedRate / 600) * 5));
-        
+
         // Incident calculations
         const predictions = Math.round(predictedRate || 200);
         const prevented = Math.round(predictions * 0.82);
         const occurred = predictions - prevented;
-        
+
         return {
           zone,
           predictions: Math.max(50, predictions),
@@ -105,10 +111,10 @@ export default function FullAnalytics() {
   const dynamicPerformanceMetrics = useMemo(() => {
     try {
       const metrics = getModelInfo();
-      
+
       return performanceMetrics.map(metric => {
         let current = metric.baseline;
-        
+
         // Apply realistic improvements
         if (metric.metric === "Overall Accuracy") {
           current = 99.98; // Gradient Boosting accuracy
@@ -123,11 +129,11 @@ export default function FullAnalytics() {
         } else if (metric.metric === "False Negative Rate") {
           current = 0.05;
         }
-        
+
         const change = (current - metric.baseline).toFixed(2);
         const isPositive = metric.isReverse ? change < 0 : change > 0;
         const changeStr = change < 0 ? change : `+${change}`;
-        
+
         return {
           metric: metric.metric,
           current: metric.metric.includes("Rate") ? `${current}%` : `${current}%`,
@@ -149,15 +155,15 @@ export default function FullAnalytics() {
   }, [getModelInfo]);
 
   const maxIncidents = Math.max(...historicalData.map(d => d.incidents || 0));
-  
+
   // Ensure maxIncidents is a valid number
   const safeMaxIncidents = maxIncidents && maxIncidents > 0 ? maxIncidents : 1;
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-semibold text-gray-900">Reports</h1>
-        <p className="text-sm text-gray-500 mt-1">Comprehensive performance metrics and historical analysis</p>
+        <h1 className="text-xl font-semibold text-gray-900">{t("reportsTitle")}</h1>
+        <p className="text-sm text-gray-500 mt-1">{t("reportsSubtitle")}</p>
       </div>
 
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -182,8 +188,8 @@ export default function FullAnalytics() {
         style={{ borderTopWidth: 3, borderTopColor: "#000080" }}
       >
         <div className="p-4 border-b border-gray-200">
-          <h3 className="font-semibold text-gray-900">System Comparison</h3>
-          <p className="text-xs text-gray-500 mt-0.5">Traditional vs AI platform</p>
+          <h3 className="font-semibold text-gray-900">{t("systemComparison")}</h3>
+          <p className="text-xs text-gray-500 mt-0.5">{t("traditionalVsAI")}</p>
         </div>
         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="p-4 rounded-lg bg-gray-50 border border-gray-200 border-l-4" style={{ borderLeftColor: "#ea580c" }}>
@@ -192,14 +198,14 @@ export default function FullAnalytics() {
                 <Shield className="w-5 h-5 text-gray-600" />
               </div>
               <div>
-                <p className="font-semibold text-gray-900">Traditional Systems</p>
-                <p className="text-xs text-gray-500">Rule-based analytics</p>
+                <p className="font-semibold text-gray-900">{t("traditionalSystems")}</p>
+                <p className="text-xs text-gray-500">{t("ruleBasedAnalytics")}</p>
               </div>
             </div>
             <div className="space-y-4">
               <div>
                 <div className="flex justify-between text-sm mb-2">
-                  <span className="text-gray-500">Prediction Accuracy</span>
+                  <span className="text-gray-500">{t("predictionAccuracy")}</span>
                   <span className="font-bold text-gray-900">78%</span>
                 </div>
                 <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
@@ -208,7 +214,7 @@ export default function FullAnalytics() {
               </div>
               <div>
                 <div className="flex justify-between text-sm mb-2">
-                  <span className="text-gray-500">Response Time</span>
+                  <span className="text-gray-500">{t("responseTime")}</span>
                   <span className="font-bold text-gray-900">18 min</span>
                 </div>
                 <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
@@ -217,7 +223,7 @@ export default function FullAnalytics() {
               </div>
               <div>
                 <div className="flex justify-between text-sm mb-2">
-                  <span className="text-gray-500">Crime Prevention Rate</span>
+                  <span className="text-gray-500">{t("crimePreventionRate")}</span>
                   <span className="font-bold text-gray-900">65%</span>
                 </div>
                 <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
@@ -232,14 +238,14 @@ export default function FullAnalytics() {
                 <Shield className="w-5 h-5 text-gray-600" />
               </div>
               <div>
-                <p className="font-semibold text-gray-900">AI Platform</p>
+                <p className="font-semibold text-gray-900">{t("aiPlatform")}</p>
                 <p className="text-xs text-gray-500">PreCrime AI v3.2.1</p>
               </div>
             </div>
             <div className="space-y-4">
               <div>
                 <div className="flex justify-between text-sm mb-2">
-                  <span className="text-gray-500">Prediction Accuracy</span>
+                  <span className="text-gray-500">{t("predictionAccuracy")}</span>
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-gray-900">99.98%</span>
                     <CheckCircle className="w-4 h-4 text-green-600" />
@@ -251,7 +257,7 @@ export default function FullAnalytics() {
               </div>
               <div>
                 <div className="flex justify-between text-sm mb-2">
-                  <span className="text-gray-500">Response Time</span>
+                  <span className="text-gray-500">{t("responseTime")}</span>
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-gray-900">3.2 min</span>
                     <CheckCircle className="w-4 h-4 text-green-600" />
@@ -263,7 +269,7 @@ export default function FullAnalytics() {
               </div>
               <div>
                 <div className="flex justify-between text-sm mb-2">
-                  <span className="text-gray-500">Crime Prevention Rate</span>
+                  <span className="text-gray-500">{t("crimePreventionRate")}</span>
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-gray-900">94%</span>
                     <CheckCircle className="w-4 h-4 text-green-600" />
@@ -276,7 +282,7 @@ export default function FullAnalytics() {
             </div>
             <div className="mt-4 pt-4 border-t border-gray-200">
               <p className="text-xs text-gray-600 font-medium">
-                ✓ +22% accuracy improvement (78% → 99.98%) · ✓ 82% faster response · ✓ +29% more crimes prevented
+                ✓ +22% {t("accuracyImprovement")} (78% → 99.98%) · ✓ 82% {t("fasterResponse")} · ✓ +29% {t("moreCrimesPrevented")}
               </p>
             </div>
           </div>
@@ -286,10 +292,10 @@ export default function FullAnalytics() {
       {/* Historical Trends */}
       <div className="rounded-lg bg-white/95 border border-gray-200 overflow-hidden" style={{ borderTopWidth: 3, borderTopColor: "#138808" }}>
         <div className="p-4 border-b border-gray-200">
-          <h3 className="font-semibold text-gray-900">Historical Crime Trends</h3>
-          <p className="text-xs text-gray-500 mt-0.5">Monthly incidents, prevention rate, and outcomes</p>
+          <h3 className="font-semibold text-gray-900">{t("historicalCrimeTrends")}</h3>
+          <p className="text-xs text-gray-500 mt-0.5">{t("monthlyIncidents")}</p>
         </div>
-        
+
         <div className="p-6">
           <div className="h-80 flex items-end gap-2">
             {historicalData.map((data, index) => (
@@ -320,8 +326,8 @@ export default function FullAnalytics() {
                   <div className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity cursor-pointer z-10">
                     <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs whitespace-nowrap shadow-sm">
                       <p className="text-gray-900 font-medium">{data.month}</p>
-                      <p className="text-green-700">Prevented: {data.prevented}</p>
-                      <p className="text-red-600">Occurred: {data.occurred}</p>
+                      <p className="text-green-700">{t("prevented")}: {data.prevented}</p>
+                      <p className="text-red-600">{t("occurred")}: {data.occurred}</p>
                     </div>
                   </div>
                 </div>
@@ -329,19 +335,19 @@ export default function FullAnalytics() {
               </motion.div>
             ))}
           </div>
-          
+
           <div className="flex items-center justify-center gap-6 mt-6 text-xs text-gray-600">
             <span className="flex items-center gap-2">
               <span className="w-3 h-3 bg-gray-400 rounded" />
-              Total Incidents
+              {t("totalIncidents")}
             </span>
             <span className="flex items-center gap-2">
               <span className="w-3 h-3 bg-green-600 rounded" />
-              Prevented
+              {t("prevented")}
             </span>
             <span className="flex items-center gap-2">
               <span className="w-3 h-3 bg-red-500 rounded" />
-              Occurred
+              {t("occurred")}
             </span>
           </div>
         </div>
@@ -350,8 +356,8 @@ export default function FullAnalytics() {
       {/* Model Performance Metrics */}
       <div className="rounded-lg bg-white/95 border border-gray-200 overflow-hidden" style={{ borderTopWidth: 3, borderTopColor: "#000080" }}>
         <div className="p-4 border-b border-gray-200">
-          <h3 className="font-semibold text-gray-900">Model Performance Metrics</h3>
-          <p className="text-xs text-gray-500 mt-0.5">Key ML model evaluation metrics</p>
+          <h3 className="font-semibold text-gray-900">{t("modelPerformanceMetrics")}</h3>
+          <p className="text-xs text-gray-500 mt-0.5">{t("modelEvalMetrics")}</p>
         </div>
         <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {dynamicPerformanceMetrics.map((metric, index) => (
@@ -381,18 +387,18 @@ export default function FullAnalytics() {
       {/* Zone-wise Logs */}
       <div className="rounded-lg bg-white/95 border border-gray-200 overflow-hidden" style={{ borderTopWidth: 3, borderTopColor: "#138808" }}>
         <div className="p-4 border-b border-gray-200">
-          <h3 className="font-semibold text-gray-900">Zone-wise Performance Log</h3>
-          <p className="text-xs text-gray-500 mt-0.5">Detailed breakdown by zone</p>
+          <h3 className="font-semibold text-gray-900">{t("zonePerformanceLog")}</h3>
+          <p className="text-xs text-gray-500 mt-0.5">{t("zoneDetailedBreakdown")}</p>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">
-                <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Zone</th>
-                <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Predictions</th>
-                <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Prevented</th>
-                <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Occurred</th>
-                <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Accuracy</th>
+                <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">{t("zone")}</th>
+                <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase">{t("predictions")}</th>
+                <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase">{t("prevented")}</th>
+                <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase">{t("occurred")}</th>
+                <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase">{t("accuracy")}</th>
               </tr>
             </thead>
             <tbody>

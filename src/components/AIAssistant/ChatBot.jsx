@@ -5,10 +5,14 @@ import ChatBotContext from '@/contexts/ChatBotContext';
 import { useAlerts } from '@/contexts/AlertContext';
 import { generateChatbotResponse, getQuickSuggestions, getOutOfScopeResponse, isOutOfScope, getEthicalDisclaimer } from '@/utils/chatbotIntelligence';
 import ReactMarkdown from 'react-markdown';
+import { useTranslate } from '@/hooks/useTranslate';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function ChatBot() {
   const context = useContext(ChatBotContext);
   const [showSuggestions, setShowSuggestions] = useState(true);
+  const { t } = useTranslate();
+  const { selectedLanguage } = useLanguage();
 
   if (!context) {
     return null;
@@ -62,15 +66,17 @@ export default function ChatBot() {
       let response = '';
 
       // Check for dispatch command
-      const isDispatchCmd = /dispatch|send|patrol/i.test(text);
+      const isDispatchCmd = /dispatch|send|patrol|डिस्पैच|गस्त|तैनात|गस्त/i.test(text); // Added Hindi/Marathi keywords
       if (isDispatchCmd && criticalAlerts.length > 0) {
         const targetAlert = criticalAlerts[0]; // Dispatch to highest priority/oldest active alert
         markAsDispatched(targetAlert.id);
-        response = `Affirmative. **Dispatching patrol unit** to ${targetAlert.zone} for ${targetAlert.type}. Direct visual tracking is now active on the map.`;
+        response = t('dispatchingPatrol')
+          .replace('{type}', targetAlert.type)
+          .replace('{zone}', targetAlert.zone);
       } else if (isDispatchCmd && criticalAlerts.length === 0) {
-        response = "Negative. All sectors are currently clear of critical alerts. No immediate dispatch required.";
+        response = t('noAlertsToDispatch');
       } else if (isOutOfScope(text)) {
-        response = getOutOfScopeResponse();
+        response = getOutOfScopeResponse(t);
       } else {
         // Generate intelligent response based on context
         response = generateChatbotResponse(text, {
@@ -78,14 +84,14 @@ export default function ChatBot() {
           factors: currentFactors,
           city: selectedCity,
           hour: selectedHour
-        });
+        }, t);
       }
 
       addBotMessage(response);
 
       // Add ethical disclaimer if needed
-      if (currentPrediction && getEthicalDisclaimer(currentPrediction)) {
-        const disclaimer = getEthicalDisclaimer(currentPrediction);
+      if (currentPrediction && getEthicalDisclaimer(currentPrediction, t)) {
+        const disclaimer = getEthicalDisclaimer(currentPrediction, t);
         setTimeout(() => {
           addBotMessage(disclaimer);
         }, 800);
@@ -105,7 +111,7 @@ export default function ChatBot() {
     }, 50);
   };
 
-  const quickSuggestions = getQuickSuggestions(!!currentPrediction);
+  const quickSuggestions = getQuickSuggestions(t, !!currentPrediction);
 
   return (
     <>
@@ -115,7 +121,7 @@ export default function ChatBot() {
         className="fixed bottom-6 right-6 z-[9999] w-14 h-14 rounded-full bg-gradient-to-br from-cyan-500 to-purple-600 text-white shadow-lg hover:shadow-2xl transition-all flex items-center justify-center hover:scale-110"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
-        title="Open AI Assistant"
+        title={t('openAiAssistant')}
       >
         <AnimatePresence mode="wait">
           {isOpen ? (
@@ -156,9 +162,9 @@ export default function ChatBot() {
             <div className="bg-gradient-to-r from-cyan-500/20 to-purple-600/20 border-b border-slate-700 p-4">
               <div className="flex items-center gap-2 mb-1">
                 <Sparkles className="w-4 h-4 text-cyan-400" />
-                <h2 className="text-white font-bold text-lg">AI Assistant</h2>
+                <h2 className="text-white font-bold text-lg">{t('aiAssistant')}</h2>
               </div>
-              <p className="text-xs text-slate-400">Ask about predictions, how the model works, or anything about crime analysis</p>
+              <p className="text-xs text-slate-400">{t('askAboutPredictions')}</p>
             </div>
 
             {/* Messages area */}
@@ -173,8 +179,8 @@ export default function ChatBot() {
                 >
                   <div
                     className={`max-w-xs px-4 py-3 rounded-lg ${msg.type === 'user'
-                        ? 'bg-purple-600 text-white rounded-br-none shadow-md'
-                        : 'bg-slate-800 text-slate-100 rounded-bl-none border border-slate-700'
+                      ? 'bg-purple-600 text-white rounded-br-none shadow-md'
+                      : 'bg-slate-800 text-slate-100 rounded-bl-none border border-slate-700'
                       }`}
                   >
                     <div className="text-sm leading-relaxed">
@@ -197,7 +203,7 @@ export default function ChatBot() {
                       )}
                     </div>
                     <span className="text-xs opacity-60 mt-2 block">
-                      {msg.timestamp.toLocaleTimeString('en-US', {
+                      {msg.timestamp.toLocaleTimeString(selectedLanguage === 'hi' ? 'hi-IN' : selectedLanguage === 'mr' ? 'mr-IN' : 'en-US', {
                         hour: '2-digit',
                         minute: '2-digit'
                       })}
@@ -229,7 +235,7 @@ export default function ChatBot() {
                   animate={{ opacity: 1, y: 0 }}
                   className="flex flex-col gap-2 mt-4"
                 >
-                  <p className="text-xs text-slate-500 px-2">Quick questions:</p>
+                  <p className="text-xs text-slate-500 px-2">{t('quickQuestions')}</p>
                   <div className="flex flex-wrap gap-2">
                     {quickSuggestions.map((suggestion, idx) => (
                       <motion.button
@@ -259,7 +265,7 @@ export default function ChatBot() {
                 <input
                   ref={inputRef}
                   type="text"
-                  placeholder="Ask me anything or say 'dispatch'..."
+                  placeholder={t('askAnything')}
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   disabled={isLoading}

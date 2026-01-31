@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Target, CheckCircle, XCircle, Clock, TrendingUp, AlertTriangle, Shield, BarChart3 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import KPICard from "@/components/dashboard/KPICard";
+import { useTranslate } from "@/hooks/useTranslate";
 
 const interventions = [
   {
@@ -98,9 +99,10 @@ const stats = {
 
 export default function InterventionTracker() {
   const [filter, setFilter] = useState("all");
+  const { t } = useTranslate();
 
-  const filteredInterventions = filter === "all" 
-    ? interventions 
+  const filteredInterventions = filter === "all"
+    ? interventions
     : interventions.filter(i => i.outcome === filter);
 
   return (
@@ -111,42 +113,42 @@ export default function InterventionTracker() {
           <Target className="w-6 h-6 text-cyan-400" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-white">Intervention Tracker</h1>
-          <p className="text-slate-400 text-sm">Closed-loop learning and effectiveness tracking</p>
+          <h1 className="text-2xl font-bold text-white">{t('interventionTracker')}</h1>
+          <p className="text-slate-400 text-sm">{t('closedLoopLearning')}</p>
         </div>
       </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <KPICard
-          title="Success Rate"
+          title={t('successRate')}
           value={`${stats.successRate}%`}
-          subtitle="Crimes prevented"
+          subtitle={t('crimesPrevented')}
           icon={CheckCircle}
           accentColor="green"
           trend="up"
           trendValue="+2.1% this week"
         />
         <KPICard
-          title="Predictions Made"
+          title={t('predictionsMade')}
           value={stats.totalPredictions}
-          subtitle="Last 30 days"
+          subtitle={t('last30Days')}
           icon={BarChart3}
           accentColor="cyan"
         />
         <KPICard
-          title="Avg Response Time"
+          title={t('avgResponseTime')}
           value={stats.avgResponseTime}
-          subtitle="Prediction to action"
+          subtitle={t('predictionToAction')}
           icon={Clock}
           accentColor="purple"
           trend="down"
           trendValue="-1.5 min improvement"
         />
         <KPICard
-          title="Model Accuracy"
+          title={t('modelAccuracy')}
           value="94.2%"
-          subtitle="Outcome verification"
+          subtitle={t('outcomeVerification')}
           icon={TrendingUp}
           accentColor="green"
           trend="up"
@@ -157,8 +159,8 @@ export default function InterventionTracker() {
       {/* Success Rate Visualization */}
       <div className="rounded-2xl bg-slate-900/50 border border-slate-800 overflow-hidden">
         <div className="p-4 border-b border-slate-800">
-          <h3 className="font-semibold text-white">Outcome Distribution</h3>
-          <p className="text-xs text-slate-500 mt-0.5">Prediction outcomes for the last 30 days</p>
+          <h3 className="font-semibold text-white">{t('outcomeDistribution')}</h3>
+          <p className="text-xs text-slate-500 mt-0.5">{t('last30Days')}</p>
         </div>
         <div className="p-6">
           <div className="flex items-center gap-8">
@@ -189,7 +191,7 @@ export default function InterventionTracker() {
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center">
                   <p className="text-2xl font-bold text-white">{stats.prevented}</p>
-                  <p className="text-xs text-slate-400">Prevented</p>
+                  <p className="text-xs text-slate-400">{t('prevented')}</p>
                 </div>
               </div>
             </div>
@@ -200,19 +202,19 @@ export default function InterventionTracker() {
                 <div className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 text-green-400" />
                   <div>
-                    <p className="font-medium text-white">Crimes Prevented</p>
-                    <p className="text-xs text-slate-400">Successful interventions</p>
+                    <p className="font-medium text-white">{t('crimesPrevented')}</p>
+                    <p className="text-xs text-slate-400">{t('successfulInterventions')}</p>
                   </div>
                 </div>
                 <p className="text-2xl font-bold text-green-400">{stats.prevented}</p>
               </div>
-              
+
               <div className="flex items-center justify-between p-3 rounded-lg bg-red-500/10 border border-red-500/30">
                 <div className="flex items-center gap-3">
                   <XCircle className="w-5 h-5 text-red-400" />
                   <div>
-                    <p className="font-medium text-white">Crimes Occurred</p>
-                    <p className="text-xs text-slate-400">Despite prediction</p>
+                    <p className="font-medium text-white">{t('crimesOccurred')}</p>
+                    <p className="text-xs text-slate-400">{t('despitePrediction')}</p>
                   </div>
                 </div>
                 <p className="text-2xl font-bold text-red-400">{stats.occurred}</p>
@@ -226,25 +228,25 @@ export default function InterventionTracker() {
       <div className="rounded-2xl bg-slate-900/50 border border-slate-800 overflow-hidden">
         <div className="p-4 border-b border-slate-800 flex items-center justify-between">
           <div>
-            <h3 className="font-semibold text-white">Intervention Timeline</h3>
-            <p className="text-xs text-slate-500 mt-0.5">Prediction → Intervention → Outcome</p>
+            <h3 className="font-semibold text-white">{t('interventionTimeline')}</h3>
+            <p className="text-xs text-slate-500 mt-0.5">{t('predictionTime')} → {t('intervention')} → {t('outcome')}</p>
           </div>
-          
+
           <Tabs value={filter} onValueChange={setFilter}>
             <TabsList className="bg-slate-800/50 border border-slate-700">
               <TabsTrigger value="all" className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400 text-xs">
-                All
+                {t('all')}
               </TabsTrigger>
               <TabsTrigger value="prevented" className="data-[state=active]:bg-green-500/20 data-[state=active]:text-green-400 text-xs">
-                Prevented
+                {t('prevented')}
               </TabsTrigger>
               <TabsTrigger value="occurred" className="data-[state=active]:bg-red-500/20 data-[state=active]:text-red-400 text-xs">
-                Occurred
+                {t('occurred')}
               </TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
-        
+
         <div className="divide-y divide-slate-800/50">
           {filteredInterventions.map((item, index) => (
             <motion.div
@@ -256,10 +258,9 @@ export default function InterventionTracker() {
             >
               <div className="flex items-start gap-4">
                 {/* Status icon */}
-                <div className={`p-2 rounded-lg ${
-                  item.outcome === "prevented" ? "bg-green-500/20" : "bg-red-500/20"
-                }`}>
-                  {item.outcome === "prevented" 
+                <div className={`p-2 rounded-lg ${item.outcome === "prevented" ? "bg-green-500/20" : "bg-red-500/20"
+                  }`}>
+                  {item.outcome === "prevented"
                     ? <CheckCircle className="w-5 h-5 text-green-400" />
                     : <XCircle className="w-5 h-5 text-red-400" />
                   }
@@ -281,12 +282,11 @@ export default function InterventionTracker() {
                         </span>
                       </div>
                     </div>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      item.outcome === "prevented" 
-                        ? "bg-green-500/20 text-green-400" 
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${item.outcome === "prevented"
+                        ? "bg-green-500/20 text-green-400"
                         : "bg-red-500/20 text-red-400"
-                    }`}>
-                      {item.outcome === "prevented" ? "Prevented" : "Occurred"}
+                      }`}>
+                      {item.outcome === "prevented" ? t('prevented') : t('occurred')}
                     </span>
                   </div>
 
@@ -294,18 +294,16 @@ export default function InterventionTracker() {
                   <div className="mt-3 flex items-center gap-2">
                     <div className="flex items-center gap-1 text-xs">
                       <span className="w-2 h-2 rounded-full bg-orange-400" />
-                      <span className="text-slate-500">Prediction</span>
+                      <span className="text-slate-500">{t('prediction')}</span>
                     </div>
                     <div className="flex-1 h-1 bg-slate-700 rounded relative">
-                      <div className={`absolute left-0 top-0 h-full rounded ${
-                        item.outcome === "prevented" ? "bg-green-500" : "bg-red-500"
-                      }`} style={{ width: `${item.confidence}%` }} />
+                      <div className={`absolute left-0 top-0 h-full rounded ${item.outcome === "prevented" ? "bg-green-500" : "bg-red-500"
+                        }`} style={{ width: `${item.confidence}%` }} />
                     </div>
                     <div className="flex items-center gap-1 text-xs">
-                      <span className={`w-2 h-2 rounded-full ${
-                        item.outcome === "prevented" ? "bg-green-400" : "bg-red-400"
-                      }`} />
-                      <span className="text-slate-500">Outcome</span>
+                      <span className={`w-2 h-2 rounded-full ${item.outcome === "prevented" ? "bg-green-400" : "bg-red-400"
+                        }`} />
+                      <span className="text-slate-500">{t('outcome')}</span>
                     </div>
                     <span className="text-xs text-cyan-400 ml-2">{item.confidence}% conf</span>
                   </div>

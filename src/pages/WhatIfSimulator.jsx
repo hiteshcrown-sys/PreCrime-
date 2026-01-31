@@ -4,6 +4,7 @@ import { FlaskConical, Shield, Lightbulb, Lock, Users, ArrowRight, RotateCcw, Pl
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useTranslate } from "@/hooks/useTranslate";
 import { predictScenario, CITY_BASE_RATES } from "@/utils/crimeModelService";
 import crimeModelService from "@/utils/crimeModelService";
 
@@ -43,13 +44,14 @@ const createZonesFromCities = () => {
 const zones = createZonesFromCities();
 
 const interventions = [
-  { id: "patrols", name: "Police Patrols", icon: Shield, maxValue: 10, unit: "teams", description: "Additional police presence in high-risk areas" },
-  { id: "lighting", name: "Street Lighting", icon: Lightbulb, maxValue: 10, unit: "sites", description: "Improved lighting to deter criminal activity" },
-  { id: "access", name: "Access Control", icon: Lock, maxValue: 10, unit: "points", description: "Controlled entry points and security measures" },
-  { id: "community", name: "Community Programs", icon: Users, maxValue: 10, unit: "initiatives", description: "Local engagement and prevention programs" }
+  { id: "patrols", key: "policePatrols", icon: Shield, maxValue: 10, unit: "teams", descKey: "patrolsDesc" },
+  { id: "lighting", key: "streetLighting", icon: Lightbulb, maxValue: 10, unit: "sites", descKey: "lightingDesc" },
+  { id: "access", key: "accessControl", icon: Lock, maxValue: 10, unit: "points", descKey: "accessDesc" },
+  { id: "community", key: "communityPrograms", icon: Users, maxValue: 10, unit: "initiatives", descKey: "communityDesc" }
 ];
 
 const HeatmapGrid = ({ prediction, label }) => {
+  const { t } = useTranslate();
   if (!prediction) return null;
 
   const riskScore = prediction.riskScore * 100; // Convert to percentage for display
@@ -62,7 +64,7 @@ const HeatmapGrid = ({ prediction, label }) => {
 
   return (
     <div className="p-4 rounded-lg bg-white/95 border border-gray-200">
-      <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">{label}</p>
+      <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">{t(label)}</p>
       <div className="grid grid-cols-8 gap-1 mb-3">
         {cells.map((cellRisk, i) => (
           <motion.div
@@ -82,20 +84,21 @@ const HeatmapGrid = ({ prediction, label }) => {
       </div>
       <div className="flex items-center justify-between">
         <span className="text-2xl font-bold text-gray-900">{Math.round(prediction.predictedRate)}</span>
-        <span className="text-xs text-gray-500">Predicted Crimes</span>
+        <span className="text-xs text-gray-500">{t("predictedCrimes")}</span>
       </div>
       <div className="mt-2 text-xs text-gray-500">
-        Risk Level: <span className={`font-medium ${prediction.riskLevel === 'CRITICAL' ? 'text-red-400' :
-            prediction.riskLevel === 'HIGH' ? 'text-orange-400' :
-              prediction.riskLevel === 'MEDIUM' ? 'text-yellow-400' :
-                prediction.riskLevel === 'LOW' ? 'text-blue-400' : 'text-green-400'
-          }`}>{prediction.riskLevel}</span>
+        {t("riskLevel")}: <span className={`font-medium ${prediction.riskLevel === 'CRITICAL' ? 'text-red-400' :
+          prediction.riskLevel === 'HIGH' ? 'text-orange-400' :
+            prediction.riskLevel === 'MEDIUM' ? 'text-yellow-400' :
+              prediction.riskLevel === 'LOW' ? 'text-blue-400' : 'text-green-400'
+          }`}>{t(`risk${prediction.riskLevel.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join('')}`)}</span>
       </div>
     </div>
   );
 };
 
 export default function WhatIfSimulator() {
+  const { t } = useTranslate();
   console.log('WhatIfSimulator rendering...');
   console.log('zones:', zones);
   console.log('zones[0]:', zones[0]);
@@ -185,8 +188,8 @@ export default function WhatIfSimulator() {
             <FlaskConical className="w-6 h-6 text-gray-700" />
           </div>
           <div>
-            <h1 className="text-xl font-semibold text-gray-900">Scenario Planning</h1>
-            <p className="text-gray-500 text-sm">Test crime prevention strategies</p>
+            <h1 className="text-xl font-semibold text-gray-900">{t("navScenarioPlanning")}</h1>
+            <p className="text-gray-500 text-sm">{t("scenarioSubtitle")}</p>
           </div>
         </div>
 
@@ -214,8 +217,8 @@ export default function WhatIfSimulator() {
         {/* Intervention Controls – light theme, green/orange accents */}
         <div className="rounded-lg bg-white/95 border border-gray-200 overflow-hidden" style={{ borderTopWidth: 3, borderTopColor: "#2563eb" }}>
           <div className="p-4 border-b border-gray-200">
-            <h3 className="font-semibold text-gray-900">Prevention Strategies</h3>
-            <p className="text-xs text-gray-500 mt-0.5">Select and adjust intervention measures</p>
+            <h3 className="font-semibold text-gray-900">{t("navPreventionStrategies")}</h3>
+            <p className="text-xs text-gray-500 mt-0.5">{t("scenarioSubtitle")}</p>
           </div>
 
           <div className="p-6 space-y-6">
@@ -224,10 +227,10 @@ export default function WhatIfSimulator() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <int.icon className="w-4 h-4 text-gray-600" />
-                    <span className="font-medium text-gray-900 text-sm">{int.name}</span>
+                    <span className="font-medium text-gray-900 text-sm">{t(int.key)}</span>
                   </div>
                   <span className="text-sm text-gray-500">
-                    {interventionValues[int.id]} {int.unit}
+                    {interventionValues[int.id]} {t(int.unit)}
                   </span>
                 </div>
                 <Slider
@@ -241,11 +244,11 @@ export default function WhatIfSimulator() {
                   className="w-full"
                 />
                 <div className="flex justify-between text-xs text-gray-500">
-                  <span>0 {int.unit}</span>
-                  <span className="font-medium text-gray-700">{interventionValues[int.id]} {int.unit}</span>
-                  <span>{int.maxValue} {int.unit}</span>
+                  <span>0 {t(int.unit)}</span>
+                  <span className="font-medium text-gray-700">{interventionValues[int.id]} {t(int.unit)}</span>
+                  <span>{int.maxValue} {t(int.unit)}</span>
                 </div>
-                <p className="text-xs text-gray-500 mt-1">{int.description}</p>
+                <p className="text-xs text-gray-500 mt-1">{t(int.descKey)}</p>
               </div>
             ))}
 
@@ -263,12 +266,12 @@ export default function WhatIfSimulator() {
                     >
                       <RotateCcw className="w-4 h-4 mr-2" />
                     </motion.div>
-                    Analyzing...
+                    {t("analyzing")}
                   </>
                 ) : (
                   <>
                     <Play className="w-4 h-4 mr-2" />
-                    Test Strategy
+                    {t("testStrategy")}
                   </>
                 )}
               </Button>
@@ -286,14 +289,14 @@ export default function WhatIfSimulator() {
         {/* Comparison View */}
         <div className="rounded-lg bg-white/95 border border-gray-200 overflow-hidden">
           <div className="p-4 border-b border-gray-200" style={{ borderTopWidth: 3, borderTopColor: "#138808" }}>
-            <h3 className="font-semibold text-gray-900">Impact Analysis</h3>
-            <p className="text-xs text-gray-500 mt-0.5">{selectedZone.name} - Before vs After Strategy</p>
+            <h3 className="font-semibold text-gray-900">{t("impactAnalysis")}</h3>
+            <p className="text-xs text-gray-500 mt-0.5">{selectedZone.name} - {t("beforeVsAfter")}</p>
           </div>
 
           <div className="p-6">
             <div className="grid grid-cols-2 gap-4 mb-6">
-              <HeatmapGrid prediction={basePrediction} label="Current State" />
-              <HeatmapGrid prediction={projectedPrediction || basePrediction} label="Projected State" />
+              <HeatmapGrid prediction={basePrediction} label="currentState" />
+              <HeatmapGrid prediction={projectedPrediction || basePrediction} label="projectedState" />
             </div>
 
             {/* Impact Summary */}
@@ -307,14 +310,14 @@ export default function WhatIfSimulator() {
 
               <div className="text-center">
                 <p className="text-3xl font-bold text-green-400">{Math.round(currentRisk)}</p>
-                <p className="text-xs text-gray-500">Projected Crimes</p>
+                <p className="text-xs text-gray-500">{t("projectedState")}</p>
               </div>
 
               <div className="pl-4 border-l border-gray-200">
                 <p className={`text-2xl font-bold ${riskReduction > 0 ? "text-green-600" : "text-red-600"}`}>
                   {riskReduction > 0 ? "-" : "+"}{Math.abs(Math.round(riskReduction))}
                 </p>
-                <p className="text-xs text-gray-500">Crime Reduction</p>
+                <p className="text-xs text-gray-500">{t("crimeReduction")}</p>
                 <p className="text-xs text-gray-500">({riskReductionPercent > 0 ? "-" : "+"}{Math.abs(Math.round(riskReductionPercent))}%) </p>
               </div>
             </div>
@@ -326,12 +329,15 @@ export default function WhatIfSimulator() {
                 className="mt-4 p-4 rounded-lg bg-green-50 border border-green-200"
               >
                 <p className="text-sm text-green-800">
-                  <strong>Strategy Analysis Complete:</strong> Your proposed interventions could reduce
-                  crime in {selectedZone.name} by {Math.round(riskReduction)} incidents
-                  ({Math.round(riskReductionPercent)}%), improving safety from {basePrediction?.riskLevel} to {projectedPrediction?.riskLevel} risk level.
+                  <strong>{t("strategyAnalysisComplete")}:</strong> {t("strategyReport")
+                    .replace("{city}", selectedZone.name)
+                    .replace("{reduction}", Math.round(riskReduction))
+                    .replace("{percent}", Math.round(riskReductionPercent))
+                    .replace("{from}", t(`risk${basePrediction?.riskLevel?.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join('')}`))
+                    .replace("{to}", t(`risk${projectedPrediction?.riskLevel?.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join('')}`))}
                   <br />
                   <span className="text-xs text-gray-500 mt-1 block">
-                    Based on historical crime patterns and intervention effectiveness data.
+                    {t("basedOnPatterns")}
                   </span>
                 </p>
               </motion.div>
